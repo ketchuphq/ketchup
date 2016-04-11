@@ -2,14 +2,15 @@ package bolt
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"time"
-	"io"
 
 	"github.com/boltdb/bolt"
 	"github.com/golang/protobuf/proto"
 	"github.com/octavore/naga/service"
 	"github.com/octavore/press/proto/press/models"
+	"github.com/satori/go.uuid"
 )
 
 type Module struct {
@@ -21,6 +22,21 @@ func (m *Module) Init(c *service.Config) {
 		m.DB, err = bolt.Open("default.db", os.ModePerm, &bolt.Options{
 			Timeout: 30 * time.Second,
 		})
+		m.init()
+		return
+	}
+	c.SetupTest = func() {
+		err := os.RemoveAll("test.db")
+		if err != nil {
+			panic(err)
+		}
+		m.DB, err = bolt.Open("test.db", os.ModePerm, &bolt.Options{
+			Timeout: 30 * time.Second,
+		})
+		if err != nil {
+			panic(err)
+		}
+		m.init()
 		return
 	}
 }
@@ -36,6 +52,18 @@ const (
 	ROUTE_BUCKET = "routes"
 )
 
+func (m *Module) init() error {
+	return m.DB.Update(func(tx *bolt.Tx) error {
+		buckets := []string{PAGE_BUCKET, ROUTE_BUCKET}
+		for _, bucket := range buckets {
+			_, err := tx.CreateBucketIfNotExists([]byte(bucket))
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
 func (m *Module) GetPage(uuid string) (*models.Page, error) {
 	page := &models.Page{}
 	err := m.Get(PAGE_BUCKET, uuid, page)
@@ -47,6 +75,13 @@ func (m *Module) GetPage(uuid string) (*models.Page, error) {
 
 func (m *Module) UpdatePage(page *models.Page) error {
 	return m.Update(PAGE_BUCKET, page)
+}
+
+func (m *Module) UpdateRoute(route *models.Route) error {
+	if route.Uuid == nil {
+		route.Uuid = proto.String(uuid.NewV4().String())
+	}
+	return m.Update(ROUTE_BUCKET, route)
 }
 
 type AddressableProto interface {
@@ -61,6 +96,26 @@ func (m *Module) GetRoute(key string) (*models.Route, error) {
 		return nil, err
 	}
 	return route, nil
+}
+
+func (m *Module) ListRoutes() ([]*models.Route, error) {
+	lst := []*models.Route{}
+	err := m.DB.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(ROUTE_BUCKET))
+		return b.ForEach(func(_, v []byte) error {
+			pb := &models.Route{}
+			err := proto.Unmarshal(v, pb)
+			if err != nil {
+				return err
+			}
+			lst = append(lst, pb)
+			return nil
+		})
+	})
+	if err != nil {
+		return nil, err
+	}
+	return lst, nil
 }
 
 func (m *Module) Get(bucket, key string, pb proto.Message) error {

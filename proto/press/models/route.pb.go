@@ -14,9 +14,10 @@ var _ = fmt.Errorf
 var _ = math.Inf
 
 type Route struct {
+	Uuid *string `protobuf:"bytes,1,opt,name=uuid" json:"uuid,omitempty"`
 	// Types that are valid to be assigned to Target:
 	//	*Route_File
-	//	*Route_Uuid
+	//	*Route_PageUuid
 	Target           isRoute_Target `protobuf_oneof:"target"`
 	XXX_unrecognized []byte         `json:"-"`
 }
@@ -33,18 +34,25 @@ type isRoute_Target interface {
 type Route_File struct {
 	File string `protobuf:"bytes,10,opt,name=file,oneof"`
 }
-type Route_Uuid struct {
-	Uuid string `protobuf:"bytes,11,opt,name=uuid,oneof"`
+type Route_PageUuid struct {
+	PageUuid string `protobuf:"bytes,11,opt,name=page_uuid,json=pageUuid,oneof"`
 }
 
-func (*Route_File) isRoute_Target() {}
-func (*Route_Uuid) isRoute_Target() {}
+func (*Route_File) isRoute_Target()     {}
+func (*Route_PageUuid) isRoute_Target() {}
 
 func (m *Route) GetTarget() isRoute_Target {
 	if m != nil {
 		return m.Target
 	}
 	return nil
+}
+
+func (m *Route) GetUuid() string {
+	if m != nil && m.Uuid != nil {
+		return *m.Uuid
+	}
+	return ""
 }
 
 func (m *Route) GetFile() string {
@@ -54,9 +62,9 @@ func (m *Route) GetFile() string {
 	return ""
 }
 
-func (m *Route) GetUuid() string {
-	if x, ok := m.GetTarget().(*Route_Uuid); ok {
-		return x.Uuid
+func (m *Route) GetPageUuid() string {
+	if x, ok := m.GetTarget().(*Route_PageUuid); ok {
+		return x.PageUuid
 	}
 	return ""
 }
@@ -65,7 +73,7 @@ func (m *Route) GetUuid() string {
 func (*Route) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
 	return _Route_OneofMarshaler, _Route_OneofUnmarshaler, _Route_OneofSizer, []interface{}{
 		(*Route_File)(nil),
-		(*Route_Uuid)(nil),
+		(*Route_PageUuid)(nil),
 	}
 }
 
@@ -76,9 +84,9 @@ func _Route_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
 	case *Route_File:
 		b.EncodeVarint(10<<3 | proto.WireBytes)
 		b.EncodeStringBytes(x.File)
-	case *Route_Uuid:
+	case *Route_PageUuid:
 		b.EncodeVarint(11<<3 | proto.WireBytes)
-		b.EncodeStringBytes(x.Uuid)
+		b.EncodeStringBytes(x.PageUuid)
 	case nil:
 	default:
 		return fmt.Errorf("Route.Target has unexpected type %T", x)
@@ -96,12 +104,12 @@ func _Route_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) 
 		x, err := b.DecodeStringBytes()
 		m.Target = &Route_File{x}
 		return true, err
-	case 11: // target.uuid
+	case 11: // target.page_uuid
 		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
 		}
 		x, err := b.DecodeStringBytes()
-		m.Target = &Route_Uuid{x}
+		m.Target = &Route_PageUuid{x}
 		return true, err
 	default:
 		return false, nil
@@ -116,10 +124,10 @@ func _Route_OneofSizer(msg proto.Message) (n int) {
 		n += proto.SizeVarint(10<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(len(x.File)))
 		n += len(x.File)
-	case *Route_Uuid:
+	case *Route_PageUuid:
 		n += proto.SizeVarint(11<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(len(x.Uuid)))
-		n += len(x.Uuid)
+		n += proto.SizeVarint(uint64(len(x.PageUuid)))
+		n += len(x.PageUuid)
 	case nil:
 	default:
 		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
@@ -132,12 +140,14 @@ func init() {
 }
 
 var fileDescriptor2 = []byte{
-	// 106 bytes of a gzipped FileDescriptorProto
+	// 129 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xe2, 0x2e, 0xca, 0x2f, 0x2d,
 	0x49, 0xd5, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x29, 0x28, 0x4a, 0x2d, 0x2e, 0xd6, 0xcb,
-	0xcd, 0x4f, 0x49, 0xcd, 0x29, 0x56, 0xb2, 0xe5, 0x62, 0x0d, 0x02, 0x49, 0x0a, 0x89, 0x70, 0xb1,
-	0xa4, 0x65, 0xe6, 0xa4, 0x4a, 0x70, 0x29, 0x30, 0x6a, 0x70, 0x7a, 0x30, 0x04, 0x81, 0x79, 0x20,
-	0xd1, 0xd2, 0xd2, 0xcc, 0x14, 0x09, 0x6e, 0x98, 0x28, 0x88, 0xe7, 0xc4, 0xc1, 0xc5, 0x56, 0x92,
-	0x58, 0x94, 0x9e, 0x5a, 0xe2, 0xc4, 0x17, 0x05, 0x31, 0x4e, 0x1f, 0x62, 0x1c, 0x20, 0x00, 0x00,
-	0xff, 0xff, 0x88, 0xce, 0x74, 0xf7, 0x6a, 0x00, 0x00, 0x00,
+	0xcd, 0x4f, 0x49, 0xcd, 0x29, 0x56, 0x8a, 0xe2, 0x62, 0x0d, 0x02, 0x49, 0x0a, 0x09, 0x71, 0xb1,
+	0x94, 0x96, 0x66, 0xa6, 0x48, 0x30, 0x2a, 0x30, 0x6a, 0x70, 0x06, 0x81, 0xd9, 0x42, 0x22, 0x5c,
+	0x2c, 0x69, 0x99, 0x39, 0xa9, 0x12, 0x5c, 0x20, 0x31, 0x0f, 0x86, 0x20, 0x30, 0x4f, 0x48, 0x96,
+	0x8b, 0xb3, 0x20, 0x31, 0x3d, 0x35, 0x1e, 0xac, 0x9c, 0x1b, 0x2a, 0xc5, 0x01, 0x12, 0x0a, 0x05,
+	0x8a, 0x38, 0x71, 0x70, 0xb1, 0x95, 0x24, 0x16, 0xa5, 0xa7, 0x96, 0x38, 0xf1, 0x45, 0x41, 0xec,
+	0xd2, 0x87, 0xd8, 0x05, 0x08, 0x00, 0x00, 0xff, 0xff, 0x59, 0x8b, 0x17, 0x3c, 0x87, 0x00, 0x00,
+	0x00,
 }

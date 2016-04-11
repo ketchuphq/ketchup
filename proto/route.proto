@@ -5,8 +5,9 @@ package press.models;
 option go_package = 'press/models';
 
 message Route {
+    optional string uuid = 1;
     oneof target {
         string file = 10;
-        string uuid = 11;
+        string page_uuid = 11;
     }
 }
