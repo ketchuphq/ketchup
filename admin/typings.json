@@ -1,0 +1,11 @@
+{
+  "ambientDependencies": {
+    "mithril": "github:lhorie/mithril.js/mithril.d.ts#v0.2.3"
+  },
+  "ambientDevDependencies": {
+    "chai": "registry:dt/chai#3.4.0+20160317120654",
+    "chai-as-promised": "registry:dt/chai-as-promised#0.0.0+20160317120654",
+    "mocha": "registry:dt/mocha#2.2.5+20160317120654",
+    "promises-a-plus": "registry:dt/promises-a-plus#0.0.0+20160317120654"
+  }
+}

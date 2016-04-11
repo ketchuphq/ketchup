@@ -1,0 +1,6 @@
+export SRC_DIR=./src
+export TEST_DIR=./test
+export BUILD_DIR=./build
+export SASS_ARGS=--output-style=compressed
+export SASS_DEBUG="--output-style=expanded --source-map-contents --source-map-embed"
+export SASS_WATCH="--watch --recursive ${SASS_DEBUG}"

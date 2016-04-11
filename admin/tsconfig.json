@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "noImplicitAny": true,
+    "target": "es5"
+  },
+  "compileOnSave": true,
+  "exclude": [
+    "typings/main",
+    "typings/main.d.ts",
+    "node_modules"
+  ]
+}

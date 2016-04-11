@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package press.models;
+
+option go_package = 'press/models';
+
+message Route {
+    oneof target {
+        string file = 10;
+        string uuid = 11;
+    }
+}

@@ -1,0 +1,27 @@
+html:
+	mkdir -p $(BUILD_DIR)
+	cp -r $(SRC_DIR)/html/* $(BUILD_DIR)/
+
+js:
+	# JS_DEBUG="-p tsify --debug"
+	mkdir -p $(BUILD_DIR)
+	browserify $(SRC_DIR)/js/app.ts \
+    -p tsify \
+    -g uglifyify \
+    --outfile $(BUILD_DIR)/app.js
+
+sass:
+	mkdir -p $(BUILD_DIR)
+	node-sass \
+    $(SASS_ARGS) \
+    $(SRC_DIR)/css/app.sass \
+    $(BUILD_DIR)/app.css
+
+bindata:
+	go-bindata -pkg static -prefix $(BUILD_DIR) $(BUILD_DIR)
+
+build-clean:
+	rm -rf $(BUILD_DIR)
+	rm -f bindata.go
+
+sources: build-clean html js sass bindata

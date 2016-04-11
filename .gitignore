@@ -1,0 +1,8 @@
+.idea/
+
+node_modules/
+bower_components/
+build/
+typings/
+
+bindata.go
