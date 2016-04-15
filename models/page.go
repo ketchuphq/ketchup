@@ -1,3 +1,3 @@
 package models
 
-type Page struct {}
+type Page struct{}

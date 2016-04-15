@@ -1,3 +1,3 @@
 package models
 
-type Route struct {}
+type Route struct{}
