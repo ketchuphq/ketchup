@@ -2,8 +2,6 @@ syntax = "proto2";
 
 package press.models;
 
-option go_package = 'press/models';
-
 message Page {
     optional string uuid = 1;
     optional string data = 2;

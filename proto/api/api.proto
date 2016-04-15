@@ -1,0 +1,33 @@
+syntax = "proto2";
+
+import "page.proto";
+import "route.proto";
+
+package press.api;
+
+enum ErrorCode {
+    INTERNAL_SERVER_ERROR = 1;
+    NOT_FOUND = 2;
+}
+
+message Error {
+    optional ErrorCode code = 1;
+    optional string title = 2;
+    optional string detail = 3; // optional long message
+    repeated FieldError fields = 4; // optionally indicate fields with error
+}
+
+message FieldError {
+    optional string field = 1;
+    optional string code = 2;
+    optional string title = 3;
+    optional string detail = 4;
+}
+
+message ListPageResponse {
+    repeated press.models.Page pages = 1;
+}
+
+message ListRouteResponse {
+    repeated press.models.Route routes = 1;
+}
