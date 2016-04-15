@@ -5,4 +5,5 @@ bower_components/
 build/
 typings/
 
+*.db
 bindata.go
