@@ -44,7 +44,7 @@ func (m *Module) Init(c *service.Config) {
 type ErrNoKey string
 
 func (e ErrNoKey) Error() string {
-	return fmt.Sprintf("key not found: %s", e)
+	return fmt.Sprintf("key not found: %s", string(e))
 }
 
 const (
@@ -74,6 +74,9 @@ func (m *Module) GetPage(uuid string) (*models.Page, error) {
 }
 
 func (m *Module) UpdatePage(page *models.Page) error {
+	if page.Uuid == nil {
+		page.Uuid = proto.String(uuid.NewV4().String())
+	}
 	return m.Update(PAGE_BUCKET, page)
 }
 
