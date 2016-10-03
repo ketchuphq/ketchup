@@ -1,9 +1,0 @@
-prepare:
-	go get -u github.com/jteeuwen/go-bindata/...
-	npm install
-	bower install
-	typings install
-
-prepare-clean:
-	rm -rf node_modules
-	rm -rf bower_components
