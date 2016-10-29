@@ -9,8 +9,6 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/golang/protobuf/proto"
 	"github.com/octavore/naga/service"
-	"github.com/octavore/press/proto/press/models"
-	"github.com/satori/go.uuid"
 )
 
 type Module struct {
@@ -47,11 +45,6 @@ func (e ErrNoKey) Error() string {
 	return fmt.Sprintf("key not found: %s", string(e))
 }
 
-const (
-	PAGE_BUCKET  = "pages"
-	ROUTE_BUCKET = "routes"
-)
-
 func (m *Module) init() error {
 	return m.DB.Update(func(tx *bolt.Tx) error {
 		buckets := []string{PAGE_BUCKET, ROUTE_BUCKET}
@@ -64,61 +57,10 @@ func (m *Module) init() error {
 		return nil
 	})
 }
-func (m *Module) GetPage(uuid string) (*models.Page, error) {
-	page := &models.Page{}
-	err := m.Get(PAGE_BUCKET, uuid, page)
-	if err != nil {
-		return nil, err
-	}
-	return page, nil
-}
-
-func (m *Module) UpdatePage(page *models.Page) error {
-	if page.Uuid == nil {
-		page.Uuid = proto.String(uuid.NewV4().String())
-	}
-	return m.Update(PAGE_BUCKET, page)
-}
-
-func (m *Module) UpdateRoute(route *models.Route) error {
-	if route.Uuid == nil {
-		route.Uuid = proto.String(uuid.NewV4().String())
-	}
-	return m.Update(ROUTE_BUCKET, route)
-}
 
 type AddressableProto interface {
 	GetUuid() string
 	proto.Message
-}
-
-func (m *Module) GetRoute(key string) (*models.Route, error) {
-	route := &models.Route{}
-	err := m.Get(ROUTE_BUCKET, key, route)
-	if err != nil {
-		return nil, err
-	}
-	return route, nil
-}
-
-func (m *Module) ListRoutes() ([]*models.Route, error) {
-	lst := []*models.Route{}
-	err := m.DB.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(ROUTE_BUCKET))
-		return b.ForEach(func(_, v []byte) error {
-			pb := &models.Route{}
-			err := proto.Unmarshal(v, pb)
-			if err != nil {
-				return err
-			}
-			lst = append(lst, pb)
-			return nil
-		})
-	})
-	if err != nil {
-		return nil, err
-	}
-	return lst, nil
 }
 
 func (m *Module) Get(bucket, key string, pb proto.Message) error {
