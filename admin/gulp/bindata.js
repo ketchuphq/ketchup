@@ -11,3 +11,7 @@ gulp.task('bindata', () =>
       }
     }))
 )
+
+gulp.task('bindata:watch', () =>
+  gulp.watch('./build/*', ['bindata'])
+);
