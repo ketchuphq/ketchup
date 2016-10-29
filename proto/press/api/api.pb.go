@@ -10,6 +10,7 @@ It is generated from these files:
 	metadata.proto
 	page.proto
 	route.proto
+	user.proto
 
 It has these top-level messages:
 	Error
@@ -19,6 +20,7 @@ It has these top-level messages:
 	Metadata
 	Page
 	Route
+	User
 */
 package api
 

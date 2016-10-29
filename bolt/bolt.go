@@ -11,24 +11,35 @@ import (
 	"github.com/octavore/naga/service"
 )
 
+// Module bolt provides methods for writing and retrieving
+// data from a bolt database.
 type Module struct {
 	DB *bolt.DB
 }
 
+// Init implements service.Init
 func (m *Module) Init(c *service.Config) {
 	c.Setup = func() (err error) {
+		if c.Env().IsTest() {
+			return
+		}
 		m.DB, err = bolt.Open("default.db", os.ModePerm, &bolt.Options{
 			Timeout: 30 * time.Second,
 		})
-		m.init()
-		return
+		if err != nil {
+			return err
+		}
+		return m.init()
 	}
+	var testDB string
 	c.SetupTest = func() {
-		err := os.RemoveAll("test.db")
+		suffix := time.Now().Format("20060102150405.999")
+		testDB = fmt.Sprintf("test-%s.db", suffix)
+		err := os.RemoveAll(testDB)
 		if err != nil {
 			panic(err)
 		}
-		m.DB, err = bolt.Open("test.db", os.ModePerm, &bolt.Options{
+		m.DB, err = bolt.Open(testDB, os.ModePerm, &bolt.Options{
 			Timeout: 30 * time.Second,
 		})
 		if err != nil {
@@ -36,6 +47,18 @@ func (m *Module) Init(c *service.Config) {
 		}
 		m.init()
 		return
+	}
+	c.Stop = func() {
+		err := m.DB.Close()
+		if err != nil {
+			panic(err)
+		}
+		if testDB != "" {
+			err := os.RemoveAll(testDB)
+			if err != nil {
+				panic(err)
+			}
+		}
 	}
 }
 
@@ -47,7 +70,7 @@ func (e ErrNoKey) Error() string {
 
 func (m *Module) init() error {
 	return m.DB.Update(func(tx *bolt.Tx) error {
-		buckets := []string{PAGE_BUCKET, ROUTE_BUCKET}
+		buckets := []string{PAGE_BUCKET, ROUTE_BUCKET, USER_BUCKET}
 		for _, bucket := range buckets {
 			_, err := tx.CreateBucketIfNotExists([]byte(bucket))
 			if err != nil {
