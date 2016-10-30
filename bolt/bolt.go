@@ -100,7 +100,7 @@ func (m *Module) Get(bucket, key string, pb proto.Message) error {
 func (m *Module) Update(bucket string, pb AddressableProto) error {
 	data, err := proto.Marshal(pb)
 	if err != nil {
-		return nil
+		return err
 	}
 	key := []byte(pb.GetUuid())
 	if len(key) == 0 {
