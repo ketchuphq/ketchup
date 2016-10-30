@@ -2,8 +2,9 @@ package bolt
 
 import (
 	"github.com/golang/protobuf/proto"
-	"github.com/octavore/press/proto/press/models"
 	"github.com/satori/go.uuid"
+
+	"github.com/octavore/press/proto/press/models"
 )
 
 const PAGE_BUCKET = "pages"

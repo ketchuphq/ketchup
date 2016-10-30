@@ -3,8 +3,9 @@ package bolt
 import (
 	"github.com/boltdb/bolt"
 	"github.com/golang/protobuf/proto"
-	"github.com/octavore/press/proto/press/models"
 	"github.com/satori/go.uuid"
+
+	"github.com/octavore/press/proto/press/models"
 )
 
 const ROUTE_BUCKET = "routes"
@@ -27,7 +28,7 @@ func (m *Module) GetRoute(key string) (*models.Route, error) {
 
 func (m *Module) ListRoutes() ([]*models.Route, error) {
 	lst := []*models.Route{}
-	err := m.DB.View(func(tx *bolt.Tx) error {
+	err := m.Bolt.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(ROUTE_BUCKET))
 		return b.ForEach(func(_, v []byte) error {
 			pb := &models.Route{}

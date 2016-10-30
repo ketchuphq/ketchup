@@ -5,8 +5,9 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/golang/protobuf/proto"
-	"github.com/octavore/press/proto/press/models"
 	uuid "github.com/satori/go.uuid"
+
+	"github.com/octavore/press/proto/press/models"
 )
 
 const USER_BUCKET = "users"
@@ -16,7 +17,7 @@ func (m *Module) GetUser(email string) (*models.User, error) {
 		return nil, nil
 	}
 	var user *models.User
-	err := m.DB.View(func(tx *bolt.Tx) error {
+	err := m.Bolt.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(USER_BUCKET))
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {

@@ -3,11 +3,12 @@ package api
 import (
 	"net/http"
 
-	_bolt "github.com/boltdb/bolt"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/julienschmidt/httprouter"
 	"github.com/octavore/naga/service"
-	"github.com/octavore/press/bolt"
+
+	"github.com/octavore/press/db"
+	"github.com/octavore/press/db/bolt"
 	"github.com/octavore/press/proto/press/api"
 	"github.com/octavore/press/proto/press/models"
 	"github.com/octavore/press/router"
@@ -17,7 +18,7 @@ type Handle func(rw http.ResponseWriter, req *http.Request, par httprouter.Param
 
 type Module struct {
 	Router *router.Module
-	Bolt   *bolt.Module
+	DB     *db.Module
 }
 
 func (m *Module) Init(c *service.Config) {
@@ -30,6 +31,7 @@ func (m *Module) Init(c *service.Config) {
 			{"/api/v1/pages/:uuid", "GET", m.GetPage},
 			{"/api/v1/pages", "POST", m.UpdatePage},
 			{"/api/v1/routes", "GET", m.ListRoutes},
+			{"/api/v1/routes", "POST", m.UpdateRoute},
 			{"/api/v1/debug", "GET", m.Debug},
 		}
 		for _, route := range routes {
@@ -49,17 +51,7 @@ func (m *Module) wrap(h Handle) httprouter.Handle {
 }
 
 func (m *Module) Debug(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
-	return m.Bolt.DB.View(func(tx *_bolt.Tx) error {
-		return tx.ForEach(func(name []byte, bucket *_bolt.Bucket) error {
-			return bucket.ForEach(func(key, value []byte) error {
-				rw.Write(key)
-				rw.Write([]byte("\n"))
-				rw.Write(value)
-				rw.Write([]byte("\n"))
-				return nil
-			})
-		})
-	})
+	return m.DB.Debug(rw)
 }
 
 func (m *Module) GetPage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
@@ -67,7 +59,7 @@ func (m *Module) GetPage(rw http.ResponseWriter, req *http.Request, par httprout
 	if uuid == "" {
 		return router.ErrNotFound
 	}
-	page, err := m.Bolt.GetPage(uuid)
+	page, err := m.DB.GetPage(uuid)
 	if _, ok := err.(bolt.ErrNoKey); ok {
 		return router.ErrNotFound
 	}
@@ -78,7 +70,7 @@ func (m *Module) GetPage(rw http.ResponseWriter, req *http.Request, par httprout
 }
 
 func (m *Module) ListRoutes(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
-	routes, err := m.Bolt.ListRoutes()
+	routes, err := m.DB.ListRoutes()
 	if err != nil {
 		return err
 	}
@@ -93,9 +85,22 @@ func (m *Module) UpdatePage(rw http.ResponseWriter, req *http.Request, par httpr
 	if err != nil {
 		return err
 	}
-	err = m.Bolt.UpdatePage(page)
+	err = m.DB.UpdatePage(page)
 	if err != nil {
 		return err
 	}
 	return router.Proto(rw, page)
+}
+
+func (m *Module) UpdateRoute(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+	route := &models.Route{}
+	err := jsonpb.Unmarshal(req.Body, route)
+	if err != nil {
+		return err
+	}
+	err = m.DB.UpdateRoute(route)
+	if err != nil {
+		return err
+	}
+	return router.Proto(rw, route)
 }
