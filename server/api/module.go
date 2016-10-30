@@ -11,7 +11,7 @@ import (
 	"github.com/octavore/press/db/bolt"
 	"github.com/octavore/press/proto/press/api"
 	"github.com/octavore/press/proto/press/models"
-	"github.com/octavore/press/router"
+	"github.com/octavore/press/server/router"
 )
 
 type Handle func(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error
