@@ -12,6 +12,7 @@ import (
 	"github.com/octavore/press/proto/press/api"
 	"github.com/octavore/press/proto/press/models"
 	"github.com/octavore/press/server/router"
+	"github.com/octavore/press/server/users"
 )
 
 type Handle func(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error
@@ -19,6 +20,7 @@ type Handle func(rw http.ResponseWriter, req *http.Request, par httprouter.Param
 type Module struct {
 	Router *router.Module
 	DB     *db.Module
+	Auth   *users.Module
 }
 
 func (m *Module) Init(c *service.Config) {
@@ -29,7 +31,9 @@ func (m *Module) Init(c *service.Config) {
 			handle       Handle
 		}{
 			{"/api/v1/pages/:uuid", "GET", m.GetPage},
+			{"/api/v1/pages/:uuid/routes", "GET", m.ListRoutesByPage},
 			{"/api/v1/pages", "POST", m.UpdatePage},
+			{"/api/v1/pages", "GET", m.ListPages},
 			{"/api/v1/routes", "GET", m.ListRoutes},
 			{"/api/v1/routes", "POST", m.UpdateRoute},
 			{"/api/v1/debug", "GET", m.Debug},
@@ -69,6 +73,16 @@ func (m *Module) GetPage(rw http.ResponseWriter, req *http.Request, par httprout
 	return router.Proto(rw, page)
 }
 
+func (m *Module) ListPages(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+	pages, err := m.DB.ListPages()
+	if err != nil {
+		return err
+	}
+	return router.Proto(rw, &api.ListPageResponse{
+		Pages: pages,
+	})
+}
+
 func (m *Module) ListRoutes(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	routes, err := m.DB.ListRoutes()
 	if err != nil {
@@ -76,6 +90,23 @@ func (m *Module) ListRoutes(rw http.ResponseWriter, req *http.Request, par httpr
 	}
 	return router.Proto(rw, &api.ListRouteResponse{
 		Routes: routes,
+	})
+}
+
+func (m *Module) ListRoutesByPage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+	routes, err := m.DB.ListRoutes()
+	if err != nil {
+		return err
+	}
+	pageUUID := par.ByName("uuid")
+	filteredRoutes := []*models.Route{}
+	for _, route := range routes {
+		if route.GetPageUuid() == pageUUID {
+			filteredRoutes = append(filteredRoutes, route)
+		}
+	}
+	return router.Proto(rw, &api.ListRouteResponse{
+		Routes: filteredRoutes,
 	})
 }
 
