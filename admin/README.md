@@ -13,7 +13,6 @@ The following are various configs files:
 |`package.json`|npm dependencies
 |`tsconfig.json`|Typescript
 |`tslint.json`|linter configs
-|`typings.json`|Typescript external types
 
 ## Usage
 

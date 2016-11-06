@@ -1,16 +1,20 @@
-/// <reference path="../../typings/browser.d.ts" />
+import * as m from 'mithril';
+import HomePage from './pages/home';
+import RoutesPage from './pages/routes';
+import PagesPage from './pages/pages';
+import PagePage from './pages/page';
 
-let Component = {
-  controller: class ComponentController { },
-  view: () => m('div', 'hello world!')
-};
+export let routes: Mithril.Routes = {
+  '/admin': HomePage,
+  '/admin/routes': RoutesPage,
+  '/admin/pages': PagesPage,
 
-export let routes: _mithril.MithrilRoutes = {
-  '/': Component
+  '/admin/pages/:id': PagePage,
+  '/admin/compose': PagePage
 };
 
 document.addEventListener('DOMContentLoaded', () => {
   let root = document.getElementById('app');
   m.route.mode = 'pathname';
-  m.route(root, '/', routes);
+  m.route(root, '/admin', routes);
 });

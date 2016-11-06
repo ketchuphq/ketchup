@@ -1,0 +1,40 @@
+html, body
+  height: 100%
+  margin: 0
+
+html
+  box-sizing: border-box
+
+*, *:before, *:after
+  box-sizing: inherit
+
+#app
+  border-top: 8px solid $red1
+
+a
+  color: $black1
+
+.container
+  display: flex
+  min-height: 100%
+  &--navigation
+    width: 240px
+    border-right: 1px solid $black8
+    .nav-title, .nav-link
+      padding: 12px 24px
+    .nav-title
+      font-family: $titleFont
+      font-size: $fontSize2
+      font-weight: bold
+    .nav-link
+      display: block
+      text-decoration: none
+      &:hover
+        background: #eee
+    &--hidden
+      width: 60px
+  &--body
+    width: 640px
+
+.container--body
+  padding: 10px

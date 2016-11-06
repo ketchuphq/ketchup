@@ -3,7 +3,12 @@ var webpack = require('webpack');
 var gutil = require('gutil');
 var tslint = require('gulp-tslint');
 
-gulp.task('js', (cb) => {
+gulp.task('js:internal', () =>
+  gulp.src('node_modules/mithril/mithril.min.js')
+    .pipe(gulp.dest('./build'))
+);
+
+gulp.task('js:webpack', (cb) => {
   webpack({
     entry: 'app.ts',
     devtool: 'source-map',
@@ -44,6 +49,8 @@ gulp.task('js:lint', () =>
     }))
 );
 
+gulp.task('js', ['js:internal', 'js:lint', 'js:webpack'])
+
 gulp.task('js:watch', () =>
-  gulp.watch('src/js/**/*.ts', ['js:lint', 'js'])
+  gulp.watch('src/js/**/*.ts', ['js'])
 );

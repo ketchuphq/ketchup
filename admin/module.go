@@ -1,4 +1,4 @@
-package static
+package admin
 
 import (
 	"mime"
@@ -7,22 +7,24 @@ import (
 	"strings"
 
 	"github.com/octavore/naga/service"
+	"github.com/octavore/nagax/router"
 )
 
+const basePath = "/admin/"
+
 type Module struct {
-	Router *http.ServeMux
+	Router *router.Module
 }
 
 func (m *Module) Init(c *service.Config) {
 	c.Setup = func() error {
-		m.Router = http.NewServeMux()
-		m.Router.Handle("/", m)
+		m.Router.Handle(basePath, m)
 		return nil
 	}
 }
 
 func (m *Module) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	p := strings.TrimPrefix(req.URL.Path, "/")
+	p := strings.TrimPrefix(req.URL.Path, basePath)
 	ext := path.Ext(p)
 	if ext == "" {
 		p = path.Join(p, "index.html")
@@ -30,6 +32,11 @@ func (m *Module) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	b, err := Asset(p)
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		p = "index.html"
+		b, err = Asset(p)
+	}
+
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
