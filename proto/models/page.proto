@@ -2,7 +2,32 @@ syntax = "proto2";
 
 package press.models;
 
+message PageTemplate {
+    optional string uuid = 1;
+    optional string name = 2;
+    repeated Content contents = 10; // content without value
+}
+
 message Page {
     optional string uuid = 1;
-    optional string data = 2;
+    optional string name = 2;
+    optional string template = 3;
+    optional string templateEngine = 4 [default='html'];
+    repeated Content contents = 10;
+    map<string, string> metadata = 11;
+    repeated string tags = 12;
+}
+
+enum ContentType {
+    unknown = 0;
+    html = 1;
+    markdown = 2;
+}
+
+// versioned?
+message Content {
+    optional string uuid = 1;
+    optional ContentType contentType = 2;
+    optional string key = 3;
+    optional string value = 4;
 }
