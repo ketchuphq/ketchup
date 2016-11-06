@@ -17,13 +17,19 @@ gulp.task('js', (cb) => {
     },
     module: {
       loaders: [{ test: /\.ts$/, loader: 'ts-loader' }],
-      preLoaders: [{ test: /\.js$/ , loader: 'source-map-loader' }]
+      preLoaders: [{ test: /\.js$/, loader: 'source-map-loader' }],
+    },
+    externals: {
+      'mithril': 'm'
     }
   }, (err, stats) => {
     if (err) {
       throw new gutil.PluginError('webpack', err)
     }
-    gutil.log('[webpack]', stats.toString())
+    gutil.log('[webpack]', stats.toString({
+      chunks: false,
+      colors: true
+    }))
     cb()
   })
 });

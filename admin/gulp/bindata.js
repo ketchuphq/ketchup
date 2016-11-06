@@ -4,7 +4,7 @@ var shell = require('gulp-shell')
 gulp.task('bindata', () =>
   gulp.src('build/*', { read: false })
     .pipe(shell([
-      'go-bindata -pkg static -prefix build build'
+      'go-bindata -pkg admin -prefix build build'
     ], {
       env: {
         PATH: `${process.env.GOPATH}/bin`
