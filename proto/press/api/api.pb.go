@@ -10,6 +10,7 @@ It is generated from these files:
 	metadata.proto
 	page.proto
 	route.proto
+	theme.proto
 	user.proto
 
 It has these top-level messages:
@@ -18,10 +19,12 @@ It has these top-level messages:
 	ListPageResponse
 	ListRouteResponse
 	Metadata
-	PageTemplate
 	Page
 	Content
 	Route
+	Theme
+	ThemeTemplate
+	ThemeAsset
 	User
 */
 package api

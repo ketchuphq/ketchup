@@ -2,17 +2,12 @@ syntax = "proto2";
 
 package press.models;
 
-message PageTemplate {
-    optional string uuid = 1;
-    optional string name = 2;
-    repeated Content contents = 10; // content without value
-}
 
 message Page {
     optional string uuid = 1;
     optional string name = 2;
-    optional string template = 3;
-    optional string templateEngine = 4 [default='html'];
+    optional string theme = 3; // uuid of a theme, defaults to the user's default theme
+    optional string template = 4; // template name? or template uuid
     repeated Content contents = 10;
     map<string, string> metadata = 11;
     repeated string tags = 12;
