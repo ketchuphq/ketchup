@@ -2,6 +2,7 @@ syntax = "proto2";
 
 import "page.proto";
 import "route.proto";
+import "theme.proto";
 
 package press.api;
 
@@ -31,4 +32,8 @@ message ListPageResponse {
 
 message ListRouteResponse {
     repeated press.models.Route routes = 1;
+}
+
+message ListThemeResponse {
+    repeated press.models.Theme themes = 1;
 }
