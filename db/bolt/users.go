@@ -12,7 +12,16 @@ import (
 
 const USER_BUCKET = "users"
 
-func (m *Module) GetUser(email string) (*models.User, error) {
+func (m *Module) GetUser(uuid string) (*models.User, error) {
+	user := &models.User{}
+	err := m.Get(USER_BUCKET, uuid, user)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (m *Module) GetUserByEmail(email string) (*models.User, error) {
 	if email == "" {
 		return nil, nil
 	}
