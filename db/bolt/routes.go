@@ -17,9 +17,9 @@ func (m *Module) UpdateRoute(route *models.Route) error {
 	return m.Update(ROUTE_BUCKET, route)
 }
 
-func (m *Module) GetRoute(key string) (*models.Route, error) {
+func (m *Module) GetRoute(uuid string) (*models.Route, error) {
 	route := &models.Route{}
-	err := m.Get(ROUTE_BUCKET, key, route)
+	err := m.Get(ROUTE_BUCKET, uuid, route)
 	if err != nil {
 		return nil, err
 	}
