@@ -1,5 +1,5 @@
-import Layout from '../components/layout';
-import Page from '../lib/page';
+import Page from 'lib/page';
+import Layout from 'components/layout';
 
 export default class PagesPage {
   pages: Mithril.Property<Page[]>;
@@ -14,13 +14,12 @@ export default class PagesPage {
       m('table',
         ctrl.pages().map((page) => {
           return m('tr',
-            m('td',
+            m('td.link-cell',
               m('a', {
                 href: `/admin/pages/${page.uuid}`,
                 config: m.route
               }, page.name || 'untitled')
-            ),
-            m('td')
+            )
           );
         })
       )

@@ -1,0 +1,21 @@
+=input-text($size: $fontSize1)
+  font-size: $size
+  padding: 12px 6px
+  margin-bottom: 12px
+  border: none
+  border-bottom: 1px solid $black9
+  width: $editorWidth/2
+  &:focus
+    outline: none
+    border-bottom-color: $black1
+  &:placeholder-shown
+    border-bottom-color: #ccc
+
+=input-text-large
+  +input-text($fontSize2)
+  font-family: $titleFont
+
+=input-select($size: $fontSize1)
+  font-size: $size
+  margin: 12px 0
+  width: $editorWidth/3

@@ -1,4 +1,4 @@
-import Navigation from './navigation';
+import Navigation from 'components/navigation';
 
 export default (content: string | Mithril.VirtualElement) =>
   m('.container', [

@@ -1,3 +1,5 @@
+$editorWidth: 720px
+
 html, body
   height: 100%
   margin: 0
@@ -20,17 +22,18 @@ a
   &--navigation
     width: 240px
     border-right: 1px solid $black8
-    .nav-title, .nav-link
-      padding: 12px 24px
-    .nav-title
-      font-family: $titleFont
-      font-size: $fontSize2
-      font-weight: bold
-    .nav-link
+    a
       display: block
       text-decoration: none
+    .nav-link
+      padding: 10px 24px
       &:hover
-        background: #eee
+        background-color: $black9
+    .nav-title
+      padding: 18px 24px 14px
+      font-family: $logoFont
+      font-size: $fontSize3
+      font-weight: 500
     &--hidden
       width: 60px
   &--body

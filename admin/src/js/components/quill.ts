@@ -1,4 +1,4 @@
-import { Content } from '../lib/page';
+import { Content } from 'lib/page';
 import * as Quill from 'quill';
 
 export default class QuillComponent {

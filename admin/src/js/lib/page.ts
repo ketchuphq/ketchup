@@ -1,11 +1,11 @@
 import * as m from 'mithril';
-import { BaseRoute, default as Route } from './route';
+import { BaseRoute, default as Route } from 'lib/route';
 
 interface BasePage {
   uuid: string;
   name: string;
+  theme: string;
   template: string;
-  templateEngine?: string;
   contents: Content[];
 }
 
@@ -19,7 +19,8 @@ export interface Content {
 let defaultPage: BasePage = {
   uuid: null,
   name: null,
-  template: 'html',
+  theme: 'basic',
+  template: 'index.html',
   contents: [{
     uuid: null,
     contentType: 'html',
@@ -31,16 +32,16 @@ let defaultPage: BasePage = {
 export default class Page implements BasePage {
   uuid: string;
   name: string;
+  theme: string;
   template: string;
-  templateEngine?: string;
   contents: Content[];
 
   constructor(config?: BasePage) {
     config = config || defaultPage;
     this.uuid = config.uuid;
     this.name = config.name;
+    this.theme = config.theme;
     this.template = config.template;
-    this.templateEngine = config.templateEngine;
     this.contents = config.contents;
   }
 

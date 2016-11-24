@@ -1,8 +1,9 @@
-import Layout from '../components/layout';
-import QuillComponent from '../components/quill';
-import Page from '../lib/page';
-import Route from '../lib/route';
-import EditRoutesComponent from '../components/edit_route';
+import Page from 'lib/page';
+import Route from 'lib/route';
+import Layout from 'components/layout';
+import QuillComponent from 'components/quill';
+import EditRoutesComponent from 'components/edit_route';
+import ThemePickerComponent from 'components/theme_picker';
 
 export default class PagePage {
   page: Mithril.Property<Page>;
@@ -23,6 +24,14 @@ export default class PagePage {
     } else {
       this.page(new Page());
     }
+  }
+
+
+  updateThemeTemplate(theme: string, template: string) {
+    let page = this.page()
+    page.theme = theme;
+    page.template = template;
+    this.page(page);
   }
 
   renderEditors() {
@@ -51,8 +60,8 @@ export default class PagePage {
   static view(ctrl: PagePage) {
     return Layout(
       m('.page-editor', [
-        m('.page-editor__title',
-          m('input[type=text]', {
+        m('.controls',
+          m('input[type=text].large', {
             placeholder: 'title...',
             value: ctrl.page().name || '',
             onchange: m.withAttr('value', (v: string) => {
@@ -63,7 +72,19 @@ export default class PagePage {
             onclick: () => { ctrl.save(); }
           }, 'Save Changes')
         ),
-        ctrl.page() ? m.component(EditRoutesComponent, ctrl.routes()) : '',
+        m('.controls',
+          m('.control',
+            m.component(EditRoutesComponent, ctrl.routes()),
+          ),
+        ),
+        m('.controls',
+          m.component(
+            ThemePickerComponent,
+            ctrl.page().theme,
+            ctrl.page().template,
+            ctrl.updateThemeTemplate.bind(ctrl)
+          )
+        ),
         ctrl.renderEditors()
       ])
     );

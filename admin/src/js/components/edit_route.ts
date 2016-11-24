@@ -1,4 +1,4 @@
-import Route from '../lib/route';
+import Route from 'lib/route';
 
 export default class EditRoutesComponent {
   routes: Route[];
@@ -28,7 +28,7 @@ export default class EditRoutesComponent {
       !(ctrl.allowMany || ctrl.routes.length == 0) ? '' :
         m('a.button.button--green', {
           onclick: () => { ctrl.routes.push(new Route()); }
-        }, 'Add Route')
+        }, 'Add Permalink')
     ]);
   }
 }

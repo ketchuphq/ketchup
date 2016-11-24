@@ -1,14 +1,16 @@
-$editorWidth: 720px
-
 .page-editor
-  &__title
+  .controls
     display: flex
     justify-content: space-between
-    align-items: center
+    align-items: flex-start
     input[type=text]
       +input-text
+    input[type=text].large
+      +input-text-large
+    select
+      +input-select
 
-  .edit-route
+  .theme-picker
     margin-bottom: 15px
 
   #editor

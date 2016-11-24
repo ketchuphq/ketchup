@@ -1,9 +1,9 @@
-import Layout from '../components/layout';
+import Layout from 'components/layout';
 
 export default class HomePage {
-  constructor() {}
+  constructor() { }
   static controller = HomePage;
-  static view(ctrl: HomePage) {
-    return Layout('hai');
+  static view(_: HomePage) {
+    return Layout('PLACEHOLDER');
   }
 }

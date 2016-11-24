@@ -1,6 +1,6 @@
-import Layout from '../components/layout';
-import Route from '../lib/route';
-import Page from '../lib/page';
+import Route from 'lib/route';
+import Page from 'lib/page';
+import Layout from 'components/layout';
 
 class PagePickerComponent {
   pages: Mithril.Property<Page[]>;
@@ -43,8 +43,8 @@ class PagePickerComponent {
 class NewRouteComponent {
   route: Route;
 
-  constructor(route: Route) {
-    this.route = route;
+  constructor() {
+    this.route = new Route();
   }
 
   selectPage(page: Page) {
