@@ -9,16 +9,17 @@ import (
 
 	"github.com/octavore/press/db"
 	"github.com/octavore/press/proto/press/models"
+	"github.com/octavore/press/server/content/templates"
 	"github.com/octavore/press/server/router"
 )
 
 // Module server is responsible for serving published content
 type Module struct {
-	Router *router.Module
-	DB     *db.Module
-	Logger *logger.Module
-
-	router http.Handler
+	Router    *router.Module
+	DB        *db.Module
+	Logger    *logger.Module
+	Templates *templates.Module
+	router    http.Handler
 }
 
 var _ service.Module = &Module{}
@@ -27,7 +28,7 @@ var _ service.Module = &Module{}
 func (m *Module) Init(c *service.Config) {
 	c.Start = func() {
 		var err error
-		m.router, err = m.BuildRouter()
+		m.router, _, err = m.BuildRouter()
 		if err != nil {
 			panic(err)
 		}
@@ -43,16 +44,23 @@ func (m *Module) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// BuildRouter returns a handler configured to serve content
-// from the DB
-func (m *Module) BuildRouter() (http.Handler, error) {
+// BuildRouter returns a handler configured to serve content.
+func (m *Module) BuildRouter() (http.Handler, map[string]bool, error) {
 	router := httprouter.New()
 	routes, err := m.DB.ListRoutes()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
+	activeRoutes := map[string]bool{}
+	router.NotFound = m.Templates
 	for _, route := range routes {
 		m.Logger.Info("found route:", route)
+		if _, ok := activeRoutes[route.GetPath()]; ok {
+			m.Logger.Warningf("failed to register duplicate route %q", route.GetPath())
+			continue
+		}
+		activeRoutes[route.GetPath()] = true
+
 		switch tgt := route.GetTarget().(type) {
 		case *models.Route_File:
 			m.Logger.Info("registered file route:", route.GetPath())
@@ -63,15 +71,16 @@ func (m *Module) BuildRouter() (http.Handler, error) {
 			m.Logger.Info("registered uuid route:", route.GetPath())
 			router.Handle("GET", route.GetPath(), func(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 				page, err := m.DB.GetPage(tgt.PageUuid)
+				if err == nil {
+					err = m.render(rw, page)
+				}
 				if err != nil {
 					m.Logger.Errorf("error serving page %+v: %+v", route, err)
-				} else {
-					rw.Write([]byte(page.GetData()))
 				}
 			})
 		default:
 			m.Logger.Errorf("unable to register %s", route.GetUuid())
 		}
 	}
-	return router, nil
+	return router, activeRoutes, nil
 }
