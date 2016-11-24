@@ -9,6 +9,7 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/golang/protobuf/proto"
 	"github.com/octavore/naga/service"
+	"github.com/octavore/nagax/logger"
 
 	"github.com/octavore/press/db"
 )
@@ -18,6 +19,7 @@ import (
 type Module struct {
 	Bolt    *bolt.DB
 	Backend *db.Module
+	Logger  *logger.Module
 }
 
 // Init implements service.Init
@@ -28,9 +30,12 @@ func (m *Module) Init(c *service.Config) {
 			return
 		}
 		m.Bolt, err = bolt.Open("default.db", os.ModePerm, &bolt.Options{
-			Timeout: 30 * time.Second,
+			Timeout: 5 * time.Second,
 		})
 		if err != nil {
+			if err == bolt.ErrTimeout {
+				m.Logger.Error("bolt: timeout while connecting; it may be that the database is already in use by another process.")
+			}
 			return err
 		}
 		return m.init()
@@ -69,7 +74,7 @@ func (m *Module) Init(c *service.Config) {
 type ErrNoKey string
 
 func (e ErrNoKey) Error() string {
-	return fmt.Sprintf("key not found: %s", string(e))
+	return fmt.Sprintf("boltdb: key not found: %s", string(e))
 }
 
 func (m *Module) init() error {
@@ -95,7 +100,7 @@ func (m *Module) Get(bucket, key string, pb proto.Message) error {
 		b := tx.Bucket([]byte(bucket))
 		data := b.Get([]byte(key))
 		if data == nil {
-			return ErrNoKey(key)
+			return ErrNoKey(bucket + ":" + key)
 		}
 		return proto.Unmarshal(data, pb)
 	})
