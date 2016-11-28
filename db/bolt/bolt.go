@@ -121,6 +121,13 @@ func (m *Module) Update(bucket string, pb AddressableProto) error {
 	})
 }
 
+func (m *Module) delete(bucket string, pb AddressableProto) error {
+	return m.Bolt.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(bucket))
+		return b.Delete([]byte(pb.GetUuid()))
+	})
+}
+
 func (m *Module) BackupToFile(path string) error {
 	f, err := os.Create(path)
 	if err != nil {

@@ -16,10 +16,12 @@ type Backend interface {
 
 	GetPage(uuid string) (*models.Page, error)
 	UpdatePage(*models.Page) error
+	DeletePage(*models.Page) error
 	ListPages() ([]*models.Page, error)
 
 	GetRoute(uuid string) (*models.Route, error)
 	UpdateRoute(*models.Route) error
+	DeleteRoute(*models.Route) error
 	ListRoutes() ([]*models.Route, error)
 
 	Debug(w io.Writer) error // print debug info

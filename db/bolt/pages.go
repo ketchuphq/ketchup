@@ -19,6 +19,26 @@ func (m *Module) GetPage(uuid string) (*models.Page, error) {
 	return page, nil
 }
 
+func (m *Module) DeletePage(page *models.Page) error {
+	err := m.delete(PAGE_BUCKET, page)
+	if err != nil {
+		return err
+	}
+	routes, err := m.ListRoutes()
+	if err != nil {
+		return err
+	}
+	for _, route := range routes {
+		if route.GetPageUuid() == page.GetUuid() {
+			err := m.DeleteRoute(route)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 func (m *Module) UpdatePage(page *models.Page) error {
 	if page.GetUuid() == "" {
 		page.Uuid = proto.String(uuid.NewV4().String())

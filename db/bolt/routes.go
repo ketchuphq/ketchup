@@ -26,6 +26,10 @@ func (m *Module) GetRoute(uuid string) (*models.Route, error) {
 	return route, nil
 }
 
+func (m *Module) DeleteRoute(route *models.Route) error {
+	return m.delete(ROUTE_BUCKET, route)
+}
+
 func (m *Module) ListRoutes() ([]*models.Route, error) {
 	lst := []*models.Route{}
 	err := m.Bolt.View(func(tx *bolt.Tx) error {
