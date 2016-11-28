@@ -26,6 +26,10 @@ message FieldError {
     optional string detail = 4;
 }
 
+message UpdatePageRoutesRequest {
+    repeated press.models.Route routes = 1;
+}
+
 message ListPageResponse {
     repeated press.models.Page pages = 1;
 }

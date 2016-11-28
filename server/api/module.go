@@ -40,7 +40,9 @@ func (m *Module) Init(c *service.Config) {
 			{"/api/v1/themes", "GET", m.Auth.MustWithAuth(m.ListThemes)},
 			{"/api/v1/themes/:name", "GET", m.Auth.MustWithAuth(m.GetTheme)},
 			{"/api/v1/pages", "POST", m.Auth.MustWithAuth(m.UpdatePage)},
+			{"/api/v1/pages/:uuid/routes", "POST", m.Auth.MustWithAuth(m.UpdateRoutesByPage)},
 			{"/api/v1/routes", "POST", m.Auth.MustWithAuth(m.UpdateRoute)},
+			{"/api/v1/routes/:uuid", "DELETE", m.Auth.MustWithAuth(m.DeleteRoute)},
 			{"/api/v1/debug", "GET", m.Auth.MustWithAuth(m.Debug)},
 			{"/api/v1/logout", "GET", m.Auth.MustWithAuth(m.Logout)},
 		}
@@ -123,33 +125,6 @@ func (m *Module) ListPages(rw http.ResponseWriter, req *http.Request, par httpro
 	})
 }
 
-func (m *Module) ListRoutes(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
-	routes, err := m.DB.ListRoutes()
-	if err != nil {
-		return err
-	}
-	return router.Proto(rw, &api.ListRouteResponse{
-		Routes: routes,
-	})
-}
-
-func (m *Module) ListRoutesByPage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
-	routes, err := m.DB.ListRoutes()
-	if err != nil {
-		return err
-	}
-	pageUUID := par.ByName("uuid")
-	filteredRoutes := []*models.Route{}
-	for _, route := range routes {
-		if route.GetPageUuid() == pageUUID {
-			filteredRoutes = append(filteredRoutes, route)
-		}
-	}
-	return router.Proto(rw, &api.ListRouteResponse{
-		Routes: filteredRoutes,
-	})
-}
-
 func (m *Module) UpdatePage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	page := &models.Page{}
 	err := jsonpb.Unmarshal(req.Body, page)
@@ -161,19 +136,6 @@ func (m *Module) UpdatePage(rw http.ResponseWriter, req *http.Request, par httpr
 		return err
 	}
 	return router.Proto(rw, page)
-}
-
-func (m *Module) UpdateRoute(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
-	route := &models.Route{}
-	err := jsonpb.Unmarshal(req.Body, route)
-	if err != nil {
-		return err
-	}
-	err = m.DB.UpdateRoute(route)
-	if err != nil {
-		return err
-	}
-	return router.Proto(rw, route)
 }
 
 func (m *Module) Logout(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) error {
