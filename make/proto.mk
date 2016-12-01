@@ -10,6 +10,9 @@ protos:
 	@mkdir -p proto
 	protoc $(INCL_PROTO_DIR) $(PROTO_FILES) --go_out=$(PROTO_PREFIX):./proto
 
+protos_list:
+	@echo $(PROTO_FILES) | tr " " "\n"
+
 prepare:
 	brew install grpc/grpc/google-protobuf
 	go get -u github.com/golang/protobuf/protoc-gen-go
