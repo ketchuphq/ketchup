@@ -3,7 +3,7 @@ export interface BaseRoute {
   path: string;
 
   file?: string;
-  page_uuid?: string;
+  pageUuid?: string;
   delegate?: string;
 }
 
@@ -11,7 +11,7 @@ export default class Route implements BaseRoute {
   uuid: string;
   path: string;
   file?: string;
-  page_uuid?: string;
+  pageUuid?: string;
   delegate?: string;
 
   constructor(config?: BaseRoute) {
@@ -19,7 +19,7 @@ export default class Route implements BaseRoute {
       this.uuid = config.uuid;
       this.path = config.path;
       this.file = config.file;
-      this.page_uuid = config.page_uuid;
+      this.pageUuid = config.pageUuid;
       this.delegate = config.delegate;
     }
   }
@@ -30,6 +30,18 @@ export default class Route implements BaseRoute {
       url: '/api/v1/routes',
       data: this as BaseRoute
     });
+  }
+
+  static format(s: string) {
+    s = s.toLowerCase()
+      .replace(/[^a-zA-Z0-9\/]+/ig, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '')
+      .replace(/\/\/+/, '/');
+    if (s.length > 0 && s[0] != '/') {
+      s = '/' + s;
+    }
+    return s;
   }
 
   static list() {
@@ -48,7 +60,7 @@ export default class Route implements BaseRoute {
   static saveList(routes: Route[], pageUUID: string) {
     let chain: Mithril.Promise<void> = null;
     routes.map((r) => {
-      r.page_uuid = pageUUID;
+      r.pageUuid = pageUUID;
       if (!chain) {
         chain = r.save();
       } else {

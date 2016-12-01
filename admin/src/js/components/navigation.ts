@@ -25,7 +25,12 @@ export default class NavigationComponent extends AuthController {
     }
     return m('.container--navigation', [
       ctrl.link('/admin', 'ketchup', '.nav-title'),
-      ctrl.link('/admin/compose', 'Compose'),
+      m('.nav-link',
+        m('a.button.button--green.button--center', {
+          href: '/admin/compose',
+          config: m.route
+        }, 'Compose')
+      ),
       ctrl.link('/admin/routes', 'Routes'),
       ctrl.link('/admin/pages', 'Pages'),
       ctrl.link('/admin/themes', 'Theme'),

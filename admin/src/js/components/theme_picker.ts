@@ -35,7 +35,7 @@ export default class ThemePickerComponent {
         if (!initial) {
           this.callback(this.selectedTheme(), this.selectedTemplate());
         }
-      })
+      });
   }
 
   selectTemplate(template: string) {
@@ -46,32 +46,39 @@ export default class ThemePickerComponent {
   static controller = ThemePickerComponent;
   static view(ctrl: ThemePickerComponent) {
     return m('.theme-picker', [
-      m('select', {
-        value: ctrl.selectedTheme(),
-        onchange: (e: Event) => {
-          let target = e.target as HTMLInputElement;
-          ctrl.selectTheme(target.value);
+      m('.control', [
+        m('.label', 'Template'),
+        m('select', {
+          value: ctrl.selectedTheme(),
+          onchange: (e: Event) => {
+            let target = e.target as HTMLInputElement;
+            ctrl.selectTheme(target.value);
+          },
         },
-      },
-        ctrl.themes().map((theme: Theme) => {
-          return m('option', {
-            value: theme.name,
-          }, theme.name);
-        })
-      ),
-      m('select', {
-        value: ctrl.selectedTemplate(),
-        onchange: (e: Event) => {
-          let target = e.target as HTMLInputElement;
-          ctrl.selectTemplate(target.value);
+          ctrl.themes().map((theme: Theme) => {
+            return m('option', {
+              value: theme.name,
+            }, theme.name);
+          })
+        )
+      ]),
+      m('.control', [
+        m('.label', 'Theme'),
+        m('select', {
+          value: ctrl.selectedTemplate(),
+          onchange: (e: Event) => {
+            let target = e.target as HTMLInputElement;
+            ctrl.selectTemplate(target.value);
+          },
         },
-      },
-        ctrl.templates().map((template: string) => {
-          return m('option', {
-            value: template,
-          }, template);
-        })
-      )
+          ctrl.templates().map((template: string) => {
+            return m('option', {
+              value: template,
+              key: template,
+            }, template);
+          })
+        )
+      ]),
     ]);
   }
 }

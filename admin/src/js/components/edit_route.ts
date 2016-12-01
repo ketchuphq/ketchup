@@ -2,33 +2,38 @@ import Route from 'lib/route';
 
 export default class EditRoutesComponent {
   routes: Route[];
-  allowMany: boolean;
-  // hasUserEnteredRoute?
+  dirty: boolean;
+  infer: () => string;
 
   // accept a parameter to watch for changes so we know when to save?
-  constructor(routes: Route[], allowMany: boolean = false) {
+  constructor(routes: Route[], infer: () => string) {
+    this.infer = () => this.dirty ? '' : infer();
     this.routes = routes;
-    this.allowMany = allowMany;
+    this.dirty = true;
+    if (!routes || routes.length == 0) {
+      this.routes.push(new Route());
+      this.dirty = false;
+    }
   }
 
   static controller = EditRoutesComponent;
   static view(ctrl: EditRoutesComponent) {
-    return m('.edit-route', [
-      ctrl.routes.map((route: Route) => {
-        return m('div',
+    return m('.edit-route.control', [
+      m('.label', 'Permalink'),
+      ctrl.routes.map((route: Route, i: number) => {
+        return m('div', [
           m('input[type=text]', {
             placeholder: '/path/to/page',
-            value: route.path || '',
+            value: Route.format(ctrl.infer() || route.path || ''),
             onchange: m.withAttr('value', (v) => {
+              ctrl.dirty = true;
               route.path = v;
             })
-          })
-        );
-      }),
-      !(ctrl.allowMany || ctrl.routes.length == 0) ? '' :
-        m('a.button.button--green', {
-          onclick: () => { ctrl.routes.push(new Route()); }
-        }, 'Add Permalink')
+          }),
+          i == 0 ? '' :
+            m('a', { onclick: () => ctrl.routes.splice(i, 1) }, m.trust('&times;'))
+        ]);
+      })
     ]);
   }
 }

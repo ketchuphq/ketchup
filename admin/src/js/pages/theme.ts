@@ -36,9 +36,14 @@ export default class ThemePage {
           ),
           m('h2', 'Assets'),
           m('table',
-            Object.keys(ctrl.theme().assets).sort().map((a) => {
+            Object.keys(ctrl.theme().assets).sort().map((asset) => {
               return m('tr', [
-                m('td', a),
+                m('td.link-cell',
+                  // todo: check for shadowed files
+                  m('a', {
+                    href: `/${asset}`
+                  }, asset)
+                ),
               ]);
             })
           )

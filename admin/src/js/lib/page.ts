@@ -1,7 +1,7 @@
 import * as m from 'mithril';
 import { BaseRoute, default as Route } from 'lib/route';
 
-interface BasePage {
+export interface BasePage {
   uuid: string;
   name: string;
   theme: string;
@@ -45,7 +45,7 @@ export default class Page implements BasePage {
     this.contents = config.contents;
   }
 
-  save(): Mithril.Promise<Page> {
+  save(): Mithril.Promise<BasePage> {
     return m.request({
       method: 'POST',
       url: `/api/v1/pages`,
@@ -61,6 +61,16 @@ export default class Page implements BasePage {
       .then((res: { routes: BaseRoute[] }) =>
         res.routes.map((r) =>
           new Route(r)));
+  }
+
+  saveRoutes(routes: BaseRoute[]) {
+    return m.request({
+      method: 'POST',
+      url: `/api/v1/pages/${this.uuid}/routes`,
+      data: {
+        routes: routes
+      }
+    });
   }
 
   static get(uuid: string): Mithril.Promise<Page> {

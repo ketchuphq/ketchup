@@ -3,15 +3,26 @@
     display: flex
     justify-content: space-between
     align-items: flex-start
+    margin-bottom: 25px
     input[type=text]
       +input-text
     input[type=text].large
       +input-text-large
     select
       +input-select
+    .quill
+      margin-top: $inputPadding
+
+    .control .label
+      +label
+    .control-full
+      width: 100%
+
+    .control + .control
+      margin-left: $inputPadding
 
   .theme-picker
-    margin-bottom: 15px
+    display: flex
 
   #editor
     height: 600px

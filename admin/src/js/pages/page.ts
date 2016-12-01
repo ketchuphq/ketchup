@@ -1,9 +1,10 @@
-import Page from 'lib/page';
+import { BasePage, default as Page } from 'lib/page';
 import Route from 'lib/route';
 import Layout from 'components/layout';
 import QuillComponent from 'components/quill';
 import EditRoutesComponent from 'components/edit_route';
 import ThemePickerComponent from 'components/theme_picker';
+import * as Toaster from 'components/toaster';
 
 export default class PagePage {
   page: Mithril.Property<Page>;
@@ -26,33 +27,77 @@ export default class PagePage {
     }
   }
 
-
   updateThemeTemplate(theme: string, template: string) {
-    let page = this.page()
+    let page = this.page();
     page.theme = theme;
     page.template = template;
     this.page(page);
   }
 
+  renderSettings() {
+    return [
+      m('.controls',
+        m('.control', this.page().name),
+      ),
+      m('.controls', [
+        this.page().theme,
+        this.page().template,
+      ]
+      )
+    ];
+  }
+
+  renderSettingsEditor() {
+    return [
+      m('.controls',
+        m('.control',
+          m.component(EditRoutesComponent, this.routes(), () => this.page().name),
+        ),
+      ),
+      m('.controls',
+        m.component(
+          ThemePickerComponent,
+          this.page().theme,
+          this.page().template,
+          this.updateThemeTemplate.bind(this)
+        )
+      )
+    ];
+  }
+
   renderEditors() {
     if (!this.page()) {
-      return [];
+      return m('div', []);
     }
 
-    return this.page().contents.map((content) => {
+    return m('.controls', this.page().contents.map((content) => {
       if (content.contentType == 'html') {
-        return m.component(QuillComponent, content);
+        return m('.control.control-full', [
+          m('.label', content.key),
+          m.component(QuillComponent, content)
+        ]);
       }
       return null;
-    });
+    }));
   }
 
   save() {
     this.page()
       .save()
-      .then((page: Page) => {
+      .then((page: BasePage) => {
         this.page().uuid = page.uuid;
-        Route.saveList(this.routes(), page.uuid);
+        window.history.replaceState(null, this.page().name, `/admin/pages/${page.uuid}`);
+        return this.page().saveRoutes(this.routes());
+      })
+      .then(() => {
+        Toaster.add('Page successfully saved');
+      })
+      .catch((err: any) => {
+        if (err.detail) {
+          Toaster.add(err.detail, 'error');
+        } else {
+          Toaster.add('Internal server error.', 'error');
+        }
       });
   }
 
@@ -72,19 +117,7 @@ export default class PagePage {
             onclick: () => { ctrl.save(); }
           }, 'Save Changes')
         ),
-        m('.controls',
-          m('.control',
-            m.component(EditRoutesComponent, ctrl.routes()),
-          ),
-        ),
-        m('.controls',
-          m.component(
-            ThemePickerComponent,
-            ctrl.page().theme,
-            ctrl.page().template,
-            ctrl.updateThemeTemplate.bind(ctrl)
-          )
-        ),
+        ctrl.renderSettingsEditor(),
         ctrl.renderEditors()
       ])
     );

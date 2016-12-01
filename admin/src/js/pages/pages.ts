@@ -11,6 +11,12 @@ export default class PagesPage {
   static view(ctrl: PagesPage) {
     return Layout(m('.pages', [
       m('h1', 'Pages'),
+      m('.something',
+        m('a.button.button--green.button--center', {
+          href: '/admin/compose',
+          config: m.route
+        }, 'Compose')
+      ),
       m('table',
         ctrl.pages().map((page) => {
           return m('tr',
