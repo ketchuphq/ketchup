@@ -2,8 +2,8 @@ package templates
 
 import (
 	"archive/tar"
+	"bytes"
 	"compress/gzip"
-	"encoding/json"
 	"io"
 	"io/ioutil"
 	"os"
@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/octavore/nagax/util/token"
 
 	"github.com/octavore/press/proto/press/models"
@@ -93,7 +94,7 @@ func (f *FileStore) Get(themeName string) (*models.Theme, error) {
 		Templates: map[string]*models.ThemeTemplate{},
 		Assets:    map[string]*models.ThemeAsset{},
 	}
-	err = json.Unmarshal(b, t)
+	err = jsonpb.Unmarshal(bytes.NewBuffer(b), t)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +108,11 @@ func (f *FileStore) Get(themeName string) (*models.Theme, error) {
 	for _, p := range paths {
 		q := path.Base(p)
 		e := strings.TrimLeft(path.Ext(p), ".")
-		t.Templates[q] = &models.ThemeTemplate{Name: &q, Engine: &e}
+		if t.Templates[q] == nil {
+			t.Templates[q] = &models.ThemeTemplate{}
+		}
+		t.Templates[q].Name = &q
+		t.Templates[q].Engine = &e
 	}
 
 	// get assets (todo: supported subdirs)
@@ -142,7 +147,7 @@ func (f *FileStore) List() ([]*models.Theme, error) {
 			return nil, err
 		}
 		theme := &models.Theme{}
-		err = json.Unmarshal(b, theme)
+		err = jsonpb.Unmarshal(bytes.NewBuffer(b), theme)
 		if err != nil {
 			return nil, err
 		}
