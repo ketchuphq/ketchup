@@ -13,14 +13,14 @@ message Page {
     repeated string tags = 12;
 }
 
-enum ContentType {
-    unknown = 0;
-    html = 1;
-    markdown = 2;
-}
 
 // versioned?
 message Content {
+    enum ContentType {
+        unknown = 0;
+        html = 1;
+        markdown = 2;
+    }
     optional string uuid = 1;
     optional ContentType contentType = 2;
     optional string key = 3;
