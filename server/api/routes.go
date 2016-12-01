@@ -87,8 +87,6 @@ func (m *Module) UpdateRoutesByPage(rw http.ResponseWriter, req *http.Request, p
 				if err != nil {
 					return err
 				}
-			} else {
-				delete(newList, route.GetUuid())
 			}
 		}
 	}
