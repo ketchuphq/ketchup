@@ -1,0 +1,58 @@
+@keyframes toastEnter
+  from
+    transform: scaleY(0)
+    opacity: 0
+  to
+    transform: scaleY(1)
+    opacity: 1
+
+@keyframes toastExit
+  from
+    max-height: 100px
+    margin-bottom: 10px
+    opacity: 1
+  to
+    opacity: 0
+    max-height: 0px
+    margin-bottom: 0
+    display: none
+
+
+.toast-wrapper
+  position: fixed
+  top: 15px
+  left: 0
+  width: 100%
+  z-index: 100
+  pointer-events: none
+  &--hidden
+    display: none
+
+.toast
+  width: 500px
+  border-radius: 2px
+  box-shadow: 0 1px 6px transparentize($black1, 0.8)
+  margin: 0 auto 10px
+  background: white
+  overflow: hidden
+
+  transform-origin: top
+  animation-duration: 0.3s
+
+  &--error
+    background: $red2
+    color: white
+  &--green
+    background: $green3
+    color: white
+  &--enter
+    animation-name: toastEnter
+  &--expired
+    animation-name: toastExit
+    opacity: 0
+    max-height: 0px
+    margin-bottom: 0px
+  &--noanimate
+    animation-duration: 0s
+  & .contents
+    padding: 12px 20px
