@@ -4,8 +4,11 @@ var gutil = require('gutil');
 var tslint = require('gulp-tslint');
 
 gulp.task('js:internal', () =>
-  gulp.src('node_modules/mithril/mithril.min.js')
-    .pipe(gulp.dest('./build'))
+  gulp.src([
+    'node_modules/mithril/mithril.min.js',
+    'node_modules/quill/dist/quill.min.js'
+  ])
+    .pipe(gulp.dest('./build/vendor/'))
 );
 
 gulp.task('js:webpack', (cb) => {
@@ -25,7 +28,8 @@ gulp.task('js:webpack', (cb) => {
       preLoaders: [{ test: /\.js$/, loader: 'source-map-loader' }],
     },
     externals: {
-      'mithril': 'm'
+      'mithril': 'm',
+      'quill': 'Quill'
     }
   }, (err, stats) => {
     if (err) {

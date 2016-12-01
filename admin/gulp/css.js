@@ -4,6 +4,14 @@ var gutil = require('gutil');
 var sourcemaps = require('gulp-sourcemaps');
 var cleanCSS = require('gulp-clean-css');
 
+gulp.task('css:internal', () =>
+  gulp.src([
+    'node_modules/quill/dist/quill.snow.css'
+  ])
+    .pipe(gulp.dest('./build/vendor/'))
+);
+
+
 gulp.task('css', () =>
   gulp.src('./src/css/app.sass')
     .pipe(sourcemaps.init())
