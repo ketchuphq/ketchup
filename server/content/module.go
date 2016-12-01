@@ -55,6 +55,14 @@ func (m *Module) BuildRouter() (http.Handler, map[string]bool, error) {
 	router.NotFound = m.Templates
 	for _, route := range routes {
 		m.Logger.Info("found route:", route)
+		if route.GetPath() == "" {
+			m.Logger.Warningf("no path for route: %s", route.GetUuid())
+			continue
+		}
+		if route.GetPath()[0] != '/' {
+			m.Logger.Warningf("invalid path %q for route: %s", route.GetPath(), route.GetUuid())
+			continue
+		}
 		if _, ok := activeRoutes[route.GetPath()]; ok {
 			m.Logger.Warningf("failed to register duplicate route %q", route.GetPath())
 			continue
