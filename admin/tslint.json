@@ -6,6 +6,11 @@
     ],
     "semicolon": [
       "always"
-    ]
+    ],
+    "trailing-comma": [
+      true,
+      "never"
+    ],
+    "arrow-parens": true
   }
 }
