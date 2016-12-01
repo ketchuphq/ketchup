@@ -40,10 +40,10 @@ func (d *defaultStore) Get(themeName string) (*models.Theme, error) {
 }
 
 func (d *defaultStore) GetTemplate(t *models.Theme, template string) (*models.ThemeTemplate, error) {
-	if (t.GetName() != "" && t.GetName() != noneTheme.GetName()) || template != "default" {
+	if t.GetName() != "" && t.GetName() != noneTheme.GetName() {
 		return nil, nil
 	}
-	return t.Templates[template], nil
+	return t.Templates["default"], nil
 }
 
 func (d *defaultStore) GetAsset(t *models.Theme, asset string) (*models.ThemeAsset, error) {
