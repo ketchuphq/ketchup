@@ -12,7 +12,7 @@ gulp.task('css:internal', () =>
 );
 
 
-gulp.task('css', () =>
+gulp.task('css:sass', () =>
   gulp.src('./src/css/app.sass')
     .pipe(sourcemaps.init())
     .pipe(sass().on('error', gutil.log))
@@ -23,6 +23,8 @@ gulp.task('css', () =>
     .pipe(sourcemaps.write())
     .pipe(gulp.dest('./build'))
 );
+
+gulp.task('css', ['css:internal', 'css:sass'])
 
 gulp.task('css:watch', () =>
   gulp.watch([
