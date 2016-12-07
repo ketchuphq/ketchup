@@ -12,6 +12,7 @@ html
 
 #app
   border-top: 8px solid $red1
+  display: flex
 
 a
   color: $black1
@@ -19,23 +20,67 @@ a
 .container
   display: flex
   min-height: 100%
+  margin: 0 auto
   &--navigation
     width: 240px
-    border-right: 1px solid $black8
-    a
-      display: block
-      text-decoration: none
-    .nav-link
-      padding: 10px 24px
-      &:hover
-        background-color: $black10
+    background: $black9
+    align-self: flex-start
+    transition-property: 'width background color'
+    transition-delay: 0s
+    transition-timing-function: ease-out
+    transition-duration: 0.3s
+
     .nav-title
       padding: 18px 24px 14px
       font-family: $logoFont
       font-size: $fontSize3
       font-weight: 500
+    .typcn
+      margin-right: 15px
+      font-size: 1.5em
+      position: relative
+      top: 2px
+    .nav-button .typcn
+      display: none
+    .nav-link, .nav-button a
+      display: block
+      text-decoration: none
+    .nav-link, .nav-button
+      padding: 8px 24px 12px
+      white-space: nowrap
+    .nav-link
+      transition-property: 'background'
+      transition-delay: 0s
+      transition-timing-function: ease-out
+      transition-duration: 0.2s
+      &--toggle
+        margin-top: 20px
+        text-align: center
+        cursor: pointer
+      &:hover
+        background-color: $black10
+
     &--hidden
-      width: 60px
+      width: 70px
+      background: $black1
+      margin-right: 20px
+      .nav-link:hover
+        background: $black5
+      a
+        color: white
+      .nav-link__text
+        display: none
+      .nav-button
+        padding-left: 0
+        padding-right: 0
+        .typcn
+          display: block
+          top: -8px
+        a
+          height: 38px
+        .button
+          border-radius: 0
+
   &--body
     width: 640px
 
