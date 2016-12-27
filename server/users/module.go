@@ -53,9 +53,11 @@ func (m *Module) Init(c *service.Config) {
 		},
 	})
 	c.Setup = func() error {
-		m.DBAuth.UserStore = m
-		m.DBAuth.LoginPath = "/api/v1/login"
-		m.DBAuth.ErrorHandler = m.ErrorHandler
+		m.DBAuth.Configure(
+			databaseauth.WithUserStore(m),
+			databaseauth.WithLoginPath("/api/v1/login"),
+			databaseauth.WithErrorHandler(m.ErrorHandler),
+		)
 		m.Auth.ErrorHandler = m.ErrorHandler
 		m.Auth.RegisterAuthenticator(m.Sessions)
 		// todo: allow to be set in a config file
