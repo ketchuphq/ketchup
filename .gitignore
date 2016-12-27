@@ -5,4 +5,6 @@ bower_components/
 build/
 
 *.db
+*.key
 bindata.go
+
