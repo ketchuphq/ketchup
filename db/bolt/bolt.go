@@ -12,6 +12,7 @@ import (
 	"github.com/octavore/nagax/logger"
 
 	"github.com/octavore/press/db"
+	"github.com/octavore/press/proto/press/models"
 	"github.com/octavore/press/util/errors"
 )
 
@@ -91,38 +92,47 @@ func (m *Module) init() error {
 	})
 }
 
-type AddressableProto interface {
-	GetUuid() string
-	proto.Message
-}
-
 func (m *Module) Get(bucket, key string, pb proto.Message) error {
 	return m.Bolt.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucket))
 		data := b.Get([]byte(key))
 		if data == nil {
-			return ErrNoKey(bucket + ":" + key)
+			return errors.Wrap(ErrNoKey(bucket + ":" + key))
 		}
 		return proto.Unmarshal(data, pb)
 	})
 }
 
-func (m *Module) Update(bucket string, pb AddressableProto) error {
+func (m *Module) Update(bucket string, pb db.AddressableProto) error {
+	// set timestamp
+	if tsp, ok := pb.(db.TimestampedProto); ok {
+		ts := tsp.GetTimestamps()
+		if ts == nil {
+			ts = &models.Timestamp{}
+		}
+		now := time.Now().Unix()
+		if ts.GetCreatedAt() == 0 {
+			ts.CreatedAt = proto.Int64(now)
+		}
+		ts.UpdatedAt = proto.Int64(now)
+		tsp.SetTimestamps(ts)
+	}
+
 	data, err := proto.Marshal(pb)
 	if err != nil {
 		return errors.Wrap(err)
 	}
 	key := []byte(pb.GetUuid())
 	if len(key) == 0 {
-		return fmt.Errorf("no uuid for proto")
+		return errors.Wrap(fmt.Errorf("no uuid for proto"))
 	}
 	return m.Bolt.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucket))
-		return b.Put(key, data)
+		return errors.Wrap(b.Put(key, data))
 	})
 }
 
-func (m *Module) delete(bucket string, pb AddressableProto) error {
+func (m *Module) delete(bucket string, pb db.AddressableProto) error {
 	return m.Bolt.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucket))
 		return b.Delete([]byte(pb.GetUuid()))

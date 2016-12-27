@@ -5,10 +5,14 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/satori/go.uuid"
 
+	"github.com/octavore/press/db"
 	"github.com/octavore/press/proto/press/models"
 )
 
 const PAGE_BUCKET = "pages"
+
+var _ db.AddressableProto = &models.Page{}
+var _ db.TimestampedProto = &models.Page{}
 
 func (m *Module) GetPage(uuid string) (*models.Page, error) {
 	page := &models.Page{}
