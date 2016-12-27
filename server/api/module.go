@@ -57,7 +57,7 @@ func (m *Module) wrap(h users.Handle) httprouter.Handle {
 	return func(rw http.ResponseWriter, req *http.Request, par httprouter.Params) {
 		err := h(rw, req, par)
 		if err != nil {
-			router.InternalError(rw, err)
+			m.Router.InternalError(rw, err)
 		}
 	}
 }
@@ -120,6 +120,7 @@ func (m *Module) ListPages(rw http.ResponseWriter, req *http.Request, par httpro
 	if err != nil {
 		return err
 	}
+	db.SortPagesByUpdatedAt(pages, false)
 	return router.Proto(rw, &api.ListPageResponse{
 		Pages: pages,
 	})
