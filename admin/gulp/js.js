@@ -20,12 +20,14 @@ gulp.task('js:webpack', (cb) => {
       path: 'build',
     },
     resolve: {
-      extensions: ['', '.ts', '.js'],
-      modulesDirectories: ['src/js', 'node_modules']
+      extensions: ['.ts', '.js'],
+      modules: ['src/js', 'node_modules']
     },
     module: {
-      loaders: [{ test: /\.ts$/, loader: 'ts-loader' }],
-      preLoaders: [{ test: /\.js$/, loader: 'source-map-loader' }],
+      rules: [
+        { test: /\.js$/, loader: 'source-map-loader', enforce: 'pre' },
+        { test: /\.ts$/, loader: 'ts-loader' }
+      ],
     },
     externals: {
       'mithril': 'm',

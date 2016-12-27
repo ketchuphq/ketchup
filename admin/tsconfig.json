@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "es2015",
     "noImplicitAny": true,
     "noUnusedParameters": true,
     "noUnusedLocals": true,

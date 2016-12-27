@@ -15,7 +15,8 @@ gulp.task('css:internal', () =>
 gulp.task('css:sass', () =>
   gulp.src('./src/css/app.sass')
     .pipe(sourcemaps.init())
-    .pipe(sass().on('error', gutil.log))
+    .pipe(sass({ includePaths: ['./bower_components'] })
+      .on('error', sass.logError))
     .pipe(cleanCSS({ debug: true }, function (details) {
       let percent = details.stats.minifiedSize / details.stats.originalSize
       gutil.log(`${details.name} compressed: ${(percent * 100).toFixed(2)}%`)
