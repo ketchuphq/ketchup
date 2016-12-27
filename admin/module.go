@@ -27,14 +27,14 @@ func (m *Module) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	p := strings.TrimPrefix(req.URL.Path, basePath)
 	ext := path.Ext(p)
 	if ext == "" {
-		p = path.Join(p, "index.html")
+		p = "index.html"
 		ext = path.Ext(p)
 	}
 
 	b, err := Asset(p)
 	if err != nil && strings.Contains(err.Error(), "not found") {
-		p = "index.html"
-		b, err = Asset(p)
+		rw.WriteHeader(http.StatusNotFound)
+		return
 	}
 
 	if err != nil {
@@ -42,6 +42,6 @@ func (m *Module) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	rw.Header().Add("Content-Type", mime.TypeByExtension(p))
+	rw.Header().Add("Content-Type", mime.TypeByExtension(ext))
 	rw.Write(b)
 }
