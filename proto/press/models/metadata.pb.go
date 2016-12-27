@@ -33,6 +33,11 @@ func (m *Metadata) GetUuid() string {
 func init() {
 	proto.RegisterType((*Metadata)(nil), "press.models.Metadata")
 }
+func (m *Metadata) SetUuid(v *string) {
+	m.Uuid = v
+}
+
+func init() { proto.RegisterFile("metadata.proto", fileDescriptor1) }
 
 var fileDescriptor1 = []byte{
 	// 78 bytes of a gzipped FileDescriptorProto

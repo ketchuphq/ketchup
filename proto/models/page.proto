@@ -2,19 +2,25 @@ syntax = "proto2";
 
 package press.models;
 
+message Timestamp {
+    optional int64 created_at = 1;
+    optional int64 updated_at = 2;
+}
 
 message Page {
     optional string uuid = 1;
     optional string name = 2;
     optional string theme = 3; // uuid of a theme, defaults to the user's default theme
     optional string template = 4; // template name? or template uuid
-    repeated Content contents = 10;
-    map<string, string> metadata = 11;
+    optional Timestamp timestamps = 5; // created at, updated at
+    optional int64 published_at = 6;
+    repeated Content contents = 10; // should this be a map?
+    map<string, string> metadata = 11; // tags? for filtering
     repeated string tags = 12;
 }
 
 
-// versioned?
+// versioned? drafts?
 message Content {
     enum ContentType {
         unknown = 0;
@@ -25,4 +31,5 @@ message Content {
     optional ContentType contentType = 2;
     optional string key = 3;
     optional string value = 4;
+    optional Timestamp timestamps = 5;
 }

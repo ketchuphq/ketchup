@@ -8,7 +8,7 @@ PROTO_PREFIX=import_prefix_proto=github.com/octavore/press/proto/
 
 protos:
 	@mkdir -p proto
-	protoc $(INCL_PROTO_DIR) $(PROTO_FILES) --go_out=$(PROTO_PREFIX):./proto
+	protoc $(INCL_PROTO_DIR) $(PROTO_FILES) --go_out=$(PROTO_PREFIX),plugins=setter:./proto
 
 protos_list:
 	@echo $(PROTO_FILES) | tr " " "\n"
