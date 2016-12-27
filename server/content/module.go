@@ -46,13 +46,13 @@ func (m *Module) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 // BuildRouter returns a handler configured to serve content.
 func (m *Module) BuildRouter() (http.Handler, map[string]bool, error) {
-	router := httprouter.New()
+	rt := httprouter.New()
 	routes, err := m.DB.ListRoutes()
 	if err != nil {
 		return nil, nil, err
 	}
 	activeRoutes := map[string]bool{}
-	router.NotFound = m.Templates
+	rt.NotFound = m.Templates
 	for _, route := range routes {
 		m.Logger.Info("found route:", route)
 		if route.GetPath() == "" {
@@ -72,13 +72,17 @@ func (m *Module) BuildRouter() (http.Handler, map[string]bool, error) {
 		switch tgt := route.GetTarget().(type) {
 		case *models.Route_File:
 			m.Logger.Info("registered file route:", route.GetPath())
-			router.Handle("GET", route.GetPath(), func(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+			rt.Handle("GET", route.GetPath(), func(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 				http.ServeFile(rw, req, tgt.File)
 			})
 		case *models.Route_PageUuid:
 			m.Logger.Info("registered uuid route:", route.GetPath())
-			router.Handle("GET", route.GetPath(), func(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+			rt.Handle("GET", route.GetPath(), func(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 				page, err := m.DB.GetPage(tgt.PageUuid)
+				if page.PublishedAt == nil {
+					router.NotFound(rw)
+					return
+				}
 				if err == nil {
 					err = m.render(rw, page)
 				}
@@ -90,5 +94,5 @@ func (m *Module) BuildRouter() (http.Handler, map[string]bool, error) {
 			m.Logger.Errorf("unable to register %s", route.GetUuid())
 		}
 	}
-	return router, activeRoutes, nil
+	return rt, activeRoutes, nil
 }
