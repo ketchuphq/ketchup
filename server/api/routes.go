@@ -9,6 +9,7 @@ import (
 	"github.com/octavore/press/proto/press/api"
 	"github.com/octavore/press/proto/press/models"
 	"github.com/octavore/press/server/router"
+	"github.com/octavore/press/util/errors"
 )
 
 func (m *Module) ListRoutes(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
@@ -42,7 +43,7 @@ func (m *Module) UpdateRoute(rw http.ResponseWriter, req *http.Request, par http
 	route := &models.Route{}
 	err := jsonpb.Unmarshal(req.Body, route)
 	if err != nil {
-		return err
+		return errors.Wrap(err)
 	}
 	err = m.DB.UpdateRoute(route)
 	if err != nil {
@@ -65,7 +66,7 @@ func (m *Module) UpdateRoutesByPage(rw http.ResponseWriter, req *http.Request, p
 	pb := &api.UpdatePageRoutesRequest{}
 	err := jsonpb.Unmarshal(req.Body, pb)
 	if err != nil {
-		return err
+		return errors.Wrap(err)
 	}
 
 	newList := map[string]*models.Route{}
