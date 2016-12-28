@@ -1,4 +1,24 @@
 .page-editor
+  .settings
+    padding: 14px
+    background: $black10
+    border: 1px solid $black8
+    input[type=text]
+      background: none
+    margin-bottom: 24px
+  .controlset .save-publish
+    text-align: right
+  .infoset
+    display: flex
+    justify-content: space-between
+    align-items: center
+    cursor: pointer
+    &:hover
+      background: $black9
+      transition-property: 'background'
+      transition-delay: 0s
+      transition-timing-function: ease-out
+      transition-duration: 0.1s
   .controls
     display: flex
     justify-content: space-between
@@ -12,6 +32,11 @@
       +input-select
     .quill
       margin-top: $inputPadding
+      #editor
+        border-color: white
+        .ql-editor.ql-blank::before
+          color: $black5
+          font-style: normal
 
     .control .label
       +label

@@ -14,16 +14,15 @@ export default class RoutesPage {
     return Layout(
       m('.routes',
         m('h1', 'Routes'),
-        m('ul',
+        m('.table',
           ctrl.routes().map((r) =>
-            m('li', [
+            m('.tr', [
               m('a', { href: r.path ? r.path : '#' }, r.path),
               !r.pageUuid ? '' :
                 m('a.list-link', {
                   href: `/admin/pages/${r.pageUuid}`,
                   config: m.route
-                }, 'edit page'),
-              m('a.list-link', { href: r.path }, 'delete')
+                }, 'edit page')
             ])
           )
         )

@@ -2,8 +2,8 @@
   width: 100%
   tr
     &:first-child
-      border-top: 1px solid $black8
-    border-bottom: 1px solid $black8
+      border-top: 1px solid $black9
+    border-bottom: 1px solid $black9
     td
       padding: 12px 6px
       &.link-cell
@@ -15,3 +15,16 @@
           margin: 0
           &:hover
             background: $black10
+
+.table
+  .tr
+    border-bottom: 1px solid $black9
+    display: flex
+    padding: 12px 6px
+    justify-content: space-between
+    &:first-child
+      border-top: 1px solid $black9
+    &:hover
+      background: $black10
+  a.tr
+    text-decoration: none

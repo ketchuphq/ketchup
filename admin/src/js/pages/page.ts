@@ -9,9 +9,9 @@ import * as Toaster from 'components/toaster';
 export default class PagePage {
   page: Mithril.Property<Page>;
   routes: Mithril.Property<Route[]>;
-  showRouteEditor: boolean;
+  showControls: Mithril.Property<boolean>;
   constructor() {
-    this.showRouteEditor = false;
+    this.showControls = m.prop(false);
     this.page = m.prop<Page>();
     this.routes = m.prop([]);
     let pageUUID = m.route.param('id');
@@ -35,45 +35,69 @@ export default class PagePage {
   }
 
   renderSettings() {
-    return [
-      m('.controls',
-        m('.control', this.page().name),
-      ),
-      m('.controls', [
-        this.page().theme,
-        this.page().template,
-      ]
-      )
-    ];
+    return m('.infoset', {
+      class: this.showControls() ? 'hidden' : '',
+      onclick: () => { this.showControls(true); }
+    }, [
+        this.routes().length == 0 || !this.routes()[0].path ? '' :
+          m('.small.black8', this.routes()[0].path),
+        m('.small.black8', [
+          'Theme: ', this.page().theme, ', ',
+          'Template: ', this.page().template,
+        ]),
+        m('.save-publish', [
+          m('a.button.button--small.button--green-outline', {
+            onclick: (e: Event) => { e.stopPropagation(); this.save(); }
+          }, 'Save'),
+          m('a.button.button--small.button--blue-outline', {
+            onclick: () => { this.save(); }
+          }, 'Publish')
+        ])
+      ]);
   }
 
   renderSettingsEditor() {
-    return [
-      m('.controls',
-        m('.control',
-          m.component(EditRoutesComponent, this.routes(), () => this.page().name),
-        ),
-      ),
-      m('.controls',
-        m.component(
-          ThemePickerComponent,
-          this.page().theme,
-          this.page().template,
-          this.updateThemeTemplate.bind(this)
-        )
-      )
-    ];
+    return m('.controlset', {
+      class: this.showControls() ? '' : 'hidden'
+    }, [
+        m('.settings', [
+          m('.controls',
+            m('.control',
+              m.component(EditRoutesComponent, this.routes(), () => this.page().name),
+            ),
+            m('.control', {
+              onclick: () => { this.showControls(false) }
+            }, 'close')
+          ),
+          m('.controls',
+            m.component(
+              ThemePickerComponent,
+              this.page().theme,
+              this.page().template,
+              this.updateThemeTemplate.bind(this)
+            )
+          )
+        ]),
+        m('.save-publish', [
+          m('a.button.button--small.button--green-outline', {
+            onclick: (e: Event) => { e.stopPropagation(); this.save(); }
+          }, 'Save'),
+          m('a.button.button--small.button--blue-outline', {
+            onclick: () => { this.save(); }
+          }, 'Publish')
+        ])
+      ]);
   }
-
   renderEditors() {
     if (!this.page()) {
       return m('div', []);
     }
+    var hideLabel = this.page().contents.length == 1;
 
     return m('.controls', this.page().contents.map((content) => {
       if (content.contentType == 'html') {
         return m('.control.control-full', [
-          m('.label', content.key),
+          hideLabel ? '' : m('.label', content.key),
           m.component(QuillComponent, content)
         ]);
       }
@@ -105,6 +129,8 @@ export default class PagePage {
   static view(ctrl: PagePage) {
     return Layout(
       m('.page-editor', [
+        ctrl.renderSettings(),
+        ctrl.renderSettingsEditor(),
         m('.controls',
           m('input[type=text].large', {
             placeholder: 'title...',
@@ -113,11 +139,7 @@ export default class PagePage {
               ctrl.page().name = v;
             })
           }),
-          m('a.button.button--green', {
-            onclick: () => { ctrl.save(); }
-          }, 'Save Changes')
         ),
-        ctrl.renderSettingsEditor(),
         ctrl.renderEditors()
       ])
     );

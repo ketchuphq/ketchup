@@ -1,4 +1,5 @@
-$editorWidth: 720px
+$editorWidth: 960px
+$navWidth: 240px
 
 html, body
   height: 100%
@@ -21,20 +22,22 @@ a
   display: flex
   min-height: 100%
   margin: 0 auto
+  header
+    h1
+      margin-top: 0
+    .button
+      float: right
+
   &--navigation
-    width: 240px
-    background: $black9
+    width: $navWidth
+    margin-right: 20px
+    background: $black10
     align-self: flex-start
     transition-property: 'width background color'
     transition-delay: 0s
     transition-timing-function: ease-out
     transition-duration: 0.3s
 
-    .nav-title
-      padding: 18px 24px 14px
-      font-family: $logoFont
-      font-size: $fontSize3
-      font-weight: 500
     .typcn
       margin-right: 15px
       font-size: 1.5em
@@ -52,18 +55,26 @@ a
       transition-property: 'background'
       transition-delay: 0s
       transition-timing-function: ease-out
-      transition-duration: 0.2s
+      transition-duration: 0.1s
       &--toggle
         margin-top: 20px
         text-align: center
         cursor: pointer
       &:hover
         background-color: $black10
+    .nav-title
+      padding: 18px 24px 14px
+      height: 60px
+      margin-top: 20px
+      margin-bottom: 12px
+      text-align: center
+      font-family: $logoFont
+      font-size: $fontSize3
+      font-weight: 500
 
     &--hidden
       width: 70px
       background: $black1
-      margin-right: 20px
       .nav-link:hover
         background: $black5
       a
@@ -82,7 +93,7 @@ a
           border-radius: 0
 
   &--body
-    width: 640px
+    width: $editorWidth - $navWidth
 
 .container--body
   padding: 25px 10px 10px

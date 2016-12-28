@@ -10,7 +10,10 @@ export default class QuillComponent {
   }
 
   initializeQuill() {
-    this.quill = new Quill('#editor', { theme: 'snow' });
+    this.quill = new Quill('#editor', {
+      placeholder: 'start typing...',
+      theme: 'snow'
+    });
     this.quill.on('text-change', () => {
       let editor = this.element.getElementsByClassName('ql-editor')[0];
       this.content.value = editor.innerHTML;

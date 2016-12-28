@@ -1,6 +1,13 @@
-interface User {
+import * as store from 'store';
+import * as Toaster from 'components/toaster';
+
+export interface User {
   email: string;
   uuid: string;
+}
+
+interface Preferences {
+  hideMenu: boolean;
 }
 
 let cachedUser: User = null;
@@ -33,6 +40,60 @@ export class AuthController {
         return null;
       });
     }
+  }
+
+  logout() {
+    m.request({
+      method: 'GET',
+      url: '/api/v1/logout',
+      background: false
+    }).then(() => {
+      Toaster.add('logged out');
+      setTimeout(() => {
+        location.reload();
+      }, 2000);
+    });
+  }
+
+  private get storeKey(): string {
+    if (!this.user()) {
+      return null;
+    }
+    return `user-${this.user().uuid}`;
+  }
+
+  private getPrefs(): Preferences {
+    if (!this.user()) {
+      return null;
+    }
+    let prefs: Preferences = store.get(this.storeKey);
+    if (!prefs) {
+      prefs = {
+        hideMenu: false,
+      }
+      store.set(this.storeKey, prefs);
+    }
+    return prefs;
+  }
+
+  pref<K extends keyof Preferences>(key: K): Preferences[K] {
+    if (!this.user()) {
+      return; // error
+    }
+    let prefs: Preferences = this.getPrefs();
+    if (!prefs) {
+      return; // error
+    }
+    return prefs[key];
+  }
+
+  setPref<K extends keyof Preferences>(key: K, val: Preferences[K]) {
+    if (!this.user()) {
+      return; // error
+    }
+    let prefs: Preferences = this.getPrefs();
+    prefs[key] = val;
+    store.set(this.storeKey, prefs);
   }
 }
 

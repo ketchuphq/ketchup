@@ -1,11 +1,13 @@
 const sweepInterval = 500;
 let toasts: Toast[] = [];
 
+type ToastType = 'error' | 'green';
+
 class Toast {
   public readonly key: number;
   public entered: boolean;
   private readonly expires: number;
-  constructor(public message: string, expiresSeconds: number, public klass: string = '') {
+  constructor(public message: string, expiresSeconds: number, public klass: ToastType = 'green') {
     let now = new Date().getTime();
     this.expires = now + expiresSeconds;
     this.key = now;
@@ -17,10 +19,7 @@ class Toast {
   }
 
   getClass() {
-    if (this.klass) {
-      return `toast--${this.klass}`;
-    }
-    return 'toast--green';
+    return `toast--${this.klass}`;
   }
 }
 
@@ -36,7 +35,7 @@ setInterval(() => {
   }
 }, sweepInterval);
 
-export function add(message: string, klass: string = '') {
+export function add(message: string, klass: ToastType = 'green') {
   toasts.push(new Toast(message, 3000, klass));
   m.redraw();
 }

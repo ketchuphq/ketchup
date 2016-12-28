@@ -10,23 +10,27 @@ export default class PagesPage {
   static controller = PagesPage;
   static view(ctrl: PagesPage) {
     return Layout(m('.pages', [
-      m('h1', 'Pages'),
-      m('.something',
+      m('header',
         m('a.button.button--green.button--center', {
           href: '/admin/compose',
           config: m.route
-        }, 'Compose')
+        }, 'Compose'),
+        m('h1', 'Pages')
       ),
-      m('table',
+      m('.table',
         ctrl.pages().map((page) => {
-          return m('tr',
-            m('td.link-cell',
-              m('a', {
-                href: `/admin/pages/${page.uuid}`,
-                config: m.route
-              }, page.name || 'untitled')
-            )
-          );
+          let status = page.isPublished ? '' : 'draft ';
+          let time = page.formattedUpdatedAt;
+          if (time) {
+            time = '@ ' + time;
+          }
+          return m('a.tr', {
+            href: `/admin/pages/${page.uuid}`,
+            config: m.route
+          }, [
+              m('div', page.name || 'untitled'),
+              m('.small.black5', `${status} ${time}`)
+            ]);
         })
       )
     ]));

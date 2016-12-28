@@ -7,11 +7,15 @@ export default class EditRoutesComponent {
 
   // accept a parameter to watch for changes so we know when to save?
   constructor(routes: Route[], infer: () => string) {
-    this.infer = () => this.dirty ? '' : infer();
+    this.infer = () => {
+      return this.dirty ? '' : infer();
+    };
     this.routes = routes;
     this.dirty = true;
-    if (!routes || routes.length == 0) {
+    if (routes.length == 0) {
       this.routes.push(new Route());
+      this.dirty = false;
+    } else if (!routes[0].path) {
       this.dirty = false;
     }
   }
@@ -31,7 +35,9 @@ export default class EditRoutesComponent {
             })
           }),
           i == 0 ? '' :
-            m('a', { onclick: () => ctrl.routes.splice(i, 1) }, m.trust('&times;'))
+            m('a' as any as Mithril.Component<{}>, {
+              onclick: () => ctrl.routes.splice(i, 1)
+            }, m.trust('&times;'))
         ]);
       })
     ]);

@@ -4,10 +4,34 @@
   cursor: pointer
   display: inline-block
   text-decoration: none
+  outline: none
+  border: none
+  &--small
+    font-size: $fontSize0
+    padding: 4px 12px
   &--green
     background: $green
     color: white
     &:hover
       background: $green2
+  &--green-outline
+    border: 2px solid $green
+    &:hover
+      color: white
+      border-color: $green2
+      background: $green2
+  &--blue
+    background: $blue
+    color: white
+    &:hover
+      background: $blue2
+  &--blue-outline
+    border: 2px solid $blue
+    &:hover
+      color: white
+      border-color: $blue2
+      background: $blue2
   &--center
     text-align: center
+  + .button
+    margin-left: 8px

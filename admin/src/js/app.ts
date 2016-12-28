@@ -7,6 +7,8 @@ import LoginPage from 'pages/login';
 import ThemePage from 'pages/theme';
 import ThemesPage from 'pages/themes';
 
+import * as WebFont from 'webfontloader';
+
 export let routes: Mithril.Routes = {
   '/admin': HomePage,
   '/admin/routes': RoutesPage,
@@ -20,6 +22,9 @@ export let routes: Mithril.Routes = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+  WebFont.load({
+    google: { families: ['Rubik:500', 'Roboto+Slab:400,700'] }
+  });
   let root = document.getElementById('app');
   m.route.mode = 'pathname';
   m.route(root, '/admin', routes);
