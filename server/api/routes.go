@@ -49,6 +49,10 @@ func (m *Module) UpdateRoute(rw http.ResponseWriter, req *http.Request, par http
 	if err != nil {
 		return err
 	}
+	err = m.Content.ReloadRouter()
+	if err != nil {
+		return nil
+	}
 	return router.Proto(rw, route)
 }
 
@@ -97,6 +101,11 @@ func (m *Module) UpdateRoutesByPage(rw http.ResponseWriter, req *http.Request, p
 		if err != nil {
 			return err
 		}
+	}
+
+	err = m.Content.ReloadRouter()
+	if err != nil {
+		return err
 	}
 
 	return router.Proto(rw, &api.ListRouteResponse{
