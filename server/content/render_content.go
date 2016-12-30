@@ -28,4 +28,3 @@ func renderPageContents(page *models.Page) (contentMap, error) {
 	}
 	return contents, err
 }
-

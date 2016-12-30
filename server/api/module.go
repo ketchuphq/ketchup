@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/julienschmidt/httprouter"
@@ -12,6 +13,7 @@ import (
 	"github.com/octavore/press/db/bolt"
 	"github.com/octavore/press/proto/press/api"
 	"github.com/octavore/press/proto/press/models"
+	"github.com/octavore/press/server/content"
 	"github.com/octavore/press/server/content/templates"
 	"github.com/octavore/press/server/router"
 	"github.com/octavore/press/server/users"
@@ -22,6 +24,7 @@ type Module struct {
 	DB        *db.Module
 	Auth      *users.Module
 	Templates *templates.Module
+	Content   *content.Module
 }
 
 func (m *Module) Init(c *service.Config) {
@@ -41,6 +44,7 @@ func (m *Module) Init(c *service.Config) {
 			{"/api/v1/themes/:name", "GET", m.Auth.MustWithAuth(m.GetTheme)},
 			{"/api/v1/pages", "POST", m.Auth.MustWithAuth(m.UpdatePage)},
 			{"/api/v1/pages/:uuid/routes", "POST", m.Auth.MustWithAuth(m.UpdateRoutesByPage)},
+			{"/api/v1/pages/:uuid/publish", "POST", m.Auth.MustWithAuth(m.PublishPage)},
 			{"/api/v1/routes", "POST", m.Auth.MustWithAuth(m.UpdateRoute)},
 			{"/api/v1/routes/:uuid", "DELETE", m.Auth.MustWithAuth(m.DeleteRoute)},
 			{"/api/v1/debug", "GET", m.Auth.MustWithAuth(m.Debug)},
@@ -135,6 +139,31 @@ func (m *Module) UpdatePage(rw http.ResponseWriter, req *http.Request, par httpr
 	err = m.DB.UpdatePage(page)
 	if err != nil {
 		return err
+	}
+	return router.Proto(rw, page)
+}
+
+func (m *Module) PublishPage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+	uuid := par.ByName("uuid")
+	if uuid == "" {
+		return router.ErrNotFound
+	}
+	page, err := m.DB.GetPage(uuid)
+	if _, ok := err.(bolt.ErrNoKey); ok {
+		return router.ErrNotFound
+	}
+	if err != nil {
+		return err
+	}
+	now := time.Now().Unix()
+	page.PublishedAt = &now
+	err = m.DB.UpdatePage(page)
+	if err != nil {
+		return err
+	}
+	err = m.Content.ReloadRouter()
+	if err != nil {
+		m.Router.InternalError(rw, err)
 	}
 	return router.Proto(rw, page)
 }
