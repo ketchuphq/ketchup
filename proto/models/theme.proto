@@ -30,8 +30,8 @@ message ThemePlaceholder {
         text = 2;
     }
 
-    optional string name = 1;
     optional ThemePlaceholderType type = 2;
+    optional string key = 1;
     optional Content.ContentType contentType = 3;
 }
 

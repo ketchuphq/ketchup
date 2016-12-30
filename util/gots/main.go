@@ -96,7 +96,8 @@ func (g *Generator) convertEnum(typeName, enumName string) {
 
 const typeFmt = "%s?: %s;"
 
-func (g *Generator) subconvertFields(v reflect.Type) {
+func (g *Generator) subconvertFields(v reflect.Type) []string {
+	fields := []string{}
 	for j := 0; j < v.NumField(); j++ {
 		f := v.Field(j)
 
@@ -109,16 +110,18 @@ func (g *Generator) subconvertFields(v reflect.Type) {
 		// type
 		typ := g.goTypeToTSType(f.Type, &f.Tag)
 		if typ != "" {
+			fields = append(fields, name)
 			g.p(2, fmt.Sprintf(typeFmt, name, typ))
 		} else {
 			g.p(2, "// skipped field: "+name)
 		}
 	}
+	return fields
 }
 
 func (g *Generator) convert(v reflect.Type) {
-	g.p(0, "export interface "+v.Name()+" {")
-	g.subconvertFields(v)
+	g.p(0, "export abstract class "+v.Name()+" {")
+	fields := g.subconvertFields(v)
 
 	// handle oneof fields
 	sp := proto.GetProperties(v)
@@ -127,9 +130,11 @@ func (g *Generator) convert(v reflect.Type) {
 		g.p(2, "// oneof types:")
 		for _, prop := range sp.OneofTypes {
 			// merge oneof fields into parent
-			g.subconvertFields(prop.Type.Elem())
+			f2 := g.subconvertFields(prop.Type.Elem())
+			fields = append(fields, f2...)
 		}
 	}
+	g.generateCopyFunction(v.Name(), fields)
 	g.p(0, "}\n")
 }
 
@@ -217,4 +222,14 @@ func (g *Generator) goTypeToTSType(t reflect.Type, tag *reflect.StructTag) strin
 		}
 		return typ
 	}
+}
+
+func (g *Generator) generateCopyFunction(class string, fields []string) {
+	g.p(2, fmt.Sprintf("static copy(from: %s, to?: %s): %s {", class, class, class))
+	g.p(4, "to = to || {};")
+	for _, field := range fields {
+		g.p(4, fmt.Sprintf("to.%s = from.%s;", field, field))
+	}
+	g.p(4, "return to;")
+	g.p(2, "}")
 }
