@@ -17,7 +17,7 @@ message ThemeTemplate {
     optional string name = 2;
     optional string theme = 3;
     optional string engine = 4 [default='html']; // can have custom engines
-    map<string, ThemePlaceholder> placeholders = 5; // placeholders for variables in the UI
+    repeated ThemePlaceholder placeholders = 5; // placeholders
     // maybe an option for extensions?
     optional string data = 10;
 }
