@@ -1,32 +1,11 @@
 import * as m from 'mithril';
-import { BaseRoute, default as Route } from 'lib/route';
+import * as API from 'lib/api';
+import { default as Route } from 'lib/route';
 import * as dateFormat from 'date-fns/format';
 
 const dateHumanFormat = 'MMM Do, h:mma';
 
-export interface BasePage {
-  uuid: string;
-  name: string;
-  theme: string;
-  template: string;
-  contents: Content[];
-  timestamps: Timestamps;
-  publishedAt: string;
-}
-
-export interface Timestamps {
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Content {
-  uuid?: string;
-  contentType: 'html' | 'markdown';
-  key: string;
-  value: string;
-}
-
-let defaultPage: BasePage = {
+let defaultPage: API.Page = {
   uuid: null,
   name: null,
   theme: 'basic',
@@ -44,16 +23,16 @@ let defaultPage: BasePage = {
   publishedAt: null
 };
 
-export default class Page implements BasePage {
+export default class Page implements API.Page {
   uuid: string;
   name: string;
   theme: string;
   template: string;
-  contents: Content[];
-  timestamps: Timestamps;
+  contents: API.Content[];
+  timestamps: API.Timestamp;
   publishedAt: string;
 
-  constructor(config?: BasePage) {
+  constructor(config?: API.Page) {
     config = config || defaultPage;
     this.uuid = config.uuid;
     this.name = config.name;
@@ -64,11 +43,21 @@ export default class Page implements BasePage {
     this.publishedAt = config.publishedAt;
   }
 
-  save(): Mithril.Promise<BasePage> {
+  save(): Mithril.Promise<API.Page> {
     return m.request({
       method: 'POST',
       url: `/api/v1/pages`,
       data: this
+    });
+  }
+
+  publish(): Mithril.Promise<API.Page> {
+    return m.request({
+      method: 'POST',
+      url: `/api/v1/pages/${this.uuid}/publish`,
+    }).then((page: API.Page) => {
+      this.publishedAt = page.publishedAt;
+      return page;
     });
   }
 
@@ -77,12 +66,12 @@ export default class Page implements BasePage {
       method: 'GET',
       url: `/api/v1/pages/${this.uuid}/routes`,
     })
-      .then((res: { routes: BaseRoute[] }) =>
+      .then((res: { routes: API.Route[] }) =>
         res.routes.map((r) =>
           new Route(r)));
   }
 
-  saveRoutes(routes: BaseRoute[]) {
+  saveRoutes(routes: API.Route[]) {
     return m.request({
       method: 'POST',
       url: `/api/v1/pages/${this.uuid}/routes`,
@@ -127,7 +116,7 @@ export default class Page implements BasePage {
       method: 'GET',
       url: '/api/v1/pages'
     })
-      .then((data: { pages: BasePage[] }) => {
+      .then((data: { pages: API.Page[] }) => {
         if (!data.pages) {
           return [];
         }

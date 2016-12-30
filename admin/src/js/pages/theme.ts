@@ -16,6 +16,8 @@ export default class ThemePage {
 
   static controller = ThemePage;
   static view(ctrl: ThemePage) {
+    let templateKeys = Object.keys(ctrl.theme().templates);
+    let assetKeys = Object.keys(ctrl.theme().assets);
     return Layout(
       !ctrl.theme() ? ''
         :
@@ -26,7 +28,7 @@ export default class ThemePage {
           ),
           m('h2', 'Templates'),
           m('table',
-            Object.keys(ctrl.theme().templates).sort().map((name) => {
+            templateKeys.sort().map((name) => {
               let t = ctrl.theme().templates[name];
               return m('tr', [
                 m('td', t.name),
@@ -36,16 +38,19 @@ export default class ThemePage {
           ),
           m('h2', 'Assets'),
           m('table',
-            Object.keys(ctrl.theme().assets).sort().map((asset) => {
-              return m('tr', [
-                m('td.link-cell',
-                  // todo: check for shadowed files
-                  m('a', {
-                    href: `/${asset}`
-                  }, asset)
-                ),
-              ]);
-            })
+            assetKeys.length == 0 ?
+              m('tr', m('td', 'no assets'))
+              :
+              assetKeys.sort().map((asset) => {
+                return m('tr', [
+                  m('td.link-cell',
+                    // todo: check for shadowed files
+                    m('a', {
+                      href: `/${asset}`
+                    }, asset)
+                  ),
+                ]);
+              })
           )
         ])
     );

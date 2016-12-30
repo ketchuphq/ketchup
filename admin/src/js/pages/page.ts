@@ -1,5 +1,7 @@
-import { BasePage, default as Page } from 'lib/page';
+import * as API from 'lib/api';
+import Page from 'lib/page';
 import Route from 'lib/route';
+import Theme from 'lib/theme';
 import Layout from 'components/layout';
 import QuillComponent from 'components/quill';
 import EditRoutesComponent from 'components/edit_route';
@@ -10,14 +12,20 @@ export default class PagePage {
   page: Mithril.Property<Page>;
   routes: Mithril.Property<Route[]>;
   showControls: Mithril.Property<boolean>;
+  template: Mithril.Property<API.ThemeTemplate>;
+
   constructor() {
     this.showControls = m.prop(false);
     this.page = m.prop<Page>();
     this.routes = m.prop([]);
+    this.template = m.prop<API.ThemeTemplate>();
     let pageUUID = m.route.param('id');
     if (pageUUID) {
       Page.get(pageUUID).then((page) => {
         this.page(page);
+        Theme.get(page.theme).then((t) => {
+          this.template(t.getTemplate(page.template));
+        });
         page.getRoutes().then((r) => {
           this.routes(r);
         });
@@ -32,83 +40,15 @@ export default class PagePage {
     page.theme = theme;
     page.template = template;
     this.page(page);
-  }
-
-  renderSettings() {
-    return m('.infoset', {
-      class: this.showControls() ? 'hidden' : '',
-      onclick: () => { this.showControls(true); }
-    }, [
-        this.routes().length == 0 || !this.routes()[0].path ? '' :
-          m('.small.black8', this.routes()[0].path),
-        m('.small.black8', [
-          'Theme: ', this.page().theme, ', ',
-          'Template: ', this.page().template,
-        ]),
-        m('.save-publish', [
-          m('a.button.button--small.button--green-outline', {
-            onclick: (e: Event) => { e.stopPropagation(); this.save(); }
-          }, 'Save'),
-          m('a.button.button--small.button--blue-outline', {
-            onclick: () => { this.save(); }
-          }, 'Publish')
-        ])
-      ]);
-  }
-
-  renderSettingsEditor() {
-    return m('.controlset', {
-      class: this.showControls() ? '' : 'hidden'
-    }, [
-        m('.settings', [
-          m('.controls',
-            m('.control',
-              m.component(EditRoutesComponent, this.routes(), () => this.page().name),
-            ),
-            m('.control', {
-              onclick: () => { this.showControls(false) }
-            }, 'close')
-          ),
-          m('.controls',
-            m.component(
-              ThemePickerComponent,
-              this.page().theme,
-              this.page().template,
-              this.updateThemeTemplate.bind(this)
-            )
-          )
-        ]),
-        m('.save-publish', [
-          m('a.button.button--small.button--green-outline', {
-            onclick: (e: Event) => { e.stopPropagation(); this.save(); }
-          }, 'Save'),
-          m('a.button.button--small.button--blue-outline', {
-            onclick: () => { this.save(); }
-          }, 'Publish')
-        ])
-      ]);
-  }
-  renderEditors() {
-    if (!this.page()) {
-      return m('div', []);
-    }
-    var hideLabel = this.page().contents.length == 1;
-
-    return m('.controls', this.page().contents.map((content) => {
-      if (content.contentType == 'html') {
-        return m('.control.control-full', [
-          hideLabel ? '' : m('.label', content.key),
-          m.component(QuillComponent, content)
-        ]);
-      }
-      return null;
-    }));
+    Theme.get(theme).then((t) => {
+      this.template(t.getTemplate(template));
+    });
   }
 
   save() {
     this.page()
       .save()
-      .then((page: BasePage) => {
+      .then((page: API.Page) => {
         this.page().uuid = page.uuid;
         window.history.replaceState(null, this.page().name, `/admin/pages/${page.uuid}`);
         return this.page().saveRoutes(this.routes());
@@ -123,6 +63,92 @@ export default class PagePage {
           Toaster.add('Internal server error.', 'error');
         }
       });
+  }
+
+  publish() {
+    this.page()
+      .publish()
+      .then(() => {
+        Toaster.add('Page published');
+        m.redraw();
+      });
+  }
+
+  renderSavePublish() {
+    return m('.save-publish', [
+      m('a.button.button--small.button--green', {
+        onclick: (e: Event) => { e.stopPropagation(); this.save(); }
+      }, 'Save'),
+      this.page().isPublished ?
+        m('a.button.button--small.button--blue', {
+          href: this.routes()[0].path
+        }, 'View')
+        :
+        m('a.button.button--small.button--blue', {
+          onclick: (e: Event) => { e.stopPropagation(); this.publish(); }
+        }, 'Publish')
+    ]);
+  }
+  renderSettings() {
+    return m('.controls', {
+      class: this.showControls() ? 'hidden' : '',
+    }, [
+        m('.infoset', {
+          onclick: () => { this.showControls(true); }
+        }, [
+            m('.small.black8', [
+              this.routes().length == 0 || !this.routes()[0].path ? '' :
+                ['Path: ', m('strong', this.routes()[0].path), ', '],
+              'Theme: ', m('strong', this.page().theme), ', ',
+              'Template: ', m('strong', this.page().template),
+            ]),
+          ]),
+        this.renderSavePublish()
+      ]);
+  }
+
+  renderSettingsEditor() {
+    return m('.controlset', {
+      class: this.showControls() ? '' : 'hidden'
+    }, [
+        m('.settings', [
+          m('.controls',
+            m('.control',
+              m.component(EditRoutesComponent, this.routes(), () => this.page().name),
+            ),
+            m('.control', {
+              onclick: () => { this.showControls(false); }
+            }, 'close')
+          ),
+          m('.controls',
+            m.component(
+              ThemePickerComponent,
+              this.page().theme,
+              this.page().template,
+              this.updateThemeTemplate.bind(this)
+            )
+          )
+        ]),
+        this.renderSavePublish()
+      ]);
+  }
+  renderEditors() {
+    if (!this.page()) {
+      return m('div', []);
+    }
+    let placeholderKeys = Object.keys(this.template().placeholders);
+    let contentKeys = this.page().contents.map((c) => c.key);
+
+    var hideLabel = this.page().contents.length == 1;
+    return m('.controls', this.page().contents.map((content) => {
+      if (content.contentType == 'html') {
+        return m('.control.control-full', [
+          hideLabel ? '' : m('.label', content.key),
+          m.component(QuillComponent, content)
+        ]);
+      }
+      return null;
+    }));
   }
 
   static controller = PagePage;

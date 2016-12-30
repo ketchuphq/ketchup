@@ -21,7 +21,7 @@ export default class PagesPage {
         ctrl.pages().map((page) => {
           let status = page.isPublished ? '' : 'draft ';
           let time = page.formattedUpdatedAt;
-          if (time) {
+          if (time && !page.isPublished) {
             time = '@ ' + time;
           }
           return m('a.tr', {

@@ -1,24 +1,11 @@
-export interface BaseTemplate {
-  name: string;
-  engine: string;
-}
+import * as API from 'lib/api';
 
-interface BaseAsset {
+export default class Theme implements API.Theme {
   name: string;
-}
+  templates: { [key: string]: API.ThemeTemplate };
+  assets: { [key: string]: API.ThemeAsset };
 
-export interface BaseTheme {
-  name: string;
-  templates: { [key: string]: BaseTemplate };
-  assets: { [key: string]: BaseAsset };
-}
-
-export default class Theme implements BaseTheme {
-  name: string;
-  templates: { [key: string]: BaseTemplate };
-  assets: { [key: string]: BaseAsset };
-
-  constructor(config?: BaseTheme) {
+  constructor(config?: API.Theme) {
     this.templates = {};
     this.assets = {};
     if (config) {
@@ -26,6 +13,10 @@ export default class Theme implements BaseTheme {
       this.templates = config.templates || {};
       this.assets = config.assets || {};
     }
+  }
+
+  getTemplate(name: string): API.ThemeTemplate {
+    return this.templates[name];
   }
 
   static get(name: string): Mithril.Promise<Theme> {
@@ -43,7 +34,7 @@ export default class Theme implements BaseTheme {
       method: 'GET',
       url: '/api/v1/themes'
     })
-      .then((data: { themes: BaseTheme[] }) => {
+      .then((data: { themes: API.ThemeTemplate[] }) => {
         if (!data.themes) {
           return [];
         }

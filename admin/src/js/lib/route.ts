@@ -1,26 +1,19 @@
-export interface BaseRoute {
-  uuid: string;
-  path: string;
+import * as API from 'lib/api';
 
-  file?: string;
-  pageUuid?: string;
-  delegate?: string;
-}
-
-export default class Route implements BaseRoute {
+export default class Route implements API.Route {
   uuid: string;
   path: string;
   file?: string;
   pageUuid?: string;
-  delegate?: string;
+  // delegate?: string;
 
-  constructor(config?: BaseRoute) {
+  constructor(config?: API.Route) {
     if (config) {
       this.uuid = config.uuid;
       this.path = config.path;
       this.file = config.file;
       this.pageUuid = config.pageUuid;
-      this.delegate = config.delegate;
+      // this.delegate = config.delegate;
     }
   }
 
@@ -28,7 +21,7 @@ export default class Route implements BaseRoute {
     return m.request({
       method: 'POST',
       url: '/api/v1/routes',
-      data: this as BaseRoute
+      data: this as API.Route
     });
   }
 
@@ -49,7 +42,7 @@ export default class Route implements BaseRoute {
       method: 'GET',
       url: '/api/v1/routes'
     })
-      .then((data: { routes: BaseRoute[] }) => {
+      .then((data: { routes: API.Route[] }) => {
         if (!data.routes) {
           return [];
         }
