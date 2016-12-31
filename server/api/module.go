@@ -27,6 +27,12 @@ type Module struct {
 	Content   *content.Module
 }
 
+const (
+	methodGet    = "GET"
+	methodPost   = "POST"
+	methodDelete = "DELETE"
+)
+
 func (m *Module) Init(c *service.Config) {
 	c.Setup = func() error {
 		r := m.Router.Subrouter("/api/v1/")
@@ -34,21 +40,21 @@ func (m *Module) Init(c *service.Config) {
 			path, method string
 			handle       users.Handle
 		}{
-			{"/api/v1/pages/:uuid", "GET", m.GetPage},
-			{"/api/v1/pages/:uuid/routes", "GET", m.ListRoutesByPage},
-			{"/api/v1/pages", "GET", m.ListPages},
-			{"/api/v1/routes", "GET", m.ListRoutes},
+			{"/api/v1/pages/:uuid", methodGet, m.GetPage},
+			{"/api/v1/pages/:uuid/routes", methodGet, m.ListRoutesByPage},
+			{"/api/v1/pages", methodGet, m.ListPages},
+			{"/api/v1/routes", methodGet, m.ListRoutes},
 
-			{"/api/v1/user", "GET", m.Auth.MustWithAuth(m.GetUser)},
-			{"/api/v1/themes", "GET", m.Auth.MustWithAuth(m.ListThemes)},
-			{"/api/v1/themes/:name", "GET", m.Auth.MustWithAuth(m.GetTheme)},
-			{"/api/v1/pages", "POST", m.Auth.MustWithAuth(m.UpdatePage)},
-			{"/api/v1/pages/:uuid/routes", "POST", m.Auth.MustWithAuth(m.UpdateRoutesByPage)},
-			{"/api/v1/pages/:uuid/publish", "POST", m.Auth.MustWithAuth(m.PublishPage)},
-			{"/api/v1/routes", "POST", m.Auth.MustWithAuth(m.UpdateRoute)},
-			{"/api/v1/routes/:uuid", "DELETE", m.Auth.MustWithAuth(m.DeleteRoute)},
-			{"/api/v1/debug", "GET", m.Auth.MustWithAuth(m.Debug)},
-			{"/api/v1/logout", "GET", m.Auth.MustWithAuth(m.Logout)},
+			{"/api/v1/user", methodGet, m.Auth.MustWithAuth(m.GetUser)},
+			{"/api/v1/themes", methodGet, m.Auth.MustWithAuth(m.ListThemes)},
+			{"/api/v1/themes/:name", methodGet, m.Auth.MustWithAuth(m.GetTheme)},
+			{"/api/v1/pages", methodPost, m.Auth.MustWithAuth(m.UpdatePage)},
+			{"/api/v1/pages/:uuid/routes", methodPost, m.Auth.MustWithAuth(m.UpdateRoutesByPage)},
+			{"/api/v1/pages/:uuid/publish", methodPost, m.Auth.MustWithAuth(m.PublishPage)},
+			{"/api/v1/routes", methodPost, m.Auth.MustWithAuth(m.UpdateRoute)},
+			{"/api/v1/routes/:uuid", methodDelete, m.Auth.MustWithAuth(m.DeleteRoute)},
+			{"/api/v1/debug", methodGet, m.Auth.MustWithAuth(m.Debug)},
+			{"/api/v1/logout", methodGet, m.Auth.MustWithAuth(m.Logout)},
 		}
 		for _, route := range routes {
 			r.Handle(route.method, route.path, m.wrap(route.handle))
