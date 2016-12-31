@@ -47,6 +47,12 @@ func (m *Module) UpdatePage(page *models.Page) error {
 	if page.GetUuid() == "" {
 		page.Uuid = proto.String(uuid.NewV4().String())
 	}
+
+	for _, c := range page.Contents {
+		if c.GetUuid() == "" {
+			c.Uuid = proto.String(uuid.NewV4().String())
+		}
+	}
 	return m.Update(PAGE_BUCKET, page)
 }
 
