@@ -13,6 +13,9 @@
     justify-content: space-between
     align-items: center
     cursor: pointer
+    flex-grow: 1
+    padding: 4px 0
+    margin-right: 8px
     &:hover
       background: $black9
       transition-property: 'background'
@@ -30,9 +33,12 @@
       +input-text-large
     select
       +input-select
+    textarea
+      +textarea
+      resize: vertical
     .quill
       margin-top: $inputPadding
-      #editor
+      .ql-container
         border-color: white
         .ql-editor.ql-blank::before
           color: $black5
@@ -49,6 +55,6 @@
   .theme-picker
     display: flex
 
-  #editor
+  .ql-container
     height: 600px
     font-size: 16px

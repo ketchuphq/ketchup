@@ -1,35 +1,35 @@
 import * as API from 'lib/api';
 import Page from 'lib/page';
-import Route from 'lib/route';
 import Theme from 'lib/theme';
 import Layout from 'components/layout';
-import QuillComponent from 'components/quill';
 import EditRoutesComponent from 'components/edit_route';
 import ThemePickerComponent from 'components/theme_picker';
 import * as Toaster from 'components/toaster';
+import { renderEditor } from 'components/content';
 
 export default class PagePage {
   page: Mithril.Property<Page>;
-  routes: Mithril.Property<Route[]>;
   showControls: Mithril.Property<boolean>;
   template: Mithril.Property<API.ThemeTemplate>;
 
   constructor() {
     this.showControls = m.prop(false);
     this.page = m.prop<Page>();
-    this.routes = m.prop([]);
     this.template = m.prop<API.ThemeTemplate>();
     let pageUUID = m.route.param('id');
     if (pageUUID) {
-      Page.get(pageUUID).then((page) => {
-        this.page(page);
-        Theme.get(page.theme).then((t) => {
-          this.template(t.getTemplate(page.template));
+      Page.get(pageUUID)
+        .then((page) => {
+          if (!!page.theme) {
+            Theme.get(page.theme).then((t) => {
+              this.template(t.getTemplate(page.template));
+            });
+          }
+          page.getRoutes()
+            .then(() => {
+              this.page(page);
+            });
         });
-        page.getRoutes().then((r) => {
-          this.routes(r);
-        });
-      });
     } else {
       this.page(new Page());
     }
@@ -51,7 +51,7 @@ export default class PagePage {
       .then((page: API.Page) => {
         this.page().uuid = page.uuid;
         window.history.replaceState(null, this.page().name, `/admin/pages/${page.uuid}`);
-        return this.page().saveRoutes(this.routes());
+        return this.page().saveRoutes();
       })
       .then(() => {
         Toaster.add('Page successfully saved');
@@ -81,7 +81,7 @@ export default class PagePage {
       }, 'Save'),
       this.page().isPublished ?
         m('a.button.button--small.button--blue', {
-          href: this.routes()[0].path
+          href: this.page().defaultRoute
         }, 'View')
         :
         m('a.button.button--small.button--blue', {
@@ -97,8 +97,8 @@ export default class PagePage {
           onclick: () => { this.showControls(true); }
         }, [
             m('.small.black8', [
-              this.routes().length == 0 || !this.routes()[0].path ? '' :
-                ['Path: ', m('strong', this.routes()[0].path), ', '],
+              !this.page().defaultRoute ? '' :
+                ['Path: ', m('strong', this.page().defaultRoute), ', '],
               'Theme: ', m('strong', this.page().theme), ', ',
               'Template: ', m('strong', this.page().template),
             ]),
@@ -114,7 +114,7 @@ export default class PagePage {
         m('.settings', [
           m('.controls',
             m('.control',
-              m.component(EditRoutesComponent, this.routes(), () => this.page().name),
+              this.page() ? m.component(EditRoutesComponent, this.page()) : null,
             ),
             m('.control', {
               onclick: () => { this.showControls(false); }
@@ -132,23 +132,56 @@ export default class PagePage {
         this.renderSavePublish()
       ]);
   }
+
+
+
   renderEditors() {
     if (!this.page()) {
       return m('div', []);
     }
-    let placeholderKeys = Object.keys(this.template().placeholders);
-    let contentKeys = this.page().contents.map((c) => c.key);
 
-    var hideLabel = this.page().contents.length == 1;
-    return m('.controls', this.page().contents.map((content) => {
-      if (content.contentType == 'html') {
-        return m('.control.control-full', [
-          hideLabel ? '' : m('.label', content.key),
-          m.component(QuillComponent, content)
-        ]);
+    let contentMap: { [key: string]: API.Content } = {};
+    let mainContent: API.Content;
+    let contents: API.Content[] = [];
+    (this.page().contents || []).forEach((c) => {
+      contentMap[c.key] = c;
+      if (c.key != 'content') {
+        contents.push(c);
+      } else {
+        mainContent = c;
       }
-      return null;
-    }));
+    });
+
+    let placeholders: API.ThemePlaceholder[] = [];
+    let hideContent = false;
+
+    if (this.template()) {
+      hideContent = this.template().hideContent;
+      placeholders = (this.template().placeholders || []);
+      let placeholderOrder: { [key: string]: number } = {};
+      placeholders.forEach((p, i) => { placeholderOrder[p.key] = i; });
+      placeholders = placeholders.filter((p) => !contentMap[p.key]);
+
+      contents.sort((a, b) => {
+        if (placeholderOrder[a.key] < placeholderOrder[b.key]) {
+          return - 1;
+        }
+        if (placeholderOrder[a.key] > placeholderOrder[b.key]) {
+          return 1;
+        }
+        return 0;
+      });
+    }
+
+    return m('div', [
+      contents.map((c) =>
+        renderEditor(this.page(), c, false)
+      ),
+      placeholders.map((p) =>
+        renderEditor(this.page(), p, false)
+      ),
+      !hideContent && mainContent ? renderEditor(this.page(), mainContent, true) : null
+    ]);
   }
 
   static controller = PagePage;

@@ -5,17 +5,19 @@ import * as dateFormat from 'date-fns/format';
 
 const dateHumanFormat = 'MMM Do, h:mma';
 
-let defaultPage: API.Page = {
+const defaultContent: API.Content = {
+  uuid: null,
+  text: { type: 'html' },
+  key: 'content',
+  value: ''
+};
+
+const defaultPage: API.Page = {
   uuid: null,
   name: null,
   theme: 'basic',
   template: 'index.html',
-  contents: [{
-    uuid: null,
-    contentType: 'html',
-    key: 'content',
-    value: ''
-  }],
+  contents: [defaultContent],
   timestamps: {
     createdAt: null,
     updatedAt: null
@@ -23,31 +25,44 @@ let defaultPage: API.Page = {
   publishedAt: null
 };
 
-export default class Page implements API.Page {
-  uuid: string;
-  name: string;
-  theme: string;
-  template: string;
-  contents: API.Content[];
-  timestamps: API.Timestamp;
-  publishedAt: string;
+export default class Page extends API.Page {
+  routes: API.Route[];
 
   constructor(config?: API.Page) {
+    super();
     config = config || defaultPage;
     this.uuid = config.uuid;
     this.name = config.name;
     this.theme = config.theme;
     this.template = config.template;
-    this.contents = config.contents;
+    this.contents = config.contents || [defaultContent];
     this.timestamps = config.timestamps;
     this.publishedAt = config.publishedAt;
+    this.routes = [];
+  }
+
+  get defaultRoute() {
+    if (this.routes.length > 0) {
+      return this.routes[0].path;
+    }
+  }
+
+  updateContent(c: API.Content) {
+    for (var i = 0; i < this.contents.length; i++) {
+      var element = this.contents[i];
+      if (element.key == c.key) {
+        API.Content.copy(c, element);
+        return;
+      }
+    }
+    this.contents.push(API.Content.copy(c));
   }
 
   save(): Mithril.Promise<API.Page> {
     return m.request({
       method: 'POST',
       url: `/api/v1/pages`,
-      data: this
+      data: API.Page.copy(this)
     });
   }
 
@@ -66,17 +81,18 @@ export default class Page implements API.Page {
       method: 'GET',
       url: `/api/v1/pages/${this.uuid}/routes`,
     })
-      .then((res: { routes: API.Route[] }) =>
-        res.routes.map((r) =>
-          new Route(r)));
+      .then((res: { routes: API.Route[] }) => {
+        this.routes = res.routes.map((r) => new Route(r));
+        return this.routes;
+      });
   }
 
-  saveRoutes(routes: API.Route[]) {
+  saveRoutes() {
     return m.request({
       method: 'POST',
       url: `/api/v1/pages/${this.uuid}/routes`,
       data: {
-        routes: routes
+        routes: this.routes
       }
     });
   }

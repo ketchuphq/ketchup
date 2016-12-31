@@ -70,7 +70,7 @@ export class AuthController {
     if (!prefs) {
       prefs = {
         hideMenu: false,
-      }
+      };
       store.set(this.storeKey, prefs);
     }
     return prefs;

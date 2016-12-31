@@ -27,17 +27,24 @@ export abstract class Page {
 
 export abstract class Content {
   uuid?: string;
-  contentType?: Content_ContentType;
   key?: string;
   value?: string;
   timestamps?: Timestamp;
+  // skipped field: type
+  
+  // oneof types:
+  short?: ContentString;
+  text?: ContentText;
+  multiple?: ContentMultiple;
   static copy(from: Content, to?: Content): Content {
     to = to || {};
     to.uuid = from.uuid;
-    to.contentType = from.contentType;
     to.key = from.key;
     to.value = from.value;
     to.timestamps = from.timestamps;
+    to.short = from.short;
+    to.text = from.text;
+    to.multiple = from.multiple;
     return to;
   }
 }
@@ -91,6 +98,7 @@ export abstract class ThemeTemplate {
   name?: string;
   theme?: string;
   engine?: string;
+  hideContent?: boolean;
   placeholders?: ThemePlaceholder[];
   data?: string;
   static copy(from: ThemeTemplate, to?: ThemeTemplate): ThemeTemplate {
@@ -99,6 +107,7 @@ export abstract class ThemeTemplate {
     to.name = from.name;
     to.theme = from.theme;
     to.engine = from.engine;
+    to.hideContent = from.hideContent;
     to.placeholders = from.placeholders;
     to.data = from.data;
     return to;
@@ -107,13 +116,18 @@ export abstract class ThemeTemplate {
 
 export abstract class ThemePlaceholder {
   key?: string;
-  type?: ThemePlaceholder_ThemePlaceholderType;
-  contentType?: Content_ContentType;
+  // skipped field: type
+  
+  // oneof types:
+  multiple?: ContentMultiple;
+  short?: ContentString;
+  text?: ContentText;
   static copy(from: ThemePlaceholder, to?: ThemePlaceholder): ThemePlaceholder {
     to = to || {};
     to.key = from.key;
-    to.type = from.type;
-    to.contentType = from.contentType;
+    to.multiple = from.multiple;
+    to.short = from.short;
+    to.text = from.text;
     return to;
   }
 }
@@ -133,5 +147,40 @@ export abstract class ThemeAsset {
   }
 }
 
-export type Content_ContentType = 'unknown' | 'html' | 'markdown';
-export type ThemePlaceholder_ThemePlaceholderType = 'unknown' | 'string' | 'text';
+export abstract class ContentMultiple {
+  title?: string;
+  options?: string[];
+  type?: ContentMultiple_DropdownType;
+  static copy(from: ContentMultiple, to?: ContentMultiple): ContentMultiple {
+    to = to || {};
+    to.title = from.title;
+    to.options = from.options;
+    to.type = from.type;
+    return to;
+  }
+}
+
+export abstract class ContentText {
+  title?: string;
+  type?: ContentTextType;
+  static copy(from: ContentText, to?: ContentText): ContentText {
+    to = to || {};
+    to.title = from.title;
+    to.type = from.type;
+    return to;
+  }
+}
+
+export abstract class ContentString {
+  title?: string;
+  type?: ContentTextType;
+  static copy(from: ContentString, to?: ContentString): ContentString {
+    to = to || {};
+    to.title = from.title;
+    to.type = from.type;
+    return to;
+  }
+}
+
+export type ContentMultiple_DropdownType = 'unknown' | 'radio' | 'dropdown';
+export type ContentTextType = 'text' | 'markdown' | 'html';
