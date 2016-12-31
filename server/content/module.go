@@ -28,7 +28,7 @@ var _ service.Module = &Module{}
 func (m *Module) Init(c *service.Config) {
 	c.Start = func() {
 		var err error
-		m.router, _, err = m.BuildRouter()
+		m.router, _, err = m.buildRouter()
 		if err != nil {
 			panic(err)
 		}
@@ -44,8 +44,19 @@ func (m *Module) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// BuildRouter returns a handler configured to serve content.
-func (m *Module) BuildRouter() (http.Handler, map[string]bool, error) {
+// ReloadRouter recreates the router to add/remove routes that have change
+// and replaces the existing router.
+func (m *Module) ReloadRouter() error {
+	newRouter, _, err := m.buildRouter()
+	if err != nil {
+		return err
+	}
+	m.router = newRouter
+	return nil
+}
+
+// buildRouter returns a handler configured to serve content.
+func (m *Module) buildRouter() (http.Handler, map[string]bool, error) {
 	rt := httprouter.New()
 	routes, err := m.DB.ListRoutes()
 	if err != nil {
