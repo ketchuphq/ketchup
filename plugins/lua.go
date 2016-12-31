@@ -1,9 +1,10 @@
 package plugins
 
 import (
-	"github.com/octavore/press/proto/press/models"
 	"github.com/octavore/protobuf/proto"
 	"github.com/yuin/gopher-lua"
+
+	"github.com/octavore/press/proto/press/models"
 )
 
 type PluginRouteLoader struct {

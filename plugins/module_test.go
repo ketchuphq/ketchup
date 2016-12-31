@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
+
 	"github.com/octavore/press/proto/press/models"
 )
 
