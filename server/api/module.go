@@ -43,9 +43,13 @@ func (m *Module) Init(c *service.Config) {
 			{"/api/v1/user", methodGet, m.Auth.MustWithAuth(m.GetUser)},
 			{"/api/v1/themes", methodGet, m.Auth.MustWithAuth(m.ListThemes)},
 			{"/api/v1/themes/:name", methodGet, m.Auth.MustWithAuth(m.GetTheme)},
+
 			{"/api/v1/pages", methodPost, m.Auth.MustWithAuth(m.UpdatePage)},
+			{"/api/v1/pages/:uuid", methodDelete, m.Auth.MustWithAuth(m.DeletePage)},
 			{"/api/v1/pages/:uuid/routes", methodPost, m.Auth.MustWithAuth(m.UpdateRoutesByPage)},
 			{"/api/v1/pages/:uuid/publish", methodPost, m.Auth.MustWithAuth(m.PublishPage)},
+			{"/api/v1/pages/:uuid/unpublish", methodPost, m.Auth.MustWithAuth(m.UnpublishPage)},
+
 			{"/api/v1/routes", methodPost, m.Auth.MustWithAuth(m.UpdateRoute)},
 			{"/api/v1/routes/:uuid", methodDelete, m.Auth.MustWithAuth(m.DeleteRoute)},
 			{"/api/v1/debug", methodGet, m.Auth.MustWithAuth(m.Debug)},

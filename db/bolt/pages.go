@@ -23,6 +23,7 @@ func (m *Module) GetPage(uuid string) (*models.Page, error) {
 	return page, nil
 }
 
+// DeletePage also deletes related routes.
 func (m *Module) DeletePage(page *models.Page) error {
 	err := m.delete(PAGE_BUCKET, page)
 	if err != nil {
