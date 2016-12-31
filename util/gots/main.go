@@ -172,6 +172,7 @@ func tsFieldname(f reflect.StructField) string {
 var typeMap = map[string]string{
 	"int32": "number",
 	"int64": "string",
+	"bool":  "boolean",
 }
 
 type protoEnum interface {
