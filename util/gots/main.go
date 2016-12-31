@@ -33,6 +33,9 @@ func main() {
 		models.ThemeTemplate{},
 		models.ThemePlaceholder{},
 		models.ThemeAsset{},
+		models.ContentMultiple{},
+		models.ContentText{},
+		models.ContentString{},
 	)
 	g.Write()
 	g.Close()
