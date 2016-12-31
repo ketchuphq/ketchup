@@ -12,6 +12,7 @@ import (
 	"github.com/octavore/nagax/logger"
 
 	"github.com/octavore/press/proto/press/models"
+	"github.com/octavore/press/util/errors"
 )
 
 const themeDir = "themes"
@@ -55,6 +56,10 @@ func (m *Module) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		http.NotFound(rw, req)
 		return
 	}
+	if asset == nil {
+		http.NotFound(rw, req)
+		return
+	}
 	ext := path.Ext(req.URL.Path)
 	rw.Header().Add("Content-Type", mime.TypeByExtension(ext))
 	rw.Write([]byte(asset.GetData()))
@@ -65,7 +70,7 @@ func (m *Module) getTheme(name string) (ThemeStore, *models.Theme, error) {
 		store := m.Stores[i]
 		theme, err := store.Get(name)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, errors.Wrap(err)
 		}
 		if theme != nil {
 			theme.Name = &name
@@ -79,7 +84,7 @@ func (m *Module) getTheme(name string) (ThemeStore, *models.Theme, error) {
 func (m *Module) GetTheme(name string) (*models.Theme, error) {
 	_, theme, err := m.getTheme(name)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err)
 	}
 	return theme, nil
 }

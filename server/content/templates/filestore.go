@@ -62,6 +62,9 @@ func (f *FileStore) GetAsset(theme *models.Theme, assetName string) (*models.The
 	p := path.Join(f.dataDir, theme.GetName(), fileStoreAssetsDir, assetName)
 	b, err := ioutil.ReadFile(p)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, nil
+		}
 		return nil, err
 	}
 	data := string(b)
