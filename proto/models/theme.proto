@@ -3,6 +3,7 @@ syntax = "proto2";
 package press.models;
 
 import "page.proto";
+import "content.proto";
 
 message Theme {
     optional string uuid = 1;
@@ -17,22 +18,20 @@ message ThemeTemplate {
     optional string name = 2;
     optional string theme = 3;
     optional string engine = 4 [default='html']; // can have custom engines
-    repeated ThemePlaceholder placeholders = 5; // placeholders
+    optional bool hideContent = 5 [default=false];
+    repeated ThemePlaceholder placeholders = 10; // placeholders
     // maybe an option for extensions?
-    optional string data = 10;
+    optional string data = 11;
 }
 
 
 message ThemePlaceholder {
-    enum ThemePlaceholderType {
-        unknown = 0;
-        string = 1;
-        text = 2;
-    }
-
-    optional ThemePlaceholderType type = 2;
     optional string key = 1;
-    optional Content.ContentType contentType = 3;
+    oneof type {
+        ContentString short = 11;
+        ContentText text = 12;
+        ContentMultiple multiple = 13;
+    }
 }
 
 message ThemeAsset {

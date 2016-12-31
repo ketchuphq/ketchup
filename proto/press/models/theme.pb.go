@@ -13,45 +13,6 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-type ThemePlaceholder_ThemePlaceholderType int32
-
-const (
-	ThemePlaceholder_unknown ThemePlaceholder_ThemePlaceholderType = 0
-	ThemePlaceholder_string  ThemePlaceholder_ThemePlaceholderType = 1
-	ThemePlaceholder_text    ThemePlaceholder_ThemePlaceholderType = 2
-)
-
-var ThemePlaceholder_ThemePlaceholderType_name = map[int32]string{
-	0: "unknown",
-	1: "string",
-	2: "text",
-}
-var ThemePlaceholder_ThemePlaceholderType_value = map[string]int32{
-	"unknown": 0,
-	"string":  1,
-	"text":    2,
-}
-
-func (x ThemePlaceholder_ThemePlaceholderType) Enum() *ThemePlaceholder_ThemePlaceholderType {
-	p := new(ThemePlaceholder_ThemePlaceholderType)
-	*p = x
-	return p
-}
-func (x ThemePlaceholder_ThemePlaceholderType) String() string {
-	return proto.EnumName(ThemePlaceholder_ThemePlaceholderType_name, int32(x))
-}
-func (x *ThemePlaceholder_ThemePlaceholderType) UnmarshalJSON(data []byte) error {
-	value, err := proto.UnmarshalJSONEnum(ThemePlaceholder_ThemePlaceholderType_value, data, "ThemePlaceholder_ThemePlaceholderType")
-	if err != nil {
-		return err
-	}
-	*x = ThemePlaceholder_ThemePlaceholderType(value)
-	return nil
-}
-func (ThemePlaceholder_ThemePlaceholderType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor4, []int{2, 0}
-}
-
 type Theme struct {
 	Uuid             *string                   `protobuf:"bytes,1,opt,name=uuid" json:"uuid,omitempty"`
 	Name             *string                   `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
@@ -63,7 +24,7 @@ type Theme struct {
 func (m *Theme) Reset()                    { *m = Theme{} }
 func (m *Theme) String() string            { return proto.CompactTextString(m) }
 func (*Theme) ProtoMessage()               {}
-func (*Theme) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{0} }
+func (*Theme) Descriptor() ([]byte, []int) { return fileDescriptor5, []int{0} }
 
 func (m *Theme) GetUuid() string {
 	if m != nil && m.Uuid != nil {
@@ -98,18 +59,20 @@ type ThemeTemplate struct {
 	Name         *string             `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
 	Theme        *string             `protobuf:"bytes,3,opt,name=theme" json:"theme,omitempty"`
 	Engine       *string             `protobuf:"bytes,4,opt,name=engine,def=html" json:"engine,omitempty"`
-	Placeholders []*ThemePlaceholder `protobuf:"bytes,5,rep,name=placeholders" json:"placeholders,omitempty"`
+	HideContent  *bool               `protobuf:"varint,5,opt,name=hideContent,def=0" json:"hideContent,omitempty"`
+	Placeholders []*ThemePlaceholder `protobuf:"bytes,10,rep,name=placeholders" json:"placeholders,omitempty"`
 	// maybe an option for extensions?
-	Data             *string `protobuf:"bytes,10,opt,name=data" json:"data,omitempty"`
+	Data             *string `protobuf:"bytes,11,opt,name=data" json:"data,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
 func (m *ThemeTemplate) Reset()                    { *m = ThemeTemplate{} }
 func (m *ThemeTemplate) String() string            { return proto.CompactTextString(m) }
 func (*ThemeTemplate) ProtoMessage()               {}
-func (*ThemeTemplate) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{1} }
+func (*ThemeTemplate) Descriptor() ([]byte, []int) { return fileDescriptor5, []int{1} }
 
 const Default_ThemeTemplate_Engine string = "html"
+const Default_ThemeTemplate_HideContent bool = false
 
 func (m *ThemeTemplate) GetUuid() string {
 	if m != nil && m.Uuid != nil {
@@ -139,6 +102,13 @@ func (m *ThemeTemplate) GetEngine() string {
 	return Default_ThemeTemplate_Engine
 }
 
+func (m *ThemeTemplate) GetHideContent() bool {
+	if m != nil && m.HideContent != nil {
+		return *m.HideContent
+	}
+	return Default_ThemeTemplate_HideContent
+}
+
 func (m *ThemeTemplate) GetPlaceholders() []*ThemePlaceholder {
 	if m != nil {
 		return m.Placeholders
@@ -154,16 +124,44 @@ func (m *ThemeTemplate) GetData() string {
 }
 
 type ThemePlaceholder struct {
-	Key              *string                                `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
-	Type             *ThemePlaceholder_ThemePlaceholderType `protobuf:"varint,2,opt,name=type,enum=press.models.ThemePlaceholder_ThemePlaceholderType" json:"type,omitempty"`
-	ContentType      *Content_ContentType                   `protobuf:"varint,3,opt,name=contentType,enum=press.models.Content_ContentType" json:"contentType,omitempty"`
-	XXX_unrecognized []byte                                 `json:"-"`
+	Key *string `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
+	// Types that are valid to be assigned to Type:
+	//	*ThemePlaceholder_Short
+	//	*ThemePlaceholder_Text
+	//	*ThemePlaceholder_Multiple
+	Type             IsThemePlaceholder_Type `protobuf_oneof:"type"`
+	XXX_unrecognized []byte                  `json:"-"`
 }
 
 func (m *ThemePlaceholder) Reset()                    { *m = ThemePlaceholder{} }
 func (m *ThemePlaceholder) String() string            { return proto.CompactTextString(m) }
 func (*ThemePlaceholder) ProtoMessage()               {}
-func (*ThemePlaceholder) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{2} }
+func (*ThemePlaceholder) Descriptor() ([]byte, []int) { return fileDescriptor5, []int{2} }
+
+type IsThemePlaceholder_Type interface {
+	IsThemePlaceholder_Type()
+}
+
+type ThemePlaceholder_Short struct {
+	Short *ContentString `protobuf:"bytes,11,opt,name=short,oneof"`
+}
+type ThemePlaceholder_Text struct {
+	Text *ContentText `protobuf:"bytes,12,opt,name=text,oneof"`
+}
+type ThemePlaceholder_Multiple struct {
+	Multiple *ContentMultiple `protobuf:"bytes,13,opt,name=multiple,oneof"`
+}
+
+func (*ThemePlaceholder_Short) IsThemePlaceholder_Type()    {}
+func (*ThemePlaceholder_Text) IsThemePlaceholder_Type()     {}
+func (*ThemePlaceholder_Multiple) IsThemePlaceholder_Type() {}
+
+func (m *ThemePlaceholder) GetType() IsThemePlaceholder_Type {
+	if m != nil {
+		return m.Type
+	}
+	return nil
+}
 
 func (m *ThemePlaceholder) GetKey() string {
 	if m != nil && m.Key != nil {
@@ -172,18 +170,118 @@ func (m *ThemePlaceholder) GetKey() string {
 	return ""
 }
 
-func (m *ThemePlaceholder) GetType() ThemePlaceholder_ThemePlaceholderType {
-	if m != nil && m.Type != nil {
-		return *m.Type
+func (m *ThemePlaceholder) GetShort() *ContentString {
+	if x, ok := m.GetType().(*ThemePlaceholder_Short); ok {
+		return x.Short
 	}
-	return ThemePlaceholder_unknown
+	return nil
 }
 
-func (m *ThemePlaceholder) GetContentType() Content_ContentType {
-	if m != nil && m.ContentType != nil {
-		return *m.ContentType
+func (m *ThemePlaceholder) GetText() *ContentText {
+	if x, ok := m.GetType().(*ThemePlaceholder_Text); ok {
+		return x.Text
 	}
-	return Content_unknown
+	return nil
+}
+
+func (m *ThemePlaceholder) GetMultiple() *ContentMultiple {
+	if x, ok := m.GetType().(*ThemePlaceholder_Multiple); ok {
+		return x.Multiple
+	}
+	return nil
+}
+
+// XXX_OneofFuncs is for the internal use of the proto package.
+func (*ThemePlaceholder) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _ThemePlaceholder_OneofMarshaler, _ThemePlaceholder_OneofUnmarshaler, _ThemePlaceholder_OneofSizer, []interface{}{
+		(*ThemePlaceholder_Short)(nil),
+		(*ThemePlaceholder_Text)(nil),
+		(*ThemePlaceholder_Multiple)(nil),
+	}
+}
+
+func _ThemePlaceholder_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
+	m := msg.(*ThemePlaceholder)
+	// type
+	switch x := m.Type.(type) {
+	case *ThemePlaceholder_Short:
+		b.EncodeVarint(11<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Short); err != nil {
+			return err
+		}
+	case *ThemePlaceholder_Text:
+		b.EncodeVarint(12<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Text); err != nil {
+			return err
+		}
+	case *ThemePlaceholder_Multiple:
+		b.EncodeVarint(13<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Multiple); err != nil {
+			return err
+		}
+	case nil:
+	default:
+		return fmt.Errorf("ThemePlaceholder.Type has unexpected type %T", x)
+	}
+	return nil
+}
+
+func _ThemePlaceholder_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
+	m := msg.(*ThemePlaceholder)
+	switch tag {
+	case 11: // type.short
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(ContentString)
+		err := b.DecodeMessage(msg)
+		m.Type = &ThemePlaceholder_Short{msg}
+		return true, err
+	case 12: // type.text
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(ContentText)
+		err := b.DecodeMessage(msg)
+		m.Type = &ThemePlaceholder_Text{msg}
+		return true, err
+	case 13: // type.multiple
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(ContentMultiple)
+		err := b.DecodeMessage(msg)
+		m.Type = &ThemePlaceholder_Multiple{msg}
+		return true, err
+	default:
+		return false, nil
+	}
+}
+
+func _ThemePlaceholder_OneofSizer(msg proto.Message) (n int) {
+	m := msg.(*ThemePlaceholder)
+	// type
+	switch x := m.Type.(type) {
+	case *ThemePlaceholder_Short:
+		s := proto.Size(x.Short)
+		n += proto.SizeVarint(11<<3 | proto.WireBytes)
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *ThemePlaceholder_Text:
+		s := proto.Size(x.Text)
+		n += proto.SizeVarint(12<<3 | proto.WireBytes)
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *ThemePlaceholder_Multiple:
+		s := proto.Size(x.Multiple)
+		n += proto.SizeVarint(13<<3 | proto.WireBytes)
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case nil:
+	default:
+		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
+	}
+	return n
 }
 
 type ThemeAsset struct {
@@ -197,7 +295,7 @@ type ThemeAsset struct {
 func (m *ThemeAsset) Reset()                    { *m = ThemeAsset{} }
 func (m *ThemeAsset) String() string            { return proto.CompactTextString(m) }
 func (*ThemeAsset) ProtoMessage()               {}
-func (*ThemeAsset) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{3} }
+func (*ThemeAsset) Descriptor() ([]byte, []int) { return fileDescriptor5, []int{3} }
 
 func (m *ThemeAsset) GetUuid() string {
 	if m != nil && m.Uuid != nil {
@@ -232,7 +330,6 @@ func init() {
 	proto.RegisterType((*ThemeTemplate)(nil), "press.models.ThemeTemplate")
 	proto.RegisterType((*ThemePlaceholder)(nil), "press.models.ThemePlaceholder")
 	proto.RegisterType((*ThemeAsset)(nil), "press.models.ThemeAsset")
-	proto.RegisterEnum("press.models.ThemePlaceholder_ThemePlaceholderType", ThemePlaceholder_ThemePlaceholderType_name, ThemePlaceholder_ThemePlaceholderType_value)
 }
 func (m *Theme) SetUuid(v *string) {
 	m.Uuid = v
@@ -266,6 +363,10 @@ func (m *ThemeTemplate) SetEngine(v *string) {
 	m.Engine = v
 }
 
+func (m *ThemeTemplate) SetHideContent(v *bool) {
+	m.HideContent = v
+}
+
 func (m *ThemeTemplate) SetPlaceholders(v []*ThemePlaceholder) {
 	m.Placeholders = v
 }
@@ -276,14 +377,6 @@ func (m *ThemeTemplate) SetData(v *string) {
 
 func (m *ThemePlaceholder) SetKey(v *string) {
 	m.Key = v
-}
-
-func (m *ThemePlaceholder) SetType(v *ThemePlaceholder_ThemePlaceholderType) {
-	m.Type = v
-}
-
-func (m *ThemePlaceholder) SetContentType(v *Content_ContentType) {
-	m.ContentType = v
 }
 
 func (m *ThemeAsset) SetUuid(v *string) {
@@ -302,33 +395,35 @@ func (m *ThemeAsset) SetData(v *string) {
 	m.Data = v
 }
 
-func init() { proto.RegisterFile("theme.proto", fileDescriptor4) }
+func init() { proto.RegisterFile("theme.proto", fileDescriptor5) }
 
-var fileDescriptor4 = []byte{
-	// 396 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xa4, 0x91, 0x41, 0x8f, 0x93, 0x40,
-	0x14, 0xc7, 0x85, 0x42, 0xb5, 0x8f, 0xda, 0x90, 0x49, 0x0f, 0x93, 0x6a, 0xb4, 0x72, 0xea, 0x89,
-	0x44, 0x3c, 0xa8, 0x3d, 0xa9, 0x8d, 0xf1, 0x6a, 0xb0, 0x17, 0x2f, 0x26, 0x93, 0xf2, 0xd2, 0x36,
-	0x85, 0x81, 0x30, 0x83, 0xca, 0xe7, 0xdb, 0x6f, 0xb1, 0xdf, 0x61, 0xbf, 0xc3, 0x66, 0x66, 0x68,
-	0x0a, 0xbb, 0x93, 0xcd, 0x26, 0x7b, 0xe2, 0xf1, 0xe7, 0xff, 0xff, 0xbd, 0xc7, 0x7b, 0x10, 0xc8,
-	0x03, 0x16, 0x18, 0x57, 0x75, 0x29, 0x4b, 0x32, 0xad, 0x6a, 0x14, 0x22, 0x2e, 0xca, 0x0c, 0x73,
-	0xb1, 0x80, 0x8a, 0xed, 0xbb, 0x2f, 0xd1, 0xb5, 0x0b, 0xfe, 0x56, 0x39, 0x09, 0x01, 0xaf, 0x69,
-	0x8e, 0x19, 0x75, 0x96, 0xce, 0x6a, 0x92, 0xea, 0x5a, 0x69, 0x9c, 0x15, 0x48, 0x5d, 0xa3, 0xa9,
-	0x9a, 0x7c, 0x81, 0x89, 0xc4, 0xa2, 0xca, 0x99, 0x44, 0x41, 0x61, 0x39, 0x5a, 0x05, 0x49, 0x14,
-	0xf7, 0xf9, 0xb1, 0xe6, 0xc5, 0xdb, 0xb3, 0xe9, 0x3b, 0x97, 0x75, 0x9b, 0x5e, 0x42, 0xe4, 0x23,
-	0x8c, 0x99, 0x10, 0x28, 0x05, 0x0d, 0x74, 0xfc, 0xad, 0x2d, 0xfe, 0x55, 0x3b, 0x4c, 0xb6, 0xb3,
-	0x2f, 0x7e, 0xc3, 0x6c, 0x48, 0x25, 0x21, 0x8c, 0x4e, 0xd8, 0x76, 0x33, 0xab, 0x92, 0xbc, 0x07,
-	0xff, 0x2f, 0xcb, 0x1b, 0x33, 0x73, 0x90, 0xbc, 0xb2, 0xb0, 0xcf, 0x8c, 0xd4, 0x38, 0xd7, 0xee,
-	0x27, 0x67, 0xf1, 0x0b, 0x82, 0x5e, 0x47, 0x0b, 0x37, 0x1e, 0x72, 0xa9, 0x85, 0xab, 0x01, 0x3d,
-	0x68, 0x74, 0xe5, 0xc0, 0xcb, 0x41, 0xc7, 0x47, 0x2f, 0x79, 0x0e, 0xbe, 0xbe, 0x1f, 0x1d, 0x69,
-	0xd1, 0xbc, 0x90, 0xd7, 0x30, 0x46, 0xbe, 0x3f, 0x72, 0xa4, 0x9e, 0x92, 0xd7, 0xde, 0x41, 0x16,
-	0x79, 0xda, 0x69, 0xe4, 0x1b, 0x4c, 0xab, 0x9c, 0xed, 0xf0, 0x50, 0xe6, 0x19, 0xd6, 0x82, 0xfa,
-	0x7a, 0xb9, 0x6f, 0x2c, 0x83, 0xfe, 0xbc, 0xd8, 0xd2, 0x41, 0x46, 0xcd, 0x92, 0x31, 0xc9, 0x28,
-	0x98, 0x59, 0x54, 0x1d, 0xdd, 0x38, 0x10, 0xde, 0x8d, 0x59, 0x16, 0xf4, 0x03, 0x3c, 0xd9, 0x56,
-	0xe6, 0x37, 0x66, 0xc9, 0x87, 0x87, 0xdb, 0xde, 0x13, 0xb6, 0x6d, 0x85, 0xa9, 0x06, 0x90, 0x0d,
-	0x04, 0xbb, 0x92, 0x4b, 0xe4, 0x52, 0x89, 0x7a, 0x03, 0xb3, 0xe4, 0xdd, 0x90, 0xb7, 0x31, 0x86,
-	0xf3, 0x53, 0xa7, 0xfb, 0xa9, 0xe8, 0x33, 0xcc, 0x6d, 0x2d, 0x48, 0x00, 0xcf, 0x1b, 0x7e, 0xe2,
-	0xe5, 0x3f, 0x1e, 0x3e, 0x23, 0x00, 0x63, 0x21, 0xeb, 0x23, 0xdf, 0x87, 0x0e, 0x79, 0x01, 0x9e,
-	0xc4, 0xff, 0x32, 0x74, 0xa3, 0x3f, 0x00, 0x97, 0x73, 0x3e, 0xf1, 0x62, 0x96, 0x7d, 0xde, 0x06,
-	0x00, 0x00, 0xff, 0xff, 0x6a, 0x4a, 0x6e, 0xc0, 0x9a, 0x03, 0x00, 0x00,
+var fileDescriptor5 = []byte{
+	// 421 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xa4, 0x91, 0xbf, 0x8e, 0xd3, 0x40,
+	0x10, 0xc6, 0xe3, 0xc4, 0x8e, 0xee, 0xc6, 0x09, 0x3a, 0xad, 0x28, 0x96, 0xf0, 0x2f, 0x72, 0x43,
+	0x2a, 0x23, 0x8e, 0x02, 0x14, 0x1a, 0x38, 0x84, 0x94, 0x06, 0x09, 0xed, 0xa5, 0xa1, 0x41, 0x5a,
+	0x9d, 0x87, 0xd8, 0x62, 0xfd, 0x47, 0xde, 0x09, 0xba, 0x3c, 0x25, 0x3d, 0xcf, 0xc0, 0x43, 0x20,
+	0xef, 0xda, 0xd8, 0x86, 0x2d, 0x90, 0xae, 0x1b, 0xcf, 0x7e, 0xbf, 0x6f, 0xc6, 0xf3, 0x41, 0x48,
+	0x29, 0xe6, 0x18, 0x57, 0x75, 0x49, 0x25, 0x5b, 0x54, 0x35, 0x6a, 0x1d, 0xe7, 0x65, 0x82, 0x4a,
+	0xaf, 0xa0, 0x92, 0x87, 0xf6, 0x65, 0xb5, 0xbc, 0x29, 0x0b, 0xc2, 0x82, 0xec, 0x67, 0xf4, 0x73,
+	0x0a, 0xc1, 0xbe, 0x01, 0x19, 0x03, 0xff, 0x78, 0xcc, 0x12, 0xee, 0xad, 0xbd, 0xcd, 0xb9, 0x30,
+	0x75, 0xd3, 0x2b, 0x64, 0x8e, 0x7c, 0x6a, 0x7b, 0x4d, 0xcd, 0xde, 0xc2, 0x39, 0x61, 0x5e, 0x29,
+	0x49, 0xa8, 0x39, 0xac, 0x67, 0x9b, 0xf0, 0x32, 0x8a, 0x87, 0xe3, 0x62, 0xe3, 0x17, 0xef, 0x3b,
+	0xd1, 0x87, 0x82, 0xea, 0x93, 0xe8, 0x21, 0xf6, 0x0a, 0xe6, 0x52, 0x6b, 0x24, 0xcd, 0x43, 0x83,
+	0x3f, 0x75, 0xe1, 0xef, 0x8c, 0xc2, 0xb2, 0xad, 0x7c, 0xf5, 0x19, 0xee, 0x8d, 0x5d, 0xd9, 0x05,
+	0xcc, 0xbe, 0xe1, 0xa9, 0xdd, 0xb9, 0x29, 0xd9, 0x0b, 0x08, 0xbe, 0x4b, 0x75, 0xb4, 0x3b, 0x87,
+	0x97, 0x0f, 0x1d, 0xde, 0x9d, 0x87, 0xb0, 0xca, 0xed, 0xf4, 0xb5, 0xb7, 0xba, 0x86, 0x70, 0x30,
+	0xd1, 0xe1, 0x1b, 0x8f, 0x7d, 0xb9, 0xc3, 0xd7, 0x18, 0x0c, 0x4c, 0xa3, 0x5f, 0x1e, 0x2c, 0x47,
+	0x13, 0xff, 0xfb, 0xc8, 0xf7, 0x21, 0x30, 0x71, 0xf2, 0x99, 0x69, 0xda, 0x0f, 0xf6, 0x08, 0xe6,
+	0x58, 0x1c, 0xb2, 0x02, 0xb9, 0xdf, 0xb4, 0xb7, 0x7e, 0x4a, 0xb9, 0x12, 0x6d, 0x8f, 0x3d, 0x83,
+	0x30, 0xcd, 0x12, 0x7c, 0x6f, 0xf3, 0xe5, 0xc1, 0xda, 0xdb, 0x9c, 0x6d, 0x83, 0xaf, 0x52, 0x69,
+	0x14, 0xc3, 0x17, 0x76, 0x05, 0x8b, 0x4a, 0xc9, 0x1b, 0x4c, 0x4b, 0x95, 0x60, 0xdd, 0x85, 0xf8,
+	0xc4, 0xf1, 0x47, 0x9f, 0x7a, 0x99, 0x18, 0x31, 0xcd, 0xd2, 0x89, 0x24, 0xc9, 0x43, 0xbb, 0x74,
+	0x53, 0x47, 0x3f, 0x3c, 0xb8, 0xf8, 0x1b, 0x73, 0x5c, 0xf2, 0x25, 0x04, 0x3a, 0x2d, 0x6b, 0x32,
+	0xec, 0x3f, 0x09, 0xb5, 0x4b, 0x5e, 0x53, 0x9d, 0x15, 0x87, 0xdd, 0x44, 0x58, 0x2d, 0x7b, 0x0e,
+	0x3e, 0xe1, 0x2d, 0xf1, 0x85, 0x61, 0x1e, 0x38, 0x99, 0x3d, 0xde, 0xd2, 0x6e, 0x22, 0x8c, 0x90,
+	0xbd, 0x81, 0xb3, 0xfc, 0xa8, 0x28, 0xab, 0x14, 0xf2, 0xa5, 0x81, 0x1e, 0x3b, 0xa1, 0x8f, 0xad,
+	0x68, 0x37, 0x11, 0x7f, 0x80, 0xab, 0x39, 0xf8, 0x74, 0xaa, 0x30, 0xfa, 0x02, 0xd0, 0x27, 0x7b,
+	0xc7, 0xf0, 0xba, 0x8b, 0x41, 0x7f, 0xb1, 0xdf, 0x01, 0x00, 0x00, 0xff, 0xff, 0x0d, 0xde, 0xed,
+	0x18, 0xb4, 0x03, 0x00, 0x00,
 }

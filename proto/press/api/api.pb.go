@@ -7,6 +7,7 @@ Package api is a generated protocol buffer package.
 
 It is generated from these files:
 	api.proto
+	content.proto
 	metadata.proto
 	page.proto
 	route.proto
@@ -20,6 +21,9 @@ It has these top-level messages:
 	ListPageResponse
 	ListRouteResponse
 	ListThemeResponse
+	ContentMultiple
+	ContentText
+	ContentString
 	Metadata
 	Timestamp
 	Page

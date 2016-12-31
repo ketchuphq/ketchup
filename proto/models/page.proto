@@ -2,6 +2,8 @@ syntax = "proto2";
 
 package press.models;
 
+import "content.proto";
+
 message Timestamp {
     optional int64 created_at = 1;
     optional int64 updated_at = 2;
@@ -22,14 +24,14 @@ message Page {
 
 // versioned? drafts?
 message Content {
-    enum ContentType {
-        unknown = 0;
-        html = 1;
-        markdown = 2;
-    }
     optional string uuid = 1;
-    optional ContentType contentType = 2;
     optional string key = 3;
     optional string value = 4;
     optional Timestamp timestamps = 5;
+
+    oneof type {
+        ContentString short = 11;
+        ContentText text = 12;
+        ContentMultiple multiple = 13;
+    }
 }

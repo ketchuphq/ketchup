@@ -19,17 +19,17 @@ type Route struct {
 	// Types that are valid to be assigned to Target:
 	//	*Route_File
 	//	*Route_PageUuid
-	Target           isRoute_Target `protobuf_oneof:"target"`
+	Target           IsRoute_Target `protobuf_oneof:"target"`
 	XXX_unrecognized []byte         `json:"-"`
 }
 
 func (m *Route) Reset()                    { *m = Route{} }
 func (m *Route) String() string            { return proto.CompactTextString(m) }
 func (*Route) ProtoMessage()               {}
-func (*Route) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{0} }
+func (*Route) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{0} }
 
-type isRoute_Target interface {
-	isRoute_Target()
+type IsRoute_Target interface {
+	IsRoute_Target()
 }
 
 type Route_File struct {
@@ -39,10 +39,10 @@ type Route_PageUuid struct {
 	PageUuid string `protobuf:"bytes,11,opt,name=page_uuid,json=pageUuid,oneof"`
 }
 
-func (*Route_File) isRoute_Target()     {}
-func (*Route_PageUuid) isRoute_Target() {}
+func (*Route_File) IsRoute_Target()     {}
+func (*Route_PageUuid) IsRoute_Target() {}
 
-func (m *Route) GetTarget() isRoute_Target {
+func (m *Route) GetTarget() IsRoute_Target {
 	if m != nil {
 		return m.Target
 	}
@@ -154,9 +154,9 @@ func (m *Route) SetPath(v *string) {
 	m.Path = v
 }
 
-func init() { proto.RegisterFile("route.proto", fileDescriptor3) }
+func init() { proto.RegisterFile("route.proto", fileDescriptor4) }
 
-var fileDescriptor3 = []byte{
+var fileDescriptor4 = []byte{
 	// 134 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xe2, 0x2e, 0xca, 0x2f, 0x2d,
 	0x49, 0xd5, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x29, 0x28, 0x4a, 0x2d, 0x2e, 0xd6, 0xcb,

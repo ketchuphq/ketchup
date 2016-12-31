@@ -1,0 +1,30 @@
+syntax = "proto2";
+
+package press.models;
+
+message ContentMultiple {
+    enum DropdownType {
+        unknown = 0;
+        radio = 1;
+        dropdown = 2;
+    }
+    optional string title = 1;
+    repeated string options = 2;
+    optional DropdownType type = 3 [default=dropdown];
+}
+
+enum ContentTextType {
+    text = 0;
+    markdown = 1;
+    html = 2;
+}
+
+message ContentText {
+    optional string title = 1;
+    optional ContentTextType type = 2;
+}
+
+message ContentString {
+    optional string title = 1;
+    optional ContentTextType type = 2;
+}
