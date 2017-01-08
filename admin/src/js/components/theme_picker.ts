@@ -47,7 +47,7 @@ export default class ThemePickerComponent {
   static view(ctrl: ThemePickerComponent) {
     return m('.theme-picker', [
       m('.control', [
-        m('.label', 'Template'),
+        m('.label', 'Theme'),
         m('select', {
           value: ctrl.selectedTheme(),
           onchange: (e: Event) => {
@@ -63,7 +63,7 @@ export default class ThemePickerComponent {
         )
       ]),
       m('.control', [
-        m('.label', 'Theme'),
+        m('.label', 'Template'),
         m('select', {
           value: ctrl.selectedTemplate(),
           onchange: (e: Event) => {
