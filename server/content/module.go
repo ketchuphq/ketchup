@@ -19,7 +19,8 @@ type Module struct {
 	DB        *db.Module
 	Logger    *logger.Module
 	Templates *templates.Module
-	router    http.Handler
+
+	contentRouter http.Handler
 }
 
 var _ service.Module = &Module{}
@@ -28,7 +29,7 @@ var _ service.Module = &Module{}
 func (m *Module) Init(c *service.Config) {
 	c.Start = func() {
 		var err error
-		m.router, _, err = m.buildRouter()
+		m.contentRouter, _, err = m.buildRouter()
 		if err != nil {
 			panic(err)
 		}
@@ -39,8 +40,8 @@ func (m *Module) Init(c *service.Config) {
 // ServeHTTP is a layer of indirection to allow us
 // to replace the router at runtime.
 func (m *Module) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	if m.router != nil {
-		m.router.ServeHTTP(rw, req)
+	if m.contentRouter != nil {
+		m.contentRouter.ServeHTTP(rw, req)
 	}
 }
 
@@ -51,7 +52,7 @@ func (m *Module) ReloadRouter() error {
 	if err != nil {
 		return err
 	}
-	m.router = newRouter
+	m.contentRouter = newRouter
 	return nil
 }
 
