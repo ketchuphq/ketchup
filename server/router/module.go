@@ -13,6 +13,8 @@ import (
 	"github.com/octavore/nagax/logger"
 	"github.com/octavore/nagax/router"
 
+	"path"
+
 	"github.com/octavore/press/proto/press/api"
 )
 
@@ -50,7 +52,8 @@ func (m *Module) InternalError(rw http.ResponseWriter, err error) {
 	switch e := err.(type) {
 	case *errors.Error:
 		s := e.StackFrames()[0]
-		m.Logger.Errorf("[%s:%d] %v", s.Package, s.LineNumber, e.Error())
+		f := path.Base(s.File)
+		m.Logger.Errorf("[%s/%s:%d] %v", s.Package, f, s.LineNumber, e.Error())
 	default:
 		m.Logger.Error(e)
 	}
