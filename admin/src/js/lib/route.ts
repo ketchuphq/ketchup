@@ -26,6 +26,9 @@ export default class Route implements API.Route {
   }
 
   static format(s: string) {
+    if (s == null) {
+      return '';
+    }
     s = s.toLowerCase()
       .replace(/[^a-zA-Z0-9\/]+/ig, '-')
       .replace(/^-+/, '')
