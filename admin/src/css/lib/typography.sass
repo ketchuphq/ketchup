@@ -1,5 +1,6 @@
-$logoFont: 'Rubik', sans-serif;
-$titleFont: 'Roboto Slab', sans-serif;
+$logoFont: 'Permanent Marker', sans-serif
+$bodyFont: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif
+$titleFont: $bodyFont
 $fontSize_1: 12px
 $fontSize0: 14px
 $fontSize1: 16px
@@ -7,12 +8,13 @@ $fontSize2: 22px
 $fontSize3: 26px
 
 html, body
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif
+  font-family: $bodyFont
   color: $black1
   font-size: $fontSize1
 
 h1, h2, h3
   font-family: $titleFont
+  font-weight: normal
 
 =label($color: $black5)
   font-size: $fontSize_1

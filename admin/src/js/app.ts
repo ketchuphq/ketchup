@@ -23,7 +23,7 @@ export let routes: Mithril.Routes = {
 
 document.addEventListener('DOMContentLoaded', () => {
   WebFont.load({
-    google: { families: ['Rubik:500', 'Roboto+Slab:400,700'] }
+    google: { families: ['Permanent Marker'] }
   });
   let root = document.getElementById('app');
   m.route.mode = 'pathname';
