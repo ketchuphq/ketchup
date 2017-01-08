@@ -1,10 +1,11 @@
 package api
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"time"
 
-	"github.com/golang/protobuf/jsonpb"
 	"github.com/julienschmidt/httprouter"
 
 	"github.com/octavore/press/db"
@@ -12,6 +13,7 @@ import (
 	"github.com/octavore/press/proto/press/api"
 	"github.com/octavore/press/proto/press/models"
 	"github.com/octavore/press/server/router"
+	"github.com/octavore/press/util/errors"
 )
 
 func (m *Module) getPage(par httprouter.Params, fn func(*models.Page) error) (*models.Page, error) {
@@ -54,7 +56,11 @@ func (m *Module) ListPages(rw http.ResponseWriter, req *http.Request, par httpro
 
 func (m *Module) UpdatePage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	page := &models.Page{}
-	err := jsonpb.Unmarshal(req.Body, page)
+	b, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		return errors.Wrap(err)
+	}
+	err = json.Unmarshal(b, page)
 	if err != nil {
 		return err
 	}
