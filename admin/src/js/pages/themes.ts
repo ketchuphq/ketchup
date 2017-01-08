@@ -1,10 +1,12 @@
 import Theme from 'lib/theme';
 import Layout from 'components/layout';
+import { MustAuthController } from 'components/auth';
 
-export default class ThemePage {
+export default class ThemePage extends MustAuthController {
   themes: Mithril.Property<Theme[]>;
 
   constructor() {
+    super();
     this.themes = m.prop([]);
     Theme.list().then((themes) => this.themes(themes));
   }

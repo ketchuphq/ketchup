@@ -6,13 +6,15 @@ import EditRoutesComponent from 'components/edit_route';
 import ThemePickerComponent from 'components/theme_picker';
 import * as Toaster from 'components/toaster';
 import { renderEditor } from 'components/content';
+import { MustAuthController } from 'components/auth';
 
-export default class PagePage {
+export default class PagePage extends MustAuthController {
   page: Mithril.Property<Page>;
   showControls: Mithril.Property<boolean>;
   template: Mithril.Property<API.ThemeTemplate>;
 
   constructor() {
+    super();
     this.showControls = m.prop(false);
     this.page = m.prop<Page>();
     this.template = m.prop<API.ThemeTemplate>();

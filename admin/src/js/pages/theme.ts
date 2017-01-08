@@ -1,10 +1,12 @@
 import Theme from 'lib/theme';
 import Layout from 'components/layout';
+import { MustAuthController } from 'components/auth';
 
-export default class ThemePage {
+export default class ThemePage extends MustAuthController {
   theme: Mithril.Property<Theme>;
 
   constructor() {
+    super();
     this.theme = m.prop<Theme>();
     let themeName = m.route.param('name');
     if (themeName) {
@@ -19,8 +21,7 @@ export default class ThemePage {
     let templateKeys = Object.keys(ctrl.theme().templates);
     let assetKeys = Object.keys(ctrl.theme().assets);
     return Layout(
-      !ctrl.theme() ? ''
-        :
+      !ctrl.theme() ? '' :
         m('.theme', [
           m('h1',
             m.trust('Theme &rsaquo; '),

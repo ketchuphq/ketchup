@@ -1,9 +1,12 @@
 import Page from 'lib/page';
 import Layout from 'components/layout';
+import { MustAuthController } from 'components/auth';
 
-export default class PagesPage {
+
+export default class PagesPage extends MustAuthController {
   pages: Mithril.Property<Page[]>;
   constructor() {
+    super();
     this.pages = m.prop([]);
     Page.list().then((pages) => this.pages(pages));
   }
