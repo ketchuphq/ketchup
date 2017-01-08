@@ -58,3 +58,65 @@
   .ql-container
     height: 600px
     font-size: 16px
+    line-height: 1.6
+    h1, h2, h3
+      font-family: $bodyFont
+      margin: 0.5em 0
+    h1
+      font-size: 1.4em
+    h2
+      font-size: 1.2em
+    h3
+      font-size: 1.1em
+    p
+      margin-bottom: 10px
+
+  .ql-container-full
+    transition-property: 'background color'
+    transition-delay: 0s
+    transition-timing-function: ease-out
+    transition-duration: 0.1s
+    &.ql-container-full-dark
+      .ql-container
+        background: $black1
+        border-color: $black1
+        color: $black8
+      .qlx-controls
+        color: white
+    .ql-container
+      height: 100%
+      top: 0
+      left: 0
+      right: 0
+      position: fixed
+      background: white
+
+      transition-property: background
+      transition-delay: 0s
+      transition-timing-function: ease-out
+      transition-duration: 0.1s
+    .ql-editor
+      margin: 0 auto
+      padding: 15px
+      max-width: 600px
+    .qlx-controls
+      position: fixed
+      font-size: 36px
+      top: 10px
+      right: 10px
+      z-index: 10
+      transition-property: 'color'
+      color: $black5
+      span
+        cursor: pointer
+        transition-delay: 0s
+        transition-timing-function: ease-out
+        transition-duration: 0.1s
+        &:hover
+          color: $black8
+
+  .qlx-maximize
+    font-size: 14px
+    padding: 4px 0
+    cursor: pointer
+    float: right
