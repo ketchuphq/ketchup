@@ -15,8 +15,8 @@ const defaultContent: API.Content = {
 const defaultPage: API.Page = {
   uuid: null,
   name: null,
-  theme: 'basic',
-  template: 'index.html',
+  theme: 'none',
+  template: 'default',
   contents: [defaultContent],
   timestamps: {
     createdAt: null,
