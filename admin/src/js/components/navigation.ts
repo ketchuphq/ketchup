@@ -30,14 +30,14 @@ export default class NavigationComponent extends AuthController {
   static view(ctrl: NavigationComponent) {
     if (!ctrl.user()) {
       return m('.container--navigation', [
-        ctrl.link('/admin', 'ketchup', { additionalClasses: '.nav-title' }),
+        ctrl.link('/admin', 'K', { additionalClasses: '.nav-title' }),
         ctrl.link('/admin/login', 'Login')
       ]);
     }
     return m('.container--navigation', {
       className: ctrl.collapsed() ? 'container--navigation--hidden' : '',
     }, [
-        ctrl.link('/admin', 'ketchup', { additionalClasses: '.nav-title' }),
+        ctrl.link('/admin', 'K', { additionalClasses: '.nav-title' }),
         m('.nav-button',
           m('a.button.button--green.button--center', {
             href: '/admin/compose',
