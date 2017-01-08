@@ -35,27 +35,30 @@ export default class LoginPage extends AuthController {
   static view(ctrl: LoginPage) {
     return m('.login',
       Toaster.render(),
-      m('h1', 'Login'),
-      m('form', {
-        onsubmit: (event: Event) => {
-          event.preventDefault();
-          ctrl.login();
-        }
-      }, [
-          m('div',
-            m('input[type=text]', {
-              placeholder: 'email',
-              onchange: m.withAttr('value', ctrl.email)
-            }),
-          ),
-          m('div',
-            m('input[type=password]', {
-              placeholder: 'password',
-              onchange: m.withAttr('value', ctrl.password)
-            })
-          ),
-          m('button.button.button--green', 'Log In')
-        ])
+      m('.login-logo', 'Ketchup'),
+      m('.login-box',
+        m('h1', 'Log In'),
+        m('form', {
+          onsubmit: (event: Event) => {
+            event.preventDefault();
+            ctrl.login();
+          }
+        }, [
+            m('div',
+              m('input[type=text]', {
+                placeholder: 'email',
+                onchange: m.withAttr('value', ctrl.email)
+              }),
+            ),
+            m('div',
+              m('input[type=password]', {
+                placeholder: 'password',
+                onchange: m.withAttr('value', ctrl.password)
+              })
+            ),
+            m('button.button.button--green', 'Log In')
+          ])
+      )
     );
   }
 }

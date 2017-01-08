@@ -1,6 +1,28 @@
 .login
-  margin: 0 auto
-  input[type=text], input[type=password]
-    +input-text
-  .button
-    margin-top: 12px
+  height: 100%
+  width: 100%
+  background: #bc3e4d;
+
+  .login-logo
+    width: 400px
+    font-family: $logoFont
+    font-size: 45px
+    margin: 60px auto 45px
+    color: white
+    text-align: center
+
+  .login-box
+    background: white
+    border-radius: 4px
+    margin: 0 auto
+    width: 400px
+    padding: 30px
+    h1
+      text-align: center
+      margin-top: 0
+      margin-bottom: 20px
+    input[type=text], input[type=password]
+      +input-text($width: 100%)
+      margin-bottom: 15px
+    .button
+      margin-top: 12px
