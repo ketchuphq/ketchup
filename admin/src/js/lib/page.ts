@@ -66,12 +66,29 @@ export default class Page extends API.Page {
     });
   }
 
+  delete(): Mithril.Promise<API.Page> {
+    return m.request({
+      method: 'DELETE',
+      url: `/api/v1/pages/${this.uuid}`,
+    });
+  }
+
   publish(): Mithril.Promise<API.Page> {
     return m.request({
       method: 'POST',
       url: `/api/v1/pages/${this.uuid}/publish`,
     }).then((page: API.Page) => {
       this.publishedAt = page.publishedAt;
+      return page;
+    });
+  }
+
+  unpublish(): Mithril.Promise<API.Page> {
+    return m.request({
+      method: 'POST',
+      url: `/api/v1/pages/${this.uuid}/unpublish`,
+    }).then((page: API.Page) => {
+      this.publishedAt = null;
       return page;
     });
   }

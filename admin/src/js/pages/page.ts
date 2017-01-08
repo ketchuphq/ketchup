@@ -48,13 +48,11 @@ export default class PagePage extends MustAuthController {
   }
 
   save() {
-    this.page()
-      .save()
-      .then((page: API.Page) => {
-        this.page().uuid = page.uuid;
-        window.history.replaceState(null, this.page().name, `/admin/pages/${page.uuid}`);
-        return this.page().saveRoutes();
-      })
+    this.page().save().then((page: API.Page) => {
+      this.page().uuid = page.uuid;
+      window.history.replaceState(null, this.page().name, `/admin/pages/${page.uuid}`);
+      return this.page().saveRoutes();
+    })
       .then(() => {
         Toaster.add('Page successfully saved');
       })
@@ -68,12 +66,25 @@ export default class PagePage extends MustAuthController {
   }
 
   publish() {
-    this.page()
-      .publish()
-      .then(() => {
-        Toaster.add('Page published');
-        m.redraw();
-      });
+    // todo: handle case where not saved yet
+    this.page().publish().then(() => {
+      Toaster.add('Page published');
+      m.redraw();
+    });
+  }
+
+  unpublish() {
+    this.page().unpublish().then(() => {
+      Toaster.add('Page unpublished');
+      m.redraw();
+    });
+  }
+
+  delete() {
+    this.page().delete().then(() => {
+      Toaster.add('Page deleted', 'error');
+      m.route('/admin/pages');
+    });
   }
 
   renderSavePublish() {
@@ -81,10 +92,19 @@ export default class PagePage extends MustAuthController {
       m('a.button.button--small.button--green', {
         onclick: (e: Event) => { e.stopPropagation(); this.save(); }
       }, 'Save'),
+      !this.page().uuid ? '' :
+        m('a.button.button--small.button--red', {
+          onclick: (e: Event) => { e.stopPropagation(); this.delete(); }
+        }, 'Delete'),
       this.page().isPublished ?
-        m('a.button.button--small.button--blue', {
-          href: this.page().defaultRoute
-        }, 'View')
+        [
+          m('a.button.button--small.button--blue', {
+            onclick: (e: Event) => { e.stopPropagation(); this.unpublish(); }
+          }, 'Unpublish'),
+          m('a.button.button--small.button--blue', {
+            href: this.page().defaultRoute
+          }, 'View'),
+        ]
         :
         m('a.button.button--small.button--blue', {
           onclick: (e: Event) => { e.stopPropagation(); this.publish(); }
@@ -98,7 +118,7 @@ export default class PagePage extends MustAuthController {
         m('.infoset', {
           onclick: () => { this.showControls(true); }
         }, [
-            m('.small.black8', [
+            m('.small.black5', [
               !this.page().defaultRoute ? '' :
                 ['Path: ', m('strong', this.page().defaultRoute), ', '],
               'Theme: ', m('strong', this.page().theme), ', ',
@@ -134,8 +154,6 @@ export default class PagePage extends MustAuthController {
         this.renderSavePublish()
       ]);
   }
-
-
 
   renderEditors() {
     if (!this.page()) {
@@ -190,8 +208,6 @@ export default class PagePage extends MustAuthController {
   static view(ctrl: PagePage) {
     return Layout(
       m('.page-editor', [
-        ctrl.renderSettings(),
-        ctrl.renderSettingsEditor(),
         m('.controls',
           m('input[type=text].large', {
             placeholder: 'title...',
@@ -201,6 +217,8 @@ export default class PagePage extends MustAuthController {
             })
           }),
         ),
+        ctrl.renderSettings(),
+        ctrl.renderSettingsEditor(),
         ctrl.renderEditors()
       ])
     );
