@@ -22,6 +22,7 @@ type contentMap map[string]interface{}
 
 func (m *Module) createContentMap(page *models.Page) (contentMap, error) {
 	contents := map[string]interface{}{}
+	contents["title"] = page.GetName()
 	var err error
 	for _, c := range page.Contents {
 		switch c.GetType().(type) {
@@ -34,7 +35,7 @@ func (m *Module) createContentMap(page *models.Page) (contentMap, error) {
 		default:
 			m.Logger.Warningf("unknown content type: %s", c.GetType())
 		}
-		// future: allow custom registere content type renderers
+		// future: allow custom registered content type renderers
 		if err != nil {
 			return nil, err
 		}
