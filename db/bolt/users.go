@@ -1,13 +1,12 @@
 package bolt
 
 import (
-	"errors"
-
 	"github.com/boltdb/bolt"
 	"github.com/golang/protobuf/proto"
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/octavore/press/proto/press/models"
+	"github.com/octavore/press/util/errors"
 )
 
 const USER_BUCKET = "users"
@@ -52,5 +51,13 @@ func (m *Module) UpdateUser(user *models.User) error {
 	if user.GetEmail() == "" {
 		return errors.New("user email is required")
 	}
+	u2, err := m.GetUserByEmail(user.GetEmail())
+	if err != nil {
+		return err
+	}
+	if u2 != nil && u2.GetUuid() != user.GetUuid() {
+		return errors.New("user already exists")
+	}
+
 	return m.Update(USER_BUCKET, user)
 }
