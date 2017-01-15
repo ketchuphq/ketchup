@@ -8,14 +8,21 @@ import (
 	"path"
 
 	"github.com/octavore/naga/service"
-	"github.com/octavore/nagax/config"
 	"github.com/octavore/nagax/logger"
 
 	"github.com/octavore/press/proto/press/models"
+	"github.com/octavore/press/server/config"
 	"github.com/octavore/press/util/errors"
 )
 
 const themeDir = "themes"
+
+type ThemesConfig struct {
+	Themes struct {
+		Path        string `json:"dir"`
+		RegistryURL string `json:"registry_url"`
+	} `json:"themes"`
+}
 
 // ThemeStore is a interface to support multiple theme backends.
 type ThemeStore interface {
@@ -33,6 +40,7 @@ type Module struct {
 	Logger       *logger.Module
 
 	Stores []ThemeStore
+	config ThemesConfig
 }
 
 // Init implements service.Init
@@ -42,7 +50,14 @@ func (m *Module) Init(c *service.Config) {
 		if err != nil {
 			return err
 		}
-		dataDir := path.Join(wd, themeDir)
+
+		err = m.ConfigModule.ReadConfig(&m.config)
+		if err != nil {
+			return err
+		}
+
+		m.config.Themes.Path = m.ConfigModule.DataPath(m.config.Themes.Path, themeDir)
+		dataDir := path.Join(wd, m.config.Themes.Path)
 		m.Stores = []ThemeStore{&defaultStore{}, &FileStore{dataDir: dataDir}}
 		return nil
 	}
