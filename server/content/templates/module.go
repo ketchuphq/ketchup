@@ -89,6 +89,14 @@ func (m *Module) GetTheme(name string) (*models.Theme, error) {
 	return theme, nil
 }
 
+func (m *Module) GetTemplate(theme, template string) (*models.ThemeTemplate, error) {
+	tmpl, err := m.getTemplate(theme, template)
+	if err != nil {
+		return nil, err
+	}
+	return tmpl, nil
+}
+
 // ListThemes returns a list of all known themes.
 func (m *Module) ListThemes() ([]*models.Theme, error) {
 	themes := []*models.Theme{}
