@@ -1,0 +1,42 @@
+syntax = "proto2";
+
+package press.packages;
+
+message PackageRelease {
+  optional string ketchup_min = 1;
+  optional bool tags = 2; // "{prefix}{semantic_version}"
+  // optional string tag_prefix
+  // dependencies
+  // release_version for self hosting
+  // optional string version
+  // optional string archive_url zip containing the package
+  // optional string released_at
+}
+message Package {
+  enum Type {
+    unknown = 0;
+    theme = 1;
+    plugin = 2;
+  }
+  optional string name = 1;
+  repeated string author = 2;
+  optional Type type = 3; // plugin type
+  optional string description = 4; // short description
+  optional string readme = 5; // raw readme url
+  optional string vcs_url = 6; // support github, bitbucket
+
+  optional PackageRelease releases = 11;
+  repeated string labels = 12;
+  // issues
+  // donate
+  // buy
+  // previous_names
+}
+
+message Registry {
+  // include other registry files
+  optional string registry_version = 1; // ketchup version?
+  repeated Package packages = 10;
+
+  // format
+}

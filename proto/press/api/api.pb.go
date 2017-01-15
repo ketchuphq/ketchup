@@ -13,6 +13,7 @@ It is generated from these files:
 	route.proto
 	theme.proto
 	user.proto
+	packages.proto
 
 It has these top-level messages:
 	Error
@@ -36,6 +37,9 @@ It has these top-level messages:
 	ThemePlaceholder
 	ThemeAsset
 	User
+	PackageRelease
+	Package
+	Registry
 */
 package api
 

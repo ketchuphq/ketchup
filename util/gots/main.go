@@ -12,10 +12,11 @@ import (
 	"strings"
 
 	"github.com/golang/protobuf/proto"
-
 	router_api "github.com/octavore/nagax/proto/nagax/router/api"
+
 	"github.com/octavore/press/proto/press/api"
 	"github.com/octavore/press/proto/press/models"
+	"github.com/octavore/press/proto/press/packages"
 )
 
 func main() {
@@ -38,6 +39,9 @@ func main() {
 		models.ContentMultiple{},
 		models.ContentText{},
 		models.ContentString{},
+		packages.Package{},
+		packages.PackageRelease{},
+		packages.Registry{},
 
 		api.TLSSettingsReponse{},
 		api.EnableTLSRequest{},

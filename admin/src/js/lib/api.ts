@@ -99,7 +99,6 @@ export abstract class ThemeTemplate {
   theme?: string;
   engine?: string;
   hideContent?: boolean;
-  description?: string;
   placeholders?: ThemePlaceholder[];
   data?: string;
   static copy(from: ThemeTemplate, to?: ThemeTemplate): ThemeTemplate {
@@ -109,7 +108,6 @@ export abstract class ThemeTemplate {
     to.theme = from.theme;
     to.engine = from.engine;
     to.hideContent = from.hideContent;
-    to.description = from.description;
     to.placeholders = from.placeholders;
     to.data = from.data;
     return to;
@@ -165,12 +163,10 @@ export abstract class ContentMultiple {
 export abstract class ContentText {
   title?: string;
   type?: ContentTextType;
-  allowedTypes?: ContentTextType[];
   static copy(from: ContentText, to?: ContentText): ContentText {
     to = to || {};
     to.title = from.title;
     to.type = from.type;
-    to.allowedTypes = from.allowedTypes;
     return to;
   }
 }
@@ -182,6 +178,51 @@ export abstract class ContentString {
     to = to || {};
     to.title = from.title;
     to.type = from.type;
+    return to;
+  }
+}
+
+export abstract class Package {
+  name?: string;
+  author?: string[];
+  type?: Package_Type;
+  description?: string;
+  readme?: string;
+  vcsUrl?: string;
+  releases?: PackageRelease;
+  labels?: string[];
+  static copy(from: Package, to?: Package): Package {
+    to = to || {};
+    to.name = from.name;
+    to.author = from.author;
+    to.type = from.type;
+    to.description = from.description;
+    to.readme = from.readme;
+    to.vcsUrl = from.vcsUrl;
+    to.releases = from.releases;
+    to.labels = from.labels;
+    return to;
+  }
+}
+
+export abstract class PackageRelease {
+  ketchupMin?: string;
+  tags?: boolean;
+  static copy(from: PackageRelease, to?: PackageRelease): PackageRelease {
+    to = to || {};
+    to.ketchupMin = from.ketchupMin;
+    to.tags = from.tags;
+    return to;
+  }
+}
+
+export abstract class Registry {
+  registryVersion?: string;
+  packages?: Package[];
+  static copy(from: Registry, to?: Registry): Registry {
+    to = to || {};
+    to.registryVersion = from.registryVersion;
+    to.packages = from.packages;
     return to;
   }
 }
@@ -240,5 +281,6 @@ export abstract class ErrorResponse {
   }
 }
 
-export type ContentMultiple_DropdownType = 'radio' | 'dropdown' | 'unknown';
+export type ContentMultiple_DropdownType = 'unknown' | 'radio' | 'dropdown';
 export type ContentTextType = 'text' | 'markdown' | 'html';
+export type Package_Type = 'unknown' | 'theme' | 'plugin';
