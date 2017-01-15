@@ -12,6 +12,7 @@ import (
 	"github.com/octavore/nagax/users"
 	"github.com/octavore/nagax/users/databaseauth"
 	"github.com/octavore/nagax/users/session"
+	"github.com/octavore/nagax/util/token"
 
 	"github.com/octavore/press/db"
 	"github.com/octavore/press/server/config"
@@ -51,7 +52,33 @@ func (m *Module) Init(c *service.Config) {
 			if err != nil {
 				panic(err)
 			}
+		},
+	})
 
+	c.AddCommand(&service.Command{
+		Keyword:    "users:password <email>",
+		Usage:      "Set user password.",
+		ShortUsage: "Set user password",
+		Run: func(ctx *service.CommandContext) {
+			ctx.RequireExactlyNArgs(1)
+			email := ctx.Args[0]
+			u, err := m.DB.GetUserByEmail(email)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+
+			fmt.Println("enter a password:")
+			pass, err := gopass.GetPasswdMasked()
+			if err != nil {
+				panic(err)
+			}
+			hashedPass := databaseauth.HashPassword(string(pass), token.New32())
+			u.SetHashedPassword(&hashedPass)
+			err = m.DB.UpdateUser(u)
+			if err != nil {
+				panic(err)
+			}
 		},
 	})
 	c.Setup = func() error {
