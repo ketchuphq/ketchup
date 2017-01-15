@@ -22,7 +22,7 @@ type contentMap map[string]interface{}
 
 func (m *Module) createContentMap(page *models.Page) (contentMap, error) {
 	contents := map[string]interface{}{}
-	contents["title"] = page.GetName()
+	contents["title"] = page.GetTitle()
 	var err error
 	for _, c := range page.Contents {
 		switch c.GetType().(type) {

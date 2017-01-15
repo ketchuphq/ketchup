@@ -4,6 +4,13 @@ package press.models;
 
 import "content.proto";
 
+// presets for a page
+// message PageTemplate {
+//     optional string uuid = 1;
+//     optional string name = 2;
+//     repeated Content contents = 10; // content without value
+// }
+
 message Timestamp {
     optional int64 created_at = 1;
     optional int64 updated_at = 2;
@@ -11,7 +18,7 @@ message Timestamp {
 
 message Page {
     optional string uuid = 1;
-    optional string name = 2;
+    optional string title = 2;
     optional string theme = 3; // uuid of a theme, defaults to the user's default theme
     optional string template = 4; // template name? or template uuid
     optional Timestamp timestamps = 5; // created at, updated at
