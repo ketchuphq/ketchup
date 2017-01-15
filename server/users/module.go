@@ -14,6 +14,7 @@ import (
 	"github.com/octavore/nagax/users/session"
 
 	"github.com/octavore/press/db"
+	"github.com/octavore/press/server/config"
 )
 
 // Module users is a largely a wrapper around nagax/users/databaseauth
@@ -22,6 +23,7 @@ type Module struct {
 	Auth     *users.Module
 	DBAuth   *databaseauth.Module // todo: make this pluggable?
 	Sessions *session.Module
+	Config   *config.Module
 	Router   *router.Module
 	DB       *db.Module
 	Logger   *logger.Module
@@ -58,6 +60,7 @@ func (m *Module) Init(c *service.Config) {
 			databaseauth.WithLoginPath("/api/v1/login"),
 			databaseauth.WithErrorHandler(m.ErrorHandler),
 		)
+		m.Sessions.KeyFile = m.Config.DataPath("session.key", "session.key")
 		m.Auth.ErrorHandler = m.ErrorHandler
 		m.Auth.RegisterAuthenticator(m.Sessions)
 		// todo: allow to be set in a config file
