@@ -154,8 +154,10 @@ func (f *FileStore) List() ([]*models.Theme, error) {
 		if err != nil {
 			return nil, err
 		}
-		dir := themeNameFromPath(p)
-		theme.Name = &dir
+		if theme.GetName() == "" {
+			dir := themeNameFromPath(p)
+			theme.Name = &dir
+		}
 		themes = append(themes, theme)
 	}
 	return themes, nil
