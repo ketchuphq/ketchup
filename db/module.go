@@ -1,11 +1,13 @@
 package db
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/octavore/naga/service"
 
 	"github.com/octavore/press/proto/press/models"
+	"github.com/octavore/press/util/errors"
 )
 
 // Backend interface for models
@@ -37,4 +39,12 @@ func (m *Module) Init(c *service.Config) {
 			panic("backend not configured")
 		}
 	}
+}
+
+func (m *Module) Register(b Backend) error {
+	if m.Backend != nil {
+		return errors.Wrap(fmt.Errorf("backend already configured"))
+	}
+	m.Backend = b
+	return nil
 }
