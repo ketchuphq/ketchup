@@ -13,25 +13,40 @@ import (
 
 	"github.com/octavore/press/db"
 	"github.com/octavore/press/proto/press/models"
+	"github.com/octavore/press/server/config"
 	"github.com/octavore/press/util/errors"
 )
+
+type BoltConfig struct {
+	Bolt struct {
+		Path string `json:"path"`
+	} `json:"bolt"`
+}
 
 // Module bolt provides methods for writing and retrieving
 // data from a bolt database.
 type Module struct {
-	Bolt    *bolt.DB
-	Backend *db.Module
-	Logger  *logger.Module
+	Bolt         *bolt.DB
+	Backend      *db.Module
+	ConfigModule *config.Module
+	Logger       *logger.Module
+
+	config BoltConfig
 }
 
 // Init implements service.Init
 func (m *Module) Init(c *service.Config) {
 	c.Setup = func() (err error) {
-		m.Backend.Backend = m
+		err = m.ConfigModule.ReadConfig(&m.config)
+		if err != nil {
+			return err
+		}
 		if c.Env().IsTest() {
 			return
 		}
-		m.Bolt, err = bolt.Open("default.db", os.ModePerm, &bolt.Options{
+		m.Backend.Register(m)
+		m.config.Bolt.Path = m.ConfigModule.DataPath(m.config.Bolt.Path, "default.db")
+		m.Bolt, err = bolt.Open(m.config.Bolt.Path, os.ModePerm, &bolt.Options{
 			Timeout: 5 * time.Second,
 		})
 		if err != nil {
@@ -124,7 +139,7 @@ func (m *Module) Update(bucket string, pb db.AddressableProto) error {
 	}
 	key := []byte(pb.GetUuid())
 	if len(key) == 0 {
-		return errors.Wrap(fmt.Errorf("no uuid for proto"))
+		return errors.New("no uuid for proto")
 	}
 	return m.Bolt.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucket))
