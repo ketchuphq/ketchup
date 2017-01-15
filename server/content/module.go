@@ -56,6 +56,28 @@ func (m *Module) ReloadRouter() error {
 	return nil
 }
 
+func (m *Module) serveFile(file string) httprouter.Handle {
+	return func(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+		http.ServeFile(rw, req, file)
+	}
+}
+
+func (m *Module) servePage(pageUUID string) httprouter.Handle {
+	return func(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+		page, err := m.DB.GetPage(pageUUID)
+		if page.PublishedAt == nil {
+			router.NotFound(rw)
+			return
+		}
+		if err == nil {
+			err = m.render(rw, page)
+		}
+		if err != nil {
+			m.Logger.Errorf("error serving page %s [%s]: %+v", req.URL.Path, pageUUID, err)
+		}
+	}
+}
+
 // buildRouter returns a handler configured to serve content.
 func (m *Module) buildRouter() (http.Handler, map[string]bool, error) {
 	rt := httprouter.New()
@@ -84,24 +106,10 @@ func (m *Module) buildRouter() (http.Handler, map[string]bool, error) {
 		switch tgt := route.GetTarget().(type) {
 		case *models.Route_File:
 			m.Logger.Info("registered file route:", route.GetPath())
-			rt.Handle("GET", route.GetPath(), func(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-				http.ServeFile(rw, req, tgt.File)
-			})
+			rt.Handle("GET", route.GetPath(), m.serveFile(tgt.File))
 		case *models.Route_PageUuid:
 			m.Logger.Info("registered uuid route:", route.GetPath())
-			rt.Handle("GET", route.GetPath(), func(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-				page, err := m.DB.GetPage(tgt.PageUuid)
-				if page.PublishedAt == nil {
-					router.NotFound(rw)
-					return
-				}
-				if err == nil {
-					err = m.render(rw, page)
-				}
-				if err != nil {
-					m.Logger.Errorf("error serving page %+v: %+v", route, err)
-				}
-			})
+			rt.Handle("GET", route.GetPath(), m.servePage(tgt.PageUuid))
 		default:
 			m.Logger.Errorf("unable to register %s", route.GetUuid())
 		}
