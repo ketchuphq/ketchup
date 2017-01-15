@@ -13,6 +13,7 @@ import (
 	"github.com/xenolf/lego/acme"
 
 	"github.com/octavore/nagax/logger"
+
 	"github.com/octavore/press/server/config"
 	"github.com/octavore/press/server/router"
 	"github.com/octavore/press/util/errors"
@@ -54,7 +55,7 @@ func (m *Module) Init(c *service.Config) {
 				fmt.Print("Please provide the --agree flag to indicate that you agree to Let's Encrypt's TOS. \n")
 				return
 			}
-			user, err := m.loadUser()
+			user, err := m.GetTLSUser(true)
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -97,7 +98,7 @@ func (m *Module) tlsDirPath(file string) string {
 // func (m *Module) Renew(u *SSLUser) error {}
 
 func (m *Module) handleObtainCert(rw http.ResponseWriter, req *http.Request) {
-	user, err := m.loadUser()
+	user, err := m.GetTLSUser(true)
 	if err != nil {
 		m.Router.InternalError(rw, err)
 		return
@@ -108,7 +109,7 @@ func (m *Module) handleObtainCert(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// ObtainCert obtains a new ssl cert
+// ObtainCert obtains a new ssl cert for the given user
 func (m *Module) obtainCert(u *SSLUser) error {
 	// Initialize user and domain
 	if m.config.TLS.URL == "" {
@@ -127,13 +128,13 @@ func (m *Module) obtainCert(u *SSLUser) error {
 		return errors.Wrap(fmt.Errorf("no url specified"))
 	}
 
-	_, domainKey, err := m.keystore.LoadPrivateKey(domain.Host + ".key")
+	keyFile := path.Join(tlsDir, domain.Host+".key")
+	_, domainKey, err := m.keystore.LoadPrivateKey(keyFile)
 	if err != nil {
 		return errors.Wrap(err)
 	}
 
-	// Initialize the CLient
-
+	// Initialize the Client
 	c, err := acme.NewClient(defaultCAURL, u, "")
 	if err != nil {
 		return errors.Wrap(err)

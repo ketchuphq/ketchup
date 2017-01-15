@@ -2,9 +2,9 @@ package tls
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 
 	"github.com/xenolf/lego/acme"
 
@@ -47,29 +47,37 @@ func (m *Module) saveUser(u *SSLUser) error {
 	return ioutil.WriteFile(m.tlsDirPath(userFile), b, 0600)
 }
 
-func (m *Module) loadUser() (*SSLUser, error) {
+// GetTLSUser from the tls dir. If the user doesn't already
+// exist, it populates the user data from the config file.
+func (m *Module) GetTLSUser(withPrivateKey bool) (*SSLUser, error) {
 	// load user
 	u := &SSLUser{}
 	b, err := ioutil.ReadFile(m.tlsDirPath(userFile))
 	if err != nil && !os.IsNotExist(err) {
 		return nil, err
 	}
+
 	if !os.IsNotExist(err) {
 		err = json.Unmarshal(b, u)
 		if err != nil {
 			return nil, err
 		}
 	}
+
 	if u.Email == "" {
 		// todo: detect if changed
 		u.Email = m.config.TLS.Email
 	}
-
 	// load key
 	if m.config.TLS.URL == "" {
-		return nil, errors.Wrap(fmt.Errorf("no ssl url"))
+		return nil, errors.New("no ssl url")
 	}
-	_, u.key, err = m.keystore.LoadPrivateKey(u.Email + ".key")
+	if !withPrivateKey {
+		return u, nil
+	}
+
+	keyFile := path.Join(tlsDir, u.GetEmail()+".key")
+	_, u.key, err = m.keystore.LoadPrivateKey(keyFile)
 	if err != nil {
 		return nil, errors.Wrap(err)
 	}
