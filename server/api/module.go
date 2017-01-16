@@ -8,6 +8,7 @@ import (
 	"github.com/octavore/nagax/logger"
 
 	"github.com/octavore/press/db"
+	"github.com/octavore/press/plugins/pkg"
 	"github.com/octavore/press/server/config"
 	"github.com/octavore/press/server/content"
 	"github.com/octavore/press/server/content/templates"
@@ -25,6 +26,7 @@ type Module struct {
 	Config    *config.Module
 	TLS       *tls.Module
 	Logger    *logger.Module
+	Pkg       *pkg.Module
 }
 
 const (
@@ -52,6 +54,8 @@ func (m *Module) Init(c *service.Config) {
 			{"/api/v1/themes", methodGet, m.Auth.MustWithAuth(m.ListThemes)},
 			{"/api/v1/themes/:name", methodGet, m.Auth.MustWithAuth(m.GetTheme)},
 			{"/api/v1/themes/:name/templates/:template", methodGet, m.Auth.MustWithAuth(m.GetTemplate)},
+			{"/api/v1/theme-registry", methodGet, m.Auth.MustWithAuth(m.ThemeRegistry)},
+			{"/api/v1/theme-install", methodGet, m.Auth.MustWithAuth(m.InstallTheme)},
 
 			{"/api/v1/pages", methodPost, m.Auth.MustWithAuth(m.UpdatePage)},
 			{"/api/v1/pages/:uuid", methodDelete, m.Auth.MustWithAuth(m.DeletePage)},
