@@ -43,6 +43,7 @@ func (m *Module) Init(c *service.Config) {
 			{"/api/v1/user", methodGet, m.Auth.MustWithAuth(m.GetUser)},
 			{"/api/v1/themes", methodGet, m.Auth.MustWithAuth(m.ListThemes)},
 			{"/api/v1/themes/:name", methodGet, m.Auth.MustWithAuth(m.GetTheme)},
+			{"/api/v1/themes/:name/templates/:template", methodGet, m.Auth.MustWithAuth(m.GetTemplate)},
 
 			{"/api/v1/pages", methodPost, m.Auth.MustWithAuth(m.UpdatePage)},
 			{"/api/v1/pages/:uuid", methodDelete, m.Auth.MustWithAuth(m.DeletePage)},
@@ -73,24 +74,4 @@ func (m *Module) wrap(h users.Handle) httprouter.Handle {
 
 func (m *Module) Debug(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	return m.DB.Debug(rw)
-}
-
-func (m *Module) ListThemes(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) error {
-	themes, err := m.Templates.ListThemes()
-	if err != nil {
-		return err
-	}
-	return router.Proto(rw, &api.ListThemeResponse{Themes: themes})
-}
-
-func (m *Module) GetTheme(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
-	name := par.ByName("name")
-	theme, err := m.Templates.GetTheme(name)
-	if err != nil {
-		return err
-	}
-	if theme == nil {
-		return router.ErrNotFound
-	}
-	return router.Proto(rw, theme)
 }
