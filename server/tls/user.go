@@ -3,25 +3,36 @@ package tls
 import (
 	"crypto"
 	"crypto/rsa"
+	"path"
 
+	"github.com/octavore/nagax/keystore"
+	"github.com/octavore/press/util/errors"
 	"github.com/xenolf/lego/acme"
 )
 
-type SSLUser struct {
+type Registration struct {
 	Email        string                     `json:"email"`
+	AgreedOn     string                     `json:"agreed_on"`
+	Domain       string                     `json:"domain"`
 	Registration *acme.RegistrationResource `json:"registration"`
 
 	key *rsa.PrivateKey
 }
 
-func (s *SSLUser) GetEmail() string {
-	return s.Email
+func (r *Registration) Init(ks *keystore.KeyStore) (err error) {
+	keyFile := path.Join(tlsDir, r.GetEmail()+".key")
+	_, r.key, err = ks.LoadPrivateKey(keyFile)
+	return errors.Wrap(err)
 }
 
-func (s *SSLUser) GetRegistration() *acme.RegistrationResource {
-	return s.Registration
+func (r *Registration) GetEmail() string {
+	return r.Email
 }
 
-func (s *SSLUser) GetPrivateKey() crypto.PrivateKey {
-	return s.key
+func (r *Registration) GetPrivateKey() crypto.PrivateKey {
+	return r.key
+}
+
+func (r *Registration) GetRegistration() *acme.RegistrationResource {
+	return r.Registration
 }
