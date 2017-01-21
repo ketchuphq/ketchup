@@ -5,12 +5,14 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/octavore/naga/service"
+	"github.com/octavore/nagax/logger"
 
 	"github.com/octavore/press/db"
-	"github.com/octavore/press/proto/press/api"
+	"github.com/octavore/press/server/config"
 	"github.com/octavore/press/server/content"
 	"github.com/octavore/press/server/content/templates"
 	"github.com/octavore/press/server/router"
+	"github.com/octavore/press/server/tls"
 	"github.com/octavore/press/server/users"
 )
 
@@ -20,6 +22,9 @@ type Module struct {
 	Auth      *users.Module
 	Templates *templates.Module
 	Content   *content.Module
+	Config    *config.Module
+	TLS       *tls.Module
+	Logger    *logger.Module
 }
 
 const (
@@ -41,6 +46,9 @@ func (m *Module) Init(c *service.Config) {
 			{"/api/v1/routes", methodGet, m.ListRoutes},
 
 			{"/api/v1/user", methodGet, m.Auth.MustWithAuth(m.GetUser)},
+			{"/api/v1/settings/tls", methodGet, m.Auth.MustWithAuth(m.GetTLS)},
+			{"/api/v1/settings/tls", methodPost, m.Auth.MustWithAuth(m.EnableTLS)},
+
 			{"/api/v1/themes", methodGet, m.Auth.MustWithAuth(m.ListThemes)},
 			{"/api/v1/themes/:name", methodGet, m.Auth.MustWithAuth(m.GetTheme)},
 			{"/api/v1/themes/:name/templates/:template", methodGet, m.Auth.MustWithAuth(m.GetTemplate)},
