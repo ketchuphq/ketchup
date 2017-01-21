@@ -110,6 +110,9 @@ func (f *FileStore) Get(themeName string) (*models.Theme, error) {
 	}
 	for _, p := range paths {
 		q := path.Base(p)
+		if strings.HasPrefix(q, ".") {
+			continue
+		}
 		e := strings.TrimLeft(path.Ext(p), ".")
 		if t.Templates[q] == nil {
 			t.Templates[q] = &models.ThemeTemplate{}
@@ -126,6 +129,9 @@ func (f *FileStore) Get(themeName string) (*models.Theme, error) {
 	}
 	for _, p := range paths {
 		q := path.Base(p)
+		if strings.HasPrefix(q, ".") {
+			continue
+		}
 		t.Assets[q] = &models.ThemeAsset{Name: &q}
 	}
 	return t, nil
