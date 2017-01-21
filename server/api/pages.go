@@ -1,11 +1,10 @@
 package api
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"time"
 
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/julienschmidt/httprouter"
 
 	"github.com/octavore/press/db"
@@ -13,7 +12,6 @@ import (
 	"github.com/octavore/press/proto/press/api"
 	"github.com/octavore/press/proto/press/models"
 	"github.com/octavore/press/server/router"
-	"github.com/octavore/press/util/errors"
 )
 
 func (m *Module) getPage(par httprouter.Params, fn func(*models.Page) error) (*models.Page, error) {
@@ -35,6 +33,8 @@ func (m *Module) getPage(par httprouter.Params, fn func(*models.Page) error) (*m
 	return page, nil
 }
 
+// GetPage gets a page by UUID.
+// todo: nest response?
 func (m *Module) GetPage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	page, err := m.getPage(par, func(*models.Page) error { return nil })
 	if err != nil {
@@ -43,6 +43,8 @@ func (m *Module) GetPage(rw http.ResponseWriter, req *http.Request, par httprout
 	return router.Proto(rw, page)
 }
 
+// ListPages returns all pages, sorted by updated at.
+// todo: pagination, filtering
 func (m *Module) ListPages(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	pages, err := m.DB.ListPages()
 	if err != nil {
@@ -54,13 +56,12 @@ func (m *Module) ListPages(rw http.ResponseWriter, req *http.Request, par httpro
 	})
 }
 
+// UpdatePage saves the given page to the DB.
+// todo: nest response?
 func (m *Module) UpdatePage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	page := &models.Page{}
-	b, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		return errors.Wrap(err)
-	}
-	err = json.Unmarshal(b, page)
+	// use jsonpb.unmarshal to correct unmarshal int64 e.g. PublishedAt
+	err := jsonpb.Unmarshal(req.Body, page)
 	if err != nil {
 		return err
 	}
@@ -71,8 +72,15 @@ func (m *Module) UpdatePage(rw http.ResponseWriter, req *http.Request, par httpr
 	return router.Proto(rw, page)
 }
 
+// PublishPage sets the published time on a page to the current time.
 func (m *Module) PublishPage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	page, err := m.getPage(par, func(page *models.Page) error {
+		// already published
+		if page.PublishedAt != nil {
+			return nil
+		}
+
+		// set published at to current time
 		now := time.Now().Unix()
 		page.PublishedAt = &now
 		err := m.DB.UpdatePage(page)
@@ -87,6 +95,7 @@ func (m *Module) PublishPage(rw http.ResponseWriter, req *http.Request, par http
 	return router.Proto(rw, page)
 }
 
+// UnpublishPage sets published at to null, effectively unpublishing the page.
 func (m *Module) UnpublishPage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	page, err := m.getPage(par, func(page *models.Page) error {
 		page.PublishedAt = nil
@@ -102,6 +111,7 @@ func (m *Module) UnpublishPage(rw http.ResponseWriter, req *http.Request, par ht
 	return router.Proto(rw, page)
 }
 
+// DeletePage deletes the given page.
 func (m *Module) DeletePage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	uuid := par.ByName("uuid")
 	page, err := m.DB.GetPage(uuid)
