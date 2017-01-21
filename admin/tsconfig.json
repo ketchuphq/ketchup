@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "module": "es2015",
+    "jsx": "react",
+    "jsxFactory": "msx",
     "noImplicitAny": true,
     "noUnusedParameters": true,
     "noUnusedLocals": true,

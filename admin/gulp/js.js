@@ -11,13 +11,13 @@ let webpackConfig = {
     filename: 'app.js',
   },
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: ['.ts', '.tsx', '.js'],
     modules: ['src/js', 'node_modules']
   },
   module: {
     rules: [
       { test: /\.js$/, loader: 'source-map-loader', enforce: 'pre' },
-      { test: /\.ts$/, loader: 'ts-loader' }
+      { test: /\.tsx?$/, loader: 'ts-loader' }
     ],
   },
   externals: {
@@ -61,5 +61,5 @@ gulp.task('js:lint', () =>
 gulp.task('js', ['js:internal', 'js:lint', 'js:webpack'])
 
 gulp.task('js:watch', () =>
-  gulp.watch('src/js/**/*.ts', ['js'])
+  gulp.watch('src/js/**/*.ts*', ['js'])
 );
