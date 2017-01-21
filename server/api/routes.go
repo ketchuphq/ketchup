@@ -2,13 +2,12 @@ package api
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
-
-	"io/ioutil"
 
 	"github.com/octavore/press/proto/press/api"
 	"github.com/octavore/press/proto/press/models"
@@ -37,6 +36,7 @@ func formatRoute(r *models.Route) *models.Route {
 	return r
 }
 
+// ListRoutes returns all routes.
 func (m *Module) ListRoutes(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	routes, err := m.DB.ListRoutes()
 	if err != nil {
@@ -47,6 +47,7 @@ func (m *Module) ListRoutes(rw http.ResponseWriter, req *http.Request, par httpr
 	})
 }
 
+// ListRoutesByPage returns all routes for a given page, identified by uuid in the parameter.
 func (m *Module) ListRoutesByPage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	routes, err := m.DB.ListRoutes()
 	if err != nil {
@@ -64,6 +65,8 @@ func (m *Module) ListRoutesByPage(rw http.ResponseWriter, req *http.Request, par
 	})
 }
 
+// UpdateRoute updates the given route. The path is sanitized, and the content router is
+// reloaded after the route is saved.
 func (m *Module) UpdateRoute(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	route := &models.Route{}
 	b, err := ioutil.ReadAll(req.Body)
@@ -94,6 +97,8 @@ func (m *Module) DeleteRoute(rw http.ResponseWriter, req *http.Request, par http
 	return m.DB.DeleteRoute(r)
 }
 
+// UpdateRoutesByPage takes a list of routes and
+// /api/v1/pages/:uuid/routes
 func (m *Module) UpdateRoutesByPage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	pageUUID := par.ByName("uuid")
 	pb := &api.UpdatePageRoutesRequest{}
@@ -106,9 +111,11 @@ func (m *Module) UpdateRoutesByPage(rw http.ResponseWriter, req *http.Request, p
 		return errors.Wrap(err)
 	}
 
+	// newList contains a map of uuid to routes for routes to add.
 	newList := map[string]*models.Route{}
 	for _, route := range pb.GetRoutes() {
 		route.Target = &models.Route_PageUuid{PageUuid: pageUUID}
+		// bug: need to handle multiple routes with no uuid
 		newList[route.GetUuid()] = route
 	}
 
@@ -117,10 +124,12 @@ func (m *Module) UpdateRoutesByPage(rw http.ResponseWriter, req *http.Request, p
 		return err
 	}
 
+	// loop over all routes
 	filteredRoutes := []*models.Route{}
 	for _, route := range routes {
 		if route.GetPageUuid() == pageUUID {
 			if newList[route.GetUuid()] == nil {
+				// if we're not adding this existing route, then delete it
 				err = m.DB.DeleteRoute(route)
 				if err != nil {
 					return err
@@ -129,6 +138,7 @@ func (m *Module) UpdateRoutesByPage(rw http.ResponseWriter, req *http.Request, p
 		}
 	}
 
+	// save all the routes specified.
 	for _, route := range newList {
 		err = m.DB.UpdateRoute(formatRoute(route))
 		if err != nil {
