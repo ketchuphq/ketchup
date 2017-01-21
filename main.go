@@ -7,12 +7,14 @@ import (
 	"github.com/octavore/press/db/bolt"
 	"github.com/octavore/press/server/api"
 	"github.com/octavore/press/server/content"
+	"github.com/octavore/press/server/tls"
 )
 
 type App struct {
 	Content *content.Module
 	API     *api.Module
 	Admin   *admin.Module
+	TLS     *tls.Module
 
 	// configures backend module
 	Bolt *bolt.Module
