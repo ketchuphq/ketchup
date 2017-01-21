@@ -13,10 +13,35 @@ import (
 var noneTheme = &models.Theme{
 	Name: proto.String("none"),
 	Templates: map[string]*models.ThemeTemplate{
-		"default": &models.ThemeTemplate{
-			Name:   proto.String("default"),
+		"html": &models.ThemeTemplate{
+			Name:   proto.String("html"),
 			Engine: proto.String(engines.EngineTypeHTML),
 			Data:   proto.String("<html>{{.content}}</html>"),
+			Placeholders: []*models.ThemePlaceholder{
+				{
+					Key: proto.String("content"),
+					Type: &models.ThemePlaceholder_Text{
+						Text: &models.ContentText{
+							Type: models.ContentTextType_html.Enum(),
+						},
+					},
+				},
+			},
+		},
+		"markdown": &models.ThemeTemplate{
+			Name:   proto.String("markdown"),
+			Engine: proto.String(engines.EngineTypeHTML),
+			Data:   proto.String("<html>{{.content}}</html>"),
+			Placeholders: []*models.ThemePlaceholder{
+				{
+					Key: proto.String("content"),
+					Type: &models.ThemePlaceholder_Text{
+						Text: &models.ContentText{
+							Type: models.ContentTextType_markdown.Enum(),
+						},
+					},
+				},
+			},
 		},
 	},
 	Assets: map[string]*models.ThemeAsset{},
