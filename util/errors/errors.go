@@ -2,6 +2,7 @@ package errors
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/go-errors/errors"
 )
@@ -25,4 +26,21 @@ func WrapS(e error, skip int) error {
 		return nil
 	}
 	return errors.Wrap(e, skip+1)
+}
+
+func IsType(e1, e2 error) bool {
+	if err, ok := e1.(*errors.Error); ok {
+		return IsType(err.Err, e2)
+	}
+	if err, ok := e2.(*errors.Error); ok {
+		return IsType(e1, err.Err)
+	}
+	return reflect.TypeOf(e1) == reflect.TypeOf(e2)
+}
+
+func TypeName(e error) string {
+	if err, ok := e.(*errors.Error); ok {
+		return err.TypeName()
+	}
+	return fmt.Sprintf("%T", e)
 }
