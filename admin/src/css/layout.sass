@@ -8,6 +8,13 @@ html, body
 html
   box-sizing: border-box
 
+pre
+  background: $black1
+  color: white
+  padding: 10px
+  +standard-radius
+  font-size: 14px
+
 *, *:before, *:after
   box-sizing: inherit
 
@@ -19,6 +26,9 @@ html
 a
   color: $black1
 
+p
+  line-height: 1.6
+
 .container
   display: flex
   min-height: 100%
@@ -26,75 +36,12 @@ a
   header
     h1
       margin-top: 0
+      a
+        text-decoration: none
+        &:hover
+          color: $black5
     .button
       float: right
-
-  &--navigation
-    width: $navWidth
-    margin-right: 20px
-    border: 1px solid $black9
-    align-self: flex-start
-    transition-property: 'width background color'
-    transition-delay: 0s
-    transition-timing-function: ease-out
-    transition-duration: 0.3s
-
-    .typcn
-      margin-right: 15px
-      font-size: 1.5em
-      position: relative
-      top: 2px
-    .nav-button .typcn
-      display: none
-    .nav-link, .nav-button a
-      display: block
-      text-decoration: none
-    .nav-link, .nav-button
-      padding: 8px 24px 12px
-      white-space: nowrap
-    .nav-link
-      transition-property: 'background'
-      transition-delay: 0s
-      transition-timing-function: ease-out
-      transition-duration: 0.1s
-      &--toggle
-        margin-top: 20px
-        text-align: center
-        cursor: pointer
-      &:hover
-        background-color: $black10
-    .nav-title
-      padding: 12px 24px 14px
-      height: 60px
-      margin-top: 20px
-      margin-bottom: 12px
-      text-align: center
-      font-family: $logoFont
-      font-size: $fontSize3
-      font-weight: 500
-
-    &--hidden
-      width: 70px
-      background: $black1
-      border-color: $black1
-      .nav-link:hover
-        background: $black5
-      a
-        color: white
-      .nav-link__text
-        display: none
-      .nav-title .nav-link__text
-        display: block
-      .nav-button
-        padding-left: 0
-        padding-right: 0
-        .typcn
-          display: block
-          top: -8px
-        a
-          height: 38px
-        .button
-          border-radius: 0
 
   &--body
     width: $editorWidth - $navWidth

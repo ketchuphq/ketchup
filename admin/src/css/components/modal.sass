@@ -1,0 +1,47 @@
+$modalPadding: 15px
+
+.overlay
+  position: absolute
+  top: 0
+  bottom: 0
+  left: 0
+  right: 0
+  background: rgba(0,0,0,0.5)
+  display: flex
+  flex-direction: column
+  align-items: center
+  animation: overlayFadein 0.2s;
+
+  .modal-pad
+    height: 20%
+    width: 100%
+
+  .modal
+    max-width: 400px
+    width: 100%
+    min-height: 200px
+    background: white
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2)
+    padding: $modalPadding
+    +standard-radius
+    overflow: hidden
+    &__contents__title
+      margin: (-$modalPadding) (-$modalPadding) 0
+      background: $black1
+      color: white
+      padding: $modalPadding
+      margin-bottom: $modalPadding
+
+    &.modal--error
+      .modal__contents__title
+        background: $red1
+
+.container--modal
+  .navigation, .navigation--hidden
+    box-shadow: none
+
+@keyframes overlayFadein
+    from
+      opacity: 0
+    to
+      opacity: 1

@@ -31,7 +31,7 @@ export default class PagesPage extends MustAuthController {
             href: `/admin/pages/${page.uuid}`,
             config: m.route
           }, [
-              m('div', page.name || 'untitled'),
+              m('div', page.title || 'untitled'),
               m('.small.black5', `${status} ${time}`)
             ]);
         })

@@ -17,14 +17,36 @@
             background: $black10
 
 .table
+  +standard-radius
+  background: $black10
+  padding: 10px 12px
+  box-shadow: inset 0px 1px 8px -2px rgba(0,0,0,0.1)
   .tr
-    border-bottom: 1px solid $black9
+    border-top: 1px solid $black9
     display: flex
-    padding: 12px 6px
+    padding: 10px 8px
     justify-content: space-between
+    &--center
+      align-items: center
+    &--right
+      justify-content: flex-end
+    &--no-border
+      border-top: none
     &:first-child
-      border-top: 1px solid $black9
-    &:hover
-      background: $black10
+      border-top: none
+    input[type=text]
+      background: rgba(255,255,255,0.6)
+      padding: 8px 10px
+      border: 1px solid $black9
+      &:focus
+        border-color: $black5
+        outline: none
+
   a.tr
+    +standard-radius
     text-decoration: none
+    &:hover
+      background: $black5
+      color: #fff
+      + .tr
+        border-color: $black10

@@ -23,34 +23,35 @@ export default class ThemePage extends MustAuthController {
     return Layout(
       !ctrl.theme() ? '' :
         m('.theme', [
-          m('h1',
-            m.trust('Theme &rsaquo; '),
-            ctrl.theme().name
+          m('header',
+            m('h1', [
+              m('a[href=/admin/themes]', { config: m.route }, 'Themes'),
+              m.trust(' &rsaquo; '),
+              ctrl.theme().name
+            ]),
           ),
           m('h2', 'Templates'),
-          m('table',
+          m('.table',
             templateKeys.sort().map((name) => {
               let t = ctrl.theme().templates[name];
-              return m('tr', [
-                m('td', t.name),
-                m('td', t.engine)
-              ]);
+              return m('a.tr', {
+                config: m.route,
+                href: `/admin/themes/${ctrl.theme().name}/templates/${t.name}`
+              }, [
+                  m('div', t.name),
+                  m('div', t.engine)
+                ]);
             })
           ),
           m('h2', 'Assets'),
-          m('table',
+          m('.table',
             assetKeys.length == 0 ?
-              m('tr', m('td', 'no assets'))
-              :
+              m('.tr',  'no assets') :
               assetKeys.sort().map((asset) => {
-                return m('tr', [
-                  m('td.link-cell',
-                    // todo: check for shadowed files
-                    m('a', {
-                      href: `/${asset}`
-                    }, asset)
-                  ),
-                ]);
+                // todo: check for shadowed files
+                return m('a.tr', {
+                  href: `/${asset}`
+                }, asset);
               })
           )
         ])

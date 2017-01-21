@@ -50,7 +50,7 @@ export default class PagePage extends MustAuthController {
   save() {
     this.page().save().then((page: API.Page) => {
       this.page().uuid = page.uuid;
-      window.history.replaceState(null, this.page().name, `/admin/pages/${page.uuid}`);
+      window.history.replaceState(null, this.page().title, `/admin/pages/${page.uuid}`);
       return this.page().saveRoutes();
     })
       .then(() => {
@@ -155,6 +155,7 @@ export default class PagePage extends MustAuthController {
       ]);
   }
 
+  // todo: if not part of the theme, show delete button
   renderEditors() {
     if (!this.page()) {
       return m('div', []);
@@ -173,14 +174,24 @@ export default class PagePage extends MustAuthController {
     });
 
     let placeholders: API.ThemePlaceholder[] = [];
+    let filteredPlaceholders: API.ThemePlaceholder[] = [];
     let hideContent = false;
 
     if (this.template()) {
       hideContent = this.template().hideContent;
       placeholders = (this.template().placeholders || []);
       let placeholderOrder: { [key: string]: number } = {};
-      placeholders.forEach((p, i) => { placeholderOrder[p.key] = i; });
-      placeholders = placeholders.filter((p) => !contentMap[p.key]);
+
+      placeholders.forEach((p, i) => {
+        placeholderOrder[p.key] = i;
+        if (p.key == 'content' && !mainContent.value) {
+          API.ContentText.copy(p.text, mainContent.text);
+          // todo: if p.text is not set, set mainContent.text to html?
+        }
+        if (!contentMap[p.key]) {
+          filteredPlaceholders.push(p);
+        }
+      });
 
       contents.sort((a, b) => {
         if (placeholderOrder[a.key] < placeholderOrder[b.key]) {
@@ -197,7 +208,7 @@ export default class PagePage extends MustAuthController {
       contents.map((c) =>
         renderEditor(this.page(), c, false)
       ),
-      placeholders.map((p) =>
+      filteredPlaceholders.map((p) =>
         renderEditor(this.page(), p, false)
       ),
       !hideContent && mainContent ? renderEditor(this.page(), mainContent, true) : null
@@ -211,9 +222,9 @@ export default class PagePage extends MustAuthController {
         m('.controls',
           m('input[type=text].large', {
             placeholder: 'title...',
-            value: ctrl.page().name || '',
+            value: ctrl.page().title || '',
             onchange: m.withAttr('value', (v: string) => {
-              ctrl.page().name = v;
+              ctrl.page().title = v;
             })
           }),
         ),

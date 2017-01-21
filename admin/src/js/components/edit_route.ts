@@ -24,10 +24,10 @@ export default class EditRoutesComponent {
     if (!!this.page.routes[0].path) {
       return;
     }
-    if (!this.page.name || this.page.name.trim() == '') {
+    if (!this.page.title || this.page.title.trim() == '') {
       return;
     }
-    this.page.routes[0].path = Route.format(this.page.name);
+    this.page.routes[0].path = Route.format(this.page.title);
   };
 
   routeEditor(route: Route, i: number) {

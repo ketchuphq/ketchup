@@ -2,7 +2,7 @@
 
 export abstract class Page {
   uuid?: string;
-  name?: string;
+  title?: string;
   theme?: string;
   template?: string;
   timestamps?: Timestamp;
@@ -13,7 +13,7 @@ export abstract class Page {
   static copy(from: Page, to?: Page): Page {
     to = to || {};
     to.uuid = from.uuid;
-    to.name = from.name;
+    to.title = from.title;
     to.theme = from.theme;
     to.template = from.template;
     to.timestamps = from.timestamps;
@@ -99,6 +99,7 @@ export abstract class ThemeTemplate {
   theme?: string;
   engine?: string;
   hideContent?: boolean;
+  description?: string;
   placeholders?: ThemePlaceholder[];
   data?: string;
   static copy(from: ThemeTemplate, to?: ThemeTemplate): ThemeTemplate {
@@ -108,6 +109,7 @@ export abstract class ThemeTemplate {
     to.theme = from.theme;
     to.engine = from.engine;
     to.hideContent = from.hideContent;
+    to.description = from.description;
     to.placeholders = from.placeholders;
     to.data = from.data;
     return to;
@@ -119,15 +121,15 @@ export abstract class ThemePlaceholder {
   // skipped field: type
   
   // oneof types:
-  multiple?: ContentMultiple;
   short?: ContentString;
   text?: ContentText;
+  multiple?: ContentMultiple;
   static copy(from: ThemePlaceholder, to?: ThemePlaceholder): ThemePlaceholder {
     to = to || {};
     to.key = from.key;
-    to.multiple = from.multiple;
     to.short = from.short;
     to.text = from.text;
+    to.multiple = from.multiple;
     return to;
   }
 }
@@ -163,10 +165,12 @@ export abstract class ContentMultiple {
 export abstract class ContentText {
   title?: string;
   type?: ContentTextType;
+  allowedTypes?: ContentTextType[];
   static copy(from: ContentText, to?: ContentText): ContentText {
     to = to || {};
     to.title = from.title;
     to.type = from.type;
+    to.allowedTypes = from.allowedTypes;
     return to;
   }
 }
@@ -182,5 +186,59 @@ export abstract class ContentString {
   }
 }
 
-export type ContentMultiple_DropdownType = 'unknown' | 'radio' | 'dropdown';
+export abstract class TLSSettingsReponse {
+  tlsEmail?: string;
+  tlsDomain?: string;
+  agreedOn?: string;
+  termsOfService?: string;
+  hasCertificate?: boolean;
+  static copy(from: TLSSettingsReponse, to?: TLSSettingsReponse): TLSSettingsReponse {
+    to = to || {};
+    to.tlsEmail = from.tlsEmail;
+    to.tlsDomain = from.tlsDomain;
+    to.agreedOn = from.agreedOn;
+    to.termsOfService = from.termsOfService;
+    to.hasCertificate = from.hasCertificate;
+    return to;
+  }
+}
+
+export abstract class EnableTLSRequest {
+  tlsEmail?: string;
+  tlsDomain?: string;
+  agreed?: boolean;
+  static copy(from: EnableTLSRequest, to?: EnableTLSRequest): EnableTLSRequest {
+    to = to || {};
+    to.tlsEmail = from.tlsEmail;
+    to.tlsDomain = from.tlsDomain;
+    to.agreed = from.agreed;
+    return to;
+  }
+}
+
+export abstract class Error {
+  code?: string;
+  title?: string;
+  detail?: string;
+  field?: string;
+  static copy(from: Error, to?: Error): Error {
+    to = to || {};
+    to.code = from.code;
+    to.title = from.title;
+    to.detail = from.detail;
+    to.field = from.field;
+    return to;
+  }
+}
+
+export abstract class ErrorResponse {
+  errors?: Error[];
+  static copy(from: ErrorResponse, to?: ErrorResponse): ErrorResponse {
+    to = to || {};
+    to.errors = from.errors;
+    return to;
+  }
+}
+
+export type ContentMultiple_DropdownType = 'radio' | 'dropdown' | 'unknown';
 export type ContentTextType = 'text' | 'markdown' | 'html';

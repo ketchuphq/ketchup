@@ -4,6 +4,7 @@ import { AuthController, User } from 'components/auth';
 export default class LoginPage extends AuthController {
   email: Mithril.BasicProperty<string>;
   password: Mithril.BasicProperty<string>;
+  showReset: Mithril.BasicProperty<boolean>;
 
   constructor() {
     super();
@@ -15,6 +16,7 @@ export default class LoginPage extends AuthController {
       });
     this.email = m.prop('');
     this.password = m.prop('');
+    this.showReset = m.prop(false);
   }
 
   login() {
@@ -56,8 +58,15 @@ export default class LoginPage extends AuthController {
                 onchange: m.withAttr('value', ctrl.password)
               })
             ),
-            m('button.button.button--green', 'Log In')
-          ])
+            m('button.button.button--green', 'Log In'),
+            m('.button.small', {
+              onclick: () => ctrl.showReset(true)
+            }, 'Forgot your password?')
+          ]),
+        !ctrl.showReset() ? '' : m('.reset',
+          m('p', 'You can reset your password in the command-line using the following command:'),
+          m('pre', './ketchup users:password me@gmail.com')
+        )
       )
     );
   }

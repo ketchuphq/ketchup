@@ -6,7 +6,8 @@
     "noUnusedLocals": true,
     "target": "es5",
     "sourceMap": true,
-    "baseUrl": "./src/js"
+    "baseUrl": "./src/js",
+    "moduleResolution": "node"
   },
   "compileOnSave": true
 }

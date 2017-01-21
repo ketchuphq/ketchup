@@ -1,12 +1,17 @@
 .button
   padding: 10px 24px
-  border-radius: 4px
+  +standard-radius
   cursor: pointer
   display: inline-block
   text-decoration: none
   outline: none
   border: none
+  &--disabled, &:disabled
+    background: $black8
+    color: $black5
+    border-color: $black8
   &--small
+    +small-radius
     font-size: $fontSize0
     padding: 4px 12px
   &--green
@@ -40,3 +45,35 @@
     text-align: center
   + .button
     margin-left: 8px
+
+  &--loading
+    display: flex !important
+    justify-content: center
+    align-items: center
+    .button__inner
+      opacity: 0
+    .loader
+      position: absolute
+    .loading0, .loading1, .loading2
+      display: inline-block;
+      margin: 2px;
+      animation-duration: 1s;
+      animation-iteration-count: infinite;
+      animation-name: pulse;
+      animation-timing-function: ease-in-out;
+      width: 8px
+      height: 8px
+      background: white
+      border-radius: 10px
+    .loading1
+      animation-delay: 0.2s
+    .loading2
+      animation-delay: 0.4s
+
+@keyframes pulse
+  0%
+    opacity: 0.5
+  50%
+    opacity: 1
+  100%
+    opacity: 0.5

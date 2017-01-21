@@ -29,6 +29,31 @@ export default class Theme implements API.Theme {
       });
   }
 
+  static getFullTemplate(name: string, template: string): Mithril.Promise<API.ThemeTemplate> {
+    return m.request({
+      method: 'GET',
+      url: `/api/v1/themes/${name}/templates/${template}`
+    });
+  }
+
+  static getAll(): Mithril.Promise<API.Registry> {
+    return m.request({
+      method: 'GET',
+      url: '/api/v1/theme-registry'
+    });
+  }
+
+  static install(p: API.Package): Mithril.Promise<API.Registry> {
+    return m.request({
+      method: 'POST',
+      url: '/api/v1/theme-install',
+      background: true,
+      data: {
+        package: p.name // different id?
+      }
+    });
+  }
+
   static list() {
     return m.request({
       method: 'GET',

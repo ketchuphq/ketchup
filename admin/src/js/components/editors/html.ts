@@ -5,19 +5,13 @@ export default class QuillComponent {
   quill: any;
   content: API.Content;
   element: HTMLElement;
-  _id: string;
-  maximize: Mithril.BasicProperty<boolean>;
+  id: string;
   dark: Mithril.BasicProperty<boolean>;
 
-  constructor(content: API.Content, readonly short: boolean = false) {
+  constructor(_id: string, content: API.Content, readonly short: boolean = false) {
     this.content = content;
-    this._id = 'quill' + Math.random().toString().slice(2, 10);
-    this.maximize = m.prop(false);
+    this.id = `#quill-${_id}`;
     this.dark = m.prop(false);
-  }
-
-  get id(): string {
-    return `#${this._id}`;
   }
 
   get klass(): string {
@@ -44,15 +38,10 @@ export default class QuillComponent {
 
   static controller = QuillComponent;
   static view(ctrl: QuillComponent) {
-    return m(ctrl.klass, {
-      class: [
-        ctrl.maximize() ? 'ql-container-full' : '',
-        ctrl.dark() ? 'ql-container-full-dark' : ''
-      ].join(' ')
-    },
+    return m(ctrl.klass,
       m(`${ctrl.id}-toolbar`, [
         m('.ql-formats',
-          m('select.ql-size'),
+          m('select.ql-header'),
         ),
         m('.ql-formats',
           m('button.ql-bold'),
@@ -67,13 +56,6 @@ export default class QuillComponent {
         m('.ql-formats',
           m('button.ql-clean'),
         ),
-        m('.ql-formats.qlx-maximize',
-          m('a', {
-            onclick: () => {
-              ctrl.maximize(!ctrl.maximize());
-            }
-          }, 'Zen mode')
-        )
       ]),
       m(ctrl.id, {
         config: (el: HTMLElement, isInitialized: boolean) => {
@@ -85,15 +67,7 @@ export default class QuillComponent {
             ctrl.initializeQuill();
           }
         }
-      }),
-      ctrl.maximize() ? m('.qlx-controls', [
-        m('span.typcn.typcn-adjust-contrast', {
-          onclick: () => { ctrl.dark(!ctrl.dark()); }
-        }),
-        m('span.typcn.typcn-times', {
-          onclick: () => { ctrl.maximize(false); }
-        }),
-      ]) : ''
+      })
     );
   }
 }

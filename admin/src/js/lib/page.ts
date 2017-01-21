@@ -14,9 +14,9 @@ const defaultContent: API.Content = {
 
 const defaultPage: API.Page = {
   uuid: null,
-  name: null,
+  title: null,
   theme: 'none',
-  template: 'default',
+  template: 'html',
   contents: [defaultContent],
   timestamps: {
     createdAt: null,
@@ -32,7 +32,7 @@ export default class Page extends API.Page {
     super();
     config = config || defaultPage;
     this.uuid = config.uuid;
-    this.name = config.name;
+    this.title = config.title;
     this.theme = config.theme;
     this.template = config.template;
     this.contents = config.contents || [defaultContent];
@@ -59,6 +59,7 @@ export default class Page extends API.Page {
   }
 
   save(): Mithril.Promise<API.Page> {
+    console.log(this)
     return m.request({
       method: 'POST',
       url: `/api/v1/pages`,
