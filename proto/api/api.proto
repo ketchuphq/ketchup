@@ -41,3 +41,17 @@ message ListRouteResponse {
 message ListThemeResponse {
     repeated press.models.Theme themes = 1;
 }
+
+message TLSSettingsReponse {
+    optional string tls_email = 1;
+    optional string tls_domain = 2;
+    optional string agreed_on = 3;
+    optional string terms_of_service = 4;
+    optional bool has_certificate = 5;
+}
+
+message EnableTLSRequest {
+    optional string tls_email = 1;
+    optional string tls_domain = 2;
+    optional bool agreed = 3;
+}

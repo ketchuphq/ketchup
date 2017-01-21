@@ -13,6 +13,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
+	router_api "github.com/octavore/nagax/proto/nagax/router/api"
+	"github.com/octavore/press/proto/press/api"
 	"github.com/octavore/press/proto/press/models"
 )
 
@@ -36,6 +38,12 @@ func main() {
 		models.ContentMultiple{},
 		models.ContentText{},
 		models.ContentString{},
+
+		api.TLSSettingsReponse{},
+		api.EnableTLSRequest{},
+
+		router_api.Error{},
+		router_api.ErrorResponse{},
 	)
 	g.Write()
 	g.Close()
