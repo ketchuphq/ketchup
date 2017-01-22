@@ -9,11 +9,7 @@
     "target": "es5",
     "sourceMap": true,
     "baseUrl": "./src/js",
-    "moduleResolution": "node",
-    "types": [
-      "@types/codemirror",
-      "@types/quill"
-    ]
+    "moduleResolution": "node"
   },
   "compileOnSave": true
 }
