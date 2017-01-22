@@ -4,11 +4,13 @@ var gulpWebpack = require('webpack-stream');
 var gutil = require('gutil');
 var tslint = require('gulp-tslint');
 
+let webpackCache = {}
 let webpackConfig = {
   entry: 'app.ts',
   devtool: 'source-map',
   output: {
     filename: 'app.js',
+    publicPath: '/admin/'
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
@@ -22,21 +24,21 @@ let webpackConfig = {
   },
   externals: {
     'mithril': 'm',
-    'quill': 'Quill',
-    'CodeMirror': 'CodeMirror'
-  }
+  },
+  cache: webpackCache
+}
+
+if (false) {
+  webpackConfig.plugins = [
+    new webpack.optimize.UglifyJsPlugin({
+      compress: { warnings: false }
+    })
+  ]
 }
 
 gulp.task('js:internal', () =>
   gulp.src([
     'node_modules/mithril/mithril.min.js',
-    'node_modules/quill/dist/quill.min.js',
-
-    'node_modules/codemirror/lib/codemirror.js',
-    'node_modules/codemirror/mode/gfm/gfm.js',
-    'node_modules/codemirror/mode/markdown/markdown.js',
-    'node_modules/codemirror/addon/display/placeholder.js',
-    'node_modules/codemirror/addon/mode/overlay.js'
   ])
     .pipe(gulp.dest('./build/vendor/'))
 );

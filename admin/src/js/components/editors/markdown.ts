@@ -1,5 +1,4 @@
 import * as API from 'lib/api';
-import * as CodeMirror from 'CodeMirror';
 
 export default class CodeMirrorComponent {
   codemirror: CodeMirror.Editor;
@@ -23,18 +22,32 @@ export default class CodeMirrorComponent {
   }
 
   initializeCodeMirror(element: HTMLTextAreaElement) {
-    element.value = this.content.value;
-    this.codemirror = CodeMirror.fromTextArea(element, {
-      mode: 'gfm',
-      placeholder: 'start typing...',
-      lineNumbers: false,
-      theme: 'elegant',
-      lineWrapping: true,
-    });
-    // this.codemirror.setOption('fullscreen', 'true')
-    // this.codemirror.refresh()
-    this.codemirror.on('change', (instance) => {
-      this.content.value = instance.getValue();
+    require.ensure([
+      'codemirror/lib/codemirror',
+      'codemirror/mode/gfm/gfm',
+      'codemirror/mode/markdown/markdown',
+      'codemirror/addon/display/placeholder',
+      'codemirror/addon/mode/overlay'
+    ], () => {
+      let cm = require<typeof CodeMirror>('codemirror');
+      require('codemirror/mode/gfm/gfm');
+      require('codemirror/mode/markdown/markdown');
+      require('codemirror/addon/display/placeholder');
+      require('codemirror/addon/mode/overlay');
+
+      element.value = this.content.value;
+      this.codemirror = cm.fromTextArea(element, {
+        mode: 'gfm',
+        placeholder: 'start typing...',
+        lineNumbers: false,
+        theme: 'elegant',
+        lineWrapping: true,
+      });
+      // this.codemirror.setOption('fullscreen', 'true')
+      // this.codemirror.refresh()
+      this.codemirror.on('change', (instance) => {
+        this.content.value = instance.getValue();
+      });
     });
   }
 

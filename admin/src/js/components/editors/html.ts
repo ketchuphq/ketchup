@@ -1,8 +1,7 @@
 import * as API from 'lib/api';
-import * as Quill from 'quill';
 
 export default class QuillComponent {
-  quill: any;
+  quill: Quill.Quill;
   content: API.Content;
   element: HTMLElement;
   id: string;
@@ -23,17 +22,20 @@ export default class QuillComponent {
   }
 
   initializeQuill() {
-    this.quill = new Quill(this.id, {
-      placeholder: 'start typing...',
-      theme: 'snow',
-      modules: {
-        toolbar: `${this.id}-toolbar`
-      }
-    });
-    this.quill.on('text-change', () => {
-      let editor = this.element.getElementsByClassName('ql-editor')[0];
-      this.content.value = editor.innerHTML;
-    });
+    require.ensure(['quill'], (require) => {
+      let Quill: Quill.Quill = require<Quill.Quill>('quill');
+      this.quill = new Quill(this.id, {
+        placeholder: 'start typing...',
+        theme: 'snow',
+        modules: {
+          toolbar: `${this.id}-toolbar`
+        }
+      });
+      this.quill.on('text-change', () => {
+        let editor = this.element.getElementsByClassName('ql-editor')[0];
+        this.content.value = editor.innerHTML;
+      });
+    }); // chunkName?
   }
 
   static controller = QuillComponent;
