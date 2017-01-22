@@ -6,7 +6,7 @@ export default class Button {
   loading: Mithril.Property<boolean>;
   handler: () => void;
 
-  constructor(config: ButtonAttributes) {
+  constructor(readonly config: ButtonAttributes) {
     this.loading = m.prop(false);
     this.handler = () => {
       if (!config.handler) {

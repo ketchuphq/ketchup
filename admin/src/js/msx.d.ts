@@ -9,7 +9,7 @@ declare global {
     }
     interface ElementAttributesProperty {
       // http://www.typescriptlang.org/docs/handbook/jsx.html
-      props: any; // specify the property name on the element to use
+      config: any;
     }
   }
 }
