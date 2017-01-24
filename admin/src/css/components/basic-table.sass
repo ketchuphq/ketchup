@@ -17,10 +17,9 @@
             background: $slate10
 
 .table
-  +standard-radius
-  padding: 10px 12px
-  background: $slate10
-  box-shadow: inset 0px 1px 8px -2px rgba(0,0,0,0.1)
+  +small-radius
+  padding: 10px
+  border: 1px solid $slate6
   .tr
     border-top: 1px solid $slate9
     display: flex
@@ -36,6 +35,7 @@
     &:first-child
       border-top: none
     input[type=text]
+      +small-radius
       background: rgba(255,255,255,0.6)
       padding: 8px 10px
       border: 1px solid $slate9
@@ -44,10 +44,6 @@
         outline: none
 
   a.tr
-    +standard-radius
     text-decoration: none
     &:hover
-      background: $slate5
-      color: #fff
-      + .tr
-        border-color: $slate10
+      font-weight: bold
