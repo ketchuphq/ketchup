@@ -5,30 +5,12 @@ var gutil = require('gutil');
 var tslint = require('gulp-tslint');
 
 let webpackCache = {}
-let webpackConfig = {
-  entry: 'app.ts',
-  devtool: 'source-map',
-  output: {
-    filename: 'app.js',
-    publicPath: '/admin/'
-  },
-  resolve: {
-    extensions: ['.ts', '.tsx', '.js'],
-    modules: ['src/js', 'node_modules']
-  },
-  module: {
-    rules: [
-      { test: /\.js$/, loader: 'source-map-loader', enforce: 'pre' },
-      { test: /\.tsx?$/, loader: 'ts-loader' }
-    ],
-  },
-  externals: {
-    'mithril': 'm',
-  },
-  cache: webpackCache
-}
+let webpackConfig = require('../webpack.config')
 
-if (false) {
+webpackConfig.cache = webpackCache
+
+let prod = false
+if (prod) {
   webpackConfig.plugins = [
     new webpack.optimize.UglifyJsPlugin({
       compress: { warnings: false }
