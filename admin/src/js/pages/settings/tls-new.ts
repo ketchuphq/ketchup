@@ -80,15 +80,15 @@ export default class TLSNewComponent {
           onchange: m.withAttr('value', ctrl.tlsDomain)
         })
       ]),
-      m('.tr.tr--right', [
-        m('label[for=letos]', [
+      m('.tr.tr--right.tr--tos', [
+        m('label[for=tos]', [
           'I agree to ',
           m('a', {
             href: 'https://acme-v01.api.letsencrypt.org/terms',
             target: '_blank'
           }, `Let's Encrypt's Terms of Service`)
         ]),
-        m('input#letos[type=checkbox]')
+        m('input#tos[type=checkbox]')
       ]),
       m('.tr.tr--right.tr--no-border', [
         m.component(Button, {
