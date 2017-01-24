@@ -6,9 +6,15 @@
     input[type=text]
       background: none
     margin-bottom: 24px
+  .controlset
+    display: block
+    margin-bottom: 25px
+    overflow: hidden // clear floats
   .controlset .save-publish
     text-align: right
+    float: right
   .infoset
+    float: left
     display: flex
     justify-content: space-between
     align-items: center
@@ -18,7 +24,7 @@
     margin-right: 8px
     &:hover
       background: $slate9
-      transition-property: 'background'
+      transition-property: background
       transition-delay: 0s
       transition-timing-function: ease-out
       transition-duration: 0.1s

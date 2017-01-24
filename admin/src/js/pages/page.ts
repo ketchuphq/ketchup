@@ -112,7 +112,7 @@ export default class PagePage extends MustAuthController {
     ]);
   }
   renderSettings() {
-    return m('.controls', {
+    return m('.controlset', {
       class: this.showControls() ? 'hidden' : '',
     }, [
         m('.infoset', {
