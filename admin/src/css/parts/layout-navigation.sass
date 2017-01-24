@@ -63,3 +63,22 @@
         height: 38px
       .button
         border-radius: 0
+
+@media (max-width: 480px)
+  .navigation
+    width: 100%
+    background: $slate1
+    margin-right: 0
+    a
+      color: white
+    .nav-link:hover
+      background: $slate5
+    &.navigation--hidden
+      .nav-link, .nav-button
+        display: none
+        &.nav-title, &.nav-link--toggle
+          display: block
+          margin-top: 0
+    .nav-title, .nav-link--toggle
+      display: block
+      margin-top: 0
