@@ -16,6 +16,13 @@ $inputPadding: 12px
   +input-text($fontSize2)
   font-family: $titleFont
 
+=input-text-shade
+  background: white
+  +transition(background)
+  &:focus
+    border-bottom-color: $slate10
+    background: $slate10
+
 =input-select($size: $fontSize1)
   font-size: $size
   margin-top: $inputPadding

@@ -37,6 +37,8 @@
       +input-text
     input[type=text].large
       +input-text-large
+      +input-text-shade
+      font-weight: 700
     select
       +input-select
     textarea
@@ -82,10 +84,7 @@
       margin-bottom: 10px
 
   .ql-container-full
-    transition-property: 'background color'
-    transition-delay: 0s
-    transition-timing-function: ease-out
-    transition-duration: 0.1s
+    +transition('background color')
     &.ql-container-full-dark
       .ql-container
         background: $slate1
@@ -108,6 +107,7 @@
     .ql-editor
       margin: 0 auto
       padding: 15px
+      padding-top: 30px
       max-width: 600px
     .qlx-controls
       position: fixed
