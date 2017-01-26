@@ -1,0 +1,40 @@
+.page-max
+  height: 100%
+  top: 0
+  left: 0
+  right: 0
+  position: absolute
+  padding: 15px
+  background: white
+  opacity: 0
+  animation: fadeIn 0.3s ease-in-out 0.1s
+  animation-fill-mode: forwards
+  .page-editor
+    animation: zoomOut 0.3s ease-in-out 0.1s
+    max-width: $editorWidth - $navWidth/2 // weird
+    margin: 15px auto
+    input[type=text]
+      background: none
+    input[type=text].large
+      border: none
+    .quill .ql-editor
+      background: none
+      border: none
+
+.page-max__controls, .page-editor__icons
+  position: fixed
+  top: 10px
+  right: 10px
+  z-index: 10
+  .button
+    position: relative
+    top: -6px
+    margin-right: 12px
+  span.typcn, a.typcn
+    font-size: 42px
+    +transition(color)
+    color: $slate8
+    text-decoration: none
+    cursor: pointer
+    &:hover
+      color: $slate6

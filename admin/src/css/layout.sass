@@ -43,10 +43,13 @@ p
     .button
       float: right
 
-  &--body
+  &--in
+    animation: zoomIn 0.4s cubic-bezier(0.215, 0.61, 0.355, 1)
+
+  &__body
     width: $editorWidth - $navWidth
 
-.container--body
+.container__body
   padding: 32px 10px 10px
   h1:first-child
     margin-top: 0
@@ -55,5 +58,5 @@ p
   .container
     display: block
     max-width: 100%
-    &--body
+    &__body
       max-width: 100%

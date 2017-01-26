@@ -24,10 +24,7 @@
     margin-right: 8px
     &:hover
       background: $slate9
-      transition-property: background
-      transition-delay: 0s
-      transition-timing-function: ease-out
-      transition-duration: 0.1s
+      transition: background 0.1s ease-out
   .controls
     display: flex
     justify-content: space-between
@@ -46,11 +43,17 @@
       resize: vertical
     .quill
       margin-top: $inputPadding
+      .ql-toolbar
+        margin-bottom: 10px
+        border: 1px solid $slate8
+        +small-radius
       .ql-container
         border-color: white
-        .ql-editor.ql-blank::before
-          color: $slate5
-          font-style: normal
+      .ql-editor.ql-blank::before
+        color: $slate5
+        font-style: normal
+      .ql-editor
+        border: 1px solid $slate9
 
     .text textarea
       width: 100%
@@ -82,54 +85,6 @@
       font-size: 1.1em
     p
       margin-bottom: 10px
-
-  .ql-container-full
-    +transition('background color')
-    &.ql-container-full-dark
-      .ql-container
-        background: $slate1
-        border-color: $slate1
-        color: $slate8
-      .qlx-controls
-        color: white
-    .ql-container
-      height: 100%
-      top: 0
-      left: 0
-      right: 0
-      position: fixed
-      background: white
-
-      transition-property: background
-      transition-delay: 0s
-      transition-timing-function: ease-out
-      transition-duration: 0.1s
-    .ql-editor
-      margin: 0 auto
-      padding: 15px
-      padding-top: 30px
-      max-width: 600px
-    .qlx-controls
-      position: fixed
-      font-size: 36px
-      top: 10px
-      right: 10px
-      z-index: 10
-      transition-property: 'color'
-      color: $slate5
-      span
-        cursor: pointer
-        transition-delay: 0s
-        transition-timing-function: ease-out
-        transition-duration: 0.1s
-        &:hover
-          color: $slate8
-
-  .qlx-maximize
-    font-size: 14px
-    padding: 4px 0
-    cursor: pointer
-    float: right
 
 @media (max-width: 480px)
   .page-editor .controls

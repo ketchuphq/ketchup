@@ -4,12 +4,11 @@
 .CodeMirror
   font-family: monaco, 'Lucida Console', monospace
   font-size: 14px
-  transition: border 0.3s ease-out
-  border: 1px solid $slate9
+  +transition(background)
+  +small-radius
   padding: $inputPadding
+  background: $slate10
 
-  &.CodeMirror-focused
-    border-color: white
   &.CodeMirror-empty
     color: $slate5
     font-size: 20px

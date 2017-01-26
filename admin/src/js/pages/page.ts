@@ -12,12 +12,16 @@ export default class PagePage extends MustAuthController {
   page: Mithril.Property<Page>;
   showControls: Mithril.Property<boolean>;
   template: Mithril.Property<API.ThemeTemplate>;
+  maximize: Mithril.Property<boolean>;
+  minimiseToSettings: Mithril.Property<boolean>;
 
   constructor() {
     super();
     this.showControls = m.prop(false);
+    this.maximize = m.prop(true);
     this.page = m.prop<Page>();
     this.template = m.prop<API.ThemeTemplate>();
+    this.minimiseToSettings = m.prop(false);
     let pageUUID = m.route.param('id');
     if (pageUUID) {
       Page.get(pageUUID)
@@ -215,10 +219,56 @@ export default class PagePage extends MustAuthController {
     ]);
   }
 
+  maxView() {
+    let controls = [
+      m('a.button.button--green', {
+        onclick: (e: Event) => { e.stopPropagation(); this.save(); }
+      }, 'Save'),
+      m('span.typcn.typcn-cog', {
+        onclick: () => { this.maximize(false); }
+      }),
+    ];
+    if (!this.minimiseToSettings()) {
+      controls.push(m('a.typcn.typcn-times', {
+        href: '/admin/pages',
+        config: m.route
+      }));
+    }
+
+    return Layout(
+      m('.page-max',
+        m('.page-max__controls', controls),
+        m('.page-editor', [
+          m('.controls',
+            m('input[type=text].large', {
+              placeholder: 'title...',
+              value: this.page().title || '',
+              onchange: m.withAttr('value', (v: string) => {
+                this.page().title = v;
+              })
+            }),
+          ),
+          this.renderEditors()
+        ])
+      )
+    );
+  }
+
   static controller = PagePage;
   static view(ctrl: PagePage) {
+    if (ctrl.maximize()) {
+      return ctrl.maxView();
+    }
     return Layout(
       m('.page-editor', [
+        m('.page-editor__icons', [
+          m('span.typcn.typcn-arrow-maximise', {
+            onclick: () => {
+              ctrl.minimiseToSettings(true);
+              ctrl.maximize(true);
+            }
+          }),
+        ]),
         m('.controls',
           m('input[type=text].large', {
             placeholder: 'title...',
