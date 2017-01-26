@@ -59,7 +59,6 @@ export default class Page extends API.Page {
   }
 
   save(): Mithril.Promise<API.Page> {
-    console.log(this)
     return m.request({
       method: 'POST',
       url: `/api/v1/pages`,

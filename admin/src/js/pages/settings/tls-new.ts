@@ -35,12 +35,8 @@ export default class TLSNewComponent {
         agreed: true,
       }
     })
-      .then((res) => {
-        console.log(res);
-      })
       .catch((res: API.ErrorResponse) => {
         if (!res || !res.errors) {
-          console.log(res);
           add('Unknown error', 'error');
           return;
         }

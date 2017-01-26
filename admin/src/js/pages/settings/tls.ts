@@ -23,4 +23,4 @@ export default {
       m('.button.button--green.button--small', 'Save')
     ])
   ])
-}
+};
