@@ -48,7 +48,7 @@ export default class CodeMirrorComponent {
       this.codemirror.on('change', (instance) => {
         this.content.value = instance.getValue();
       });
-    });
+    }, 'codemirror');
   }
 
   static controller = CodeMirrorComponent;

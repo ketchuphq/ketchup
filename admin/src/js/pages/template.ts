@@ -15,6 +15,19 @@ export default class TemplatePage extends MustAuthController {
     // todo: catch
   }
 
+  colorize(el: HTMLElement) {
+    require.ensure([
+      'highlight.js',
+      'highlight.js/lib/languages/xml',
+      'highlight.js/styles/rainbow.css'
+    ], (require) => {
+      let hljs: any = require('highlight.js');
+      require('highlight.js/lib/languages/xml');
+      require('highlight.js/styles/rainbow.css');
+      hljs.highlightBlock(el);
+    }, 'hljs');
+  }
+
   static controller = TemplatePage;
   static view(ctrl: TemplatePage) {
     let name = m.route.param('name');
@@ -28,7 +41,14 @@ export default class TemplatePage extends MustAuthController {
           m.route.param('template')
         ]),
       ),
-      m('pre', ctrl.template().data)
+      m('pre', {
+        config: (el: HTMLElement, isInitialized: boolean) => {
+          if (!isInitialized) {
+            ctrl.colorize(el);
+          }
+        }
+      },
+        ctrl.template().data)
     ]));
   }
 }

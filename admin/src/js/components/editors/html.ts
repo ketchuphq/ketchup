@@ -35,7 +35,7 @@ export default class QuillComponent {
         let editor = this.element.getElementsByClassName('ql-editor')[0];
         this.content.value = editor.innerHTML;
       });
-    }); // chunkName?
+    }, 'quill');
   }
 
   static controller = QuillComponent;
