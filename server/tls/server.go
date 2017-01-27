@@ -17,7 +17,6 @@ func (m *Module) loadTLSConfig() (*tls.Config, error) {
 
 	// keys are stored in a different place currently
 	// extra dot is a hack to skip over session key
-	glob := m.Config.DataPath("*.key", "")
 	glob := m.tlsDirPath("*.key")
 	m.Logger.Infof("loading certs from %s", glob)
 	matches, err := filepath.Glob(glob)
@@ -46,6 +45,9 @@ func (m *Module) loadTLSConfig() (*tls.Config, error) {
 
 // StartTLSProxy starts the tls proxy
 func (m *Module) StartTLSProxy() error {
+	if m.serverStarted {
+		return nil
+	}
 	tlsConfig, err := m.loadTLSConfig()
 	if err != nil {
 		return err
@@ -63,5 +65,6 @@ func (m *Module) StartTLSProxy() error {
 		Handler:      m.Router,
 		TLSConfig:    tlsConfig, // needed for http/2
 	}
+	m.serverStarted = true
 	return server.Serve(l)
 }

@@ -2,6 +2,7 @@ package tls
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 	"os"
 	"path"
@@ -19,18 +20,25 @@ import (
 )
 
 const (
-	defaultCAURL = "https://acme-v01.api.letsencrypt.org/directory"
-	// defaultCAURL      = "https://acme-staging.api.letsencrypt.org/directory"
-	challengeBasePath = "/.well-known/acme-challenge"
-	tlsDir            = "tls"
+	defaultCAURL        = "https://acme-v01.api.letsencrypt.org/directory"
+	defaultStagingCAURL = "https://acme-staging.api.letsencrypt.org/directory"
+	challengeBasePath   = "/.well-known/acme-challenge/"
+	tlsDir              = "tls"
 )
+
+type acmeChallenge struct {
+	domain, token, keyAuth string
+}
 
 type Module struct {
 	Config *config.Module
 	Router *router.Module
 	Logger *logger.Module
 
-	keystore *keystore.KeyStore
+	challenge *acmeChallenge
+	keystore  *keystore.KeyStore
+
+	serverStarted bool
 }
 
 func (m *Module) Init(c *service.Config) {
@@ -61,6 +69,7 @@ Required params: domain to provision a cert for; contact email for Let's Encrypt
 		if os.IsNotExist(err) {
 			err = os.MkdirAll(dir, 0700)
 		}
+		m.Router.Handle(challengeBasePath, m)
 		return err
 	}
 	c.Start = func() {
@@ -130,6 +139,7 @@ func (m *Module) obtainCert(r *Registration) error {
 		return errors.Wrap(err)
 	}
 
+	c.SetChallengeProvider(acme.HTTP01, m)
 	registration, err := c.Register()
 	if err != nil {
 		return errors.Wrap(err)
@@ -142,7 +152,6 @@ func (m *Module) obtainCert(r *Registration) error {
 	if err != nil {
 		return errors.Wrap(err)
 	}
-
 	cert, errs := c.ObtainCertificate([]string{domain.Host}, true, domainKey, false)
 	if len(errs) > 0 {
 		lst := []string{}
@@ -156,4 +165,38 @@ func (m *Module) obtainCert(r *Registration) error {
 
 	m.saveCert(cert)
 	return errors.Wrap(err)
+}
+
+func (m *Module) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+	if m.challenge == nil {
+		router.NotFound(rw)
+		return
+	}
+	// The handler validates the HOST header and request type.
+	// For validation it then writes the token the server returned with the challenge
+	if strings.HasPrefix(req.Host, m.challenge.domain) &&
+		req.URL.Path == acme.HTTP01ChallengePath(m.challenge.token) &&
+		req.Method == "GET" {
+		rw.Header().Add("Content-Type", "text/plain")
+		rw.Write([]byte(m.challenge.keyAuth))
+		m.challenge = nil
+	} else {
+		m.Logger.Warningf("Invalid acme challenge for %s", req.Host)
+	}
+}
+
+// Present implements the acme.ChallengeProvider.Present
+func (m *Module) Present(domain, token, keyAuth string) error {
+	if m.challenge != nil {
+		m.Logger.Warningf("replacing existing challenge for %s with %s", m.challenge.domain, domain)
+	}
+	m.challenge = &acmeChallenge{domain: domain, token: token, keyAuth: keyAuth}
+	return nil
+
+}
+
+// CleanUp implements the acme.ChallengeProvider.CleanUp
+func (m *Module) CleanUp(domain, token, keyAuth string) error {
+	m.challenge = nil
+	return nil
 }

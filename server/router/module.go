@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"path"
 
 	"github.com/go-errors/errors"
 	"github.com/golang/protobuf/jsonpb"
@@ -12,8 +13,6 @@ import (
 	"github.com/octavore/naga/service"
 	"github.com/octavore/nagax/logger"
 	"github.com/octavore/nagax/router"
-
-	"path"
 
 	"github.com/octavore/press/proto/press/api"
 )
