@@ -6,7 +6,6 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/julienschmidt/httprouter"
 	"github.com/octavore/nagax/users"
-	"github.com/xenolf/lego/acme"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/octavore/press/proto/press/api"
@@ -42,11 +41,10 @@ func (m *Module) GetTLS(rw http.ResponseWriter, req *http.Request, par httproute
 	if err != nil {
 		return err
 	}
-	reg := &acme.RegistrationResource{}
+	tosURL := ""
 	if r.Registration != nil {
-		reg = r.Registration
+		tosURL = r.Registration.TosURL
 	}
-
 	crt, err := m.TLS.LoadCertResource(domain)
 	if err != nil {
 		m.Logger.Error(err)
@@ -55,7 +53,7 @@ func (m *Module) GetTLS(rw http.ResponseWriter, req *http.Request, par httproute
 		TlsEmail:       &r.Email,
 		TlsDomain:      &r.Domain,
 		AgreedOn:       &r.AgreedOn,
-		TermsOfService: &reg.TosURL,
+		TermsOfService: &tosURL,
 		HasCertificate: proto.Bool(crt != nil),
 	}
 	return m.Router.Proto(rw, http.StatusOK, res)
@@ -80,11 +78,15 @@ func (m *Module) EnableTLS(rw http.ResponseWriter, req *http.Request, par httpro
 	if err != nil {
 		return err
 	}
+	tosURL := ""
+	if r.Registration != nil {
+		tosURL = r.Registration.TosURL
+	}
 	res := &api.TLSSettingsReponse{
 		TlsEmail:       &r.Email,
 		TlsDomain:      &r.Domain,
 		AgreedOn:       &r.AgreedOn,
-		TermsOfService: &r.Registration.TosURL,
+		TermsOfService: &tosURL,
 	}
 	return m.Router.Proto(rw, http.StatusOK, res)
 }
