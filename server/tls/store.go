@@ -107,7 +107,7 @@ func (m *Module) GetAllRegisteredDomains() ([]string, error) {
 }
 
 func (m *Module) getCurrentRegistrationPath(domain string) (string, error) {
-	g := path.Join(m.Config.Config.DataDir, tlsDir, domain+"*"+".json")
+	g := path.Join(m.Config.Config.DataDir, tlsDir, domain+"-*"+".json")
 	matches, err := filepath.Glob(g)
 	if err != nil {
 		return "", err

@@ -79,6 +79,20 @@ func TestCurrentTLSPath(t *testing.T) {
 	if path.Base(s) != testPath {
 		t.Errorf("unexpected string %s", s)
 	}
+
+	// should ignore this
+	p := testDomain + ".json"
+	err = ioutil.WriteFile(path.Join(dir, tlsDir, p), []byte{}, os.ModePerm)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s, err = m.getCurrentRegistrationPath(testDomain)
+	if err != nil {
+		t.Errorf("unexpected error %v", err)
+	}
+	if path.Base(s) != testPath {
+		t.Errorf("unexpected string %s", s)
+	}
 }
 
 func TestNextTLSPath(t *testing.T) {
