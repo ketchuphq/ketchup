@@ -49,7 +49,7 @@ func TestGetAll(t *testing.T) {
 		_ = ioutil.WriteFile(path.Join(dir, tlsDir, t), []byte{}, os.ModePerm)
 	}
 
-	matches, err := m.getAllRegisteredDomains()
+	matches, err := m.GetAllRegisteredDomains()
 	if err != nil {
 		t.Fatal(err)
 	}
