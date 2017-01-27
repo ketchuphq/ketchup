@@ -25,11 +25,54 @@ const (
 
 // FileStore stores and loads templates on the filesystem
 type FileStore struct {
-	dataDir string
+	dataDir     string
+	themeDirMap map[string]string // maps theme name to dir
 }
 
-func NewFileStore(dataDir string) *FileStore {
-	return &FileStore{dataDir: dataDir}
+func (f *FileStore) readConfig(themeConfigPath string) (*models.Theme, error) {
+	_, err := os.Stat(themeConfigPath)
+	if os.IsNotExist(err) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	b, err := ioutil.ReadFile(themeConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	t := &models.Theme{
+		Templates: map[string]*models.ThemeTemplate{},
+		Assets:    map[string]*models.ThemeAsset{},
+	}
+	err = jsonpb.Unmarshal(bytes.NewBuffer(b), t)
+	if err != nil {
+		return nil, err
+	}
+	return t, nil
+}
+
+func (f *FileStore) updateThemeDirMap() error {
+	lst, err := ioutil.ReadDir(f.dataDir)
+	if err != nil {
+		return err
+	}
+	m := map[string]string{}
+	for _, fi := range lst {
+		if !fi.IsDir() {
+			continue
+		}
+		themeConfigPath := path.Join(f.dataDir, fi.Name(), configFileName)
+		c, err := f.readConfig(themeConfigPath)
+		if err != nil {
+			return nil
+		}
+		if c.GetName() != "" && fi.Name() != c.GetName() {
+			m[c.GetName()] = fi.Name()
+		}
+	}
+	f.themeDirMap = m
+	return nil
 }
 
 // GetTemplate fetches a theme's template from the filesystem. The
@@ -38,7 +81,11 @@ func (f *FileStore) GetTemplate(theme *models.Theme, templateName string) (*mode
 	if theme == nil || theme.GetName() == "" {
 		return nil, nil
 	}
-	p := path.Join(f.dataDir, theme.GetName(), fileStoreTemplateDir, templateName)
+	themeDir := theme.GetName()
+	if altDir := f.themeDirMap[theme.GetName()]; altDir != "" {
+		themeDir = altDir
+	}
+	p := path.Join(f.dataDir, themeDir, fileStoreTemplateDir, templateName)
 	b, err := ioutil.ReadFile(p)
 	if err != nil {
 		return nil, err
@@ -59,7 +106,12 @@ func (f *FileStore) GetAsset(theme *models.Theme, assetName string) (*models.The
 	if theme == nil || theme.GetName() == "" {
 		return nil, nil
 	}
-	p := path.Join(f.dataDir, theme.GetName(), fileStoreAssetsDir, assetName)
+	themeDir := theme.GetName()
+	if altDir := f.themeDirMap[theme.GetName()]; altDir != "" {
+		themeDir = altDir
+	}
+
+	p := path.Join(f.dataDir, themeDir, fileStoreAssetsDir, assetName)
 	b, err := ioutil.ReadFile(p)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -76,34 +128,56 @@ func (f *FileStore) GetAsset(theme *models.Theme, assetName string) (*models.The
 	return t, nil
 }
 
+func (f *FileStore) loadTheme(themeDir string, t *models.Theme) error {
+	// get templates (todo: supported subdirs)
+	glob := path.Join(f.dataDir, themeDir, fileStoreTemplateDir, "*")
+	paths, err := filepath.Glob(glob)
+	if err != nil {
+		return err
+	}
+	for _, p := range paths {
+		q := path.Base(p)
+		if strings.HasPrefix(q, ".") {
+			continue
+		}
+		e := strings.TrimLeft(path.Ext(p), ".")
+		if t.Templates[q] == nil {
+			t.Templates[q] = &models.ThemeTemplate{}
+		}
+		t.Templates[q].Name = &q
+		t.Templates[q].Engine = &e
+	}
+
+	// get assets (todo: supported subdirs)
+	glob = path.Join(f.dataDir, themeDir, fileStoreAssetsDir, "*")
+	paths, err = filepath.Glob(glob)
+	if err != nil {
+		return err
+	}
+	for _, p := range paths {
+		q := path.Base(p)
+		if strings.HasPrefix(q, ".") {
+			continue
+		}
+		t.Assets[q] = &models.ThemeAsset{Name: &q}
+	}
+	return nil
+}
+
 // Get a theme from the file store
 func (f *FileStore) Get(themeName string) (*models.Theme, error) {
-	if themeName == "" {
+	themeDir := themeName
+	if altDir := f.themeDirMap[themeName]; altDir != "" {
+		themeDir = altDir
+	}
+	themeConfigPath := path.Join(f.dataDir, themeDir, configFileName)
+	t, err := f.readConfig(themeConfigPath)
+	if err != nil || t == nil {
 		return nil, nil
-	}
-	themeConfigPath := path.Join(f.dataDir, themeName, configFileName)
-	_, err := os.Stat(themeConfigPath)
-	if os.IsNotExist(err) {
-		return nil, nil
-	}
-	if err != nil {
-		return nil, err
-	}
-	b, err := ioutil.ReadFile(themeConfigPath)
-	if err != nil {
-		return nil, err
-	}
-	t := &models.Theme{
-		Templates: map[string]*models.ThemeTemplate{},
-		Assets:    map[string]*models.ThemeAsset{},
-	}
-	err = jsonpb.Unmarshal(bytes.NewBuffer(b), t)
-	if err != nil {
-		return nil, err
 	}
 
 	// get templates (todo: supported subdirs)
-	glob := path.Join(f.dataDir, themeName, fileStoreTemplateDir, "*")
+	glob := path.Join(f.dataDir, themeDir, fileStoreTemplateDir, "*")
 	paths, err := filepath.Glob(glob)
 	if err != nil {
 		return nil, err
@@ -122,7 +196,7 @@ func (f *FileStore) Get(themeName string) (*models.Theme, error) {
 	}
 
 	// get assets (todo: supported subdirs)
-	glob = path.Join(f.dataDir, themeName, fileStoreAssetsDir, "*")
+	glob = path.Join(f.dataDir, themeDir, fileStoreAssetsDir, "*")
 	paths, err = filepath.Glob(glob)
 	if err != nil {
 		return nil, err

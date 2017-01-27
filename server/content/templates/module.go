@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"time"
 
 	"github.com/octavore/naga/service"
 	"github.com/octavore/nagax/logger"
@@ -58,7 +59,7 @@ func (m *Module) Init(c *service.Config) {
 
 		m.config.Themes.Path = m.ConfigModule.DataPath(m.config.Themes.Path, themeDir)
 		dataDir := path.Join(wd, m.config.Themes.Path)
-		m.Stores = []ThemeStore{&defaultStore{}, &FileStore{dataDir: dataDir}}
+		m.Stores = []ThemeStore{&defaultStore{}, m.newFileStore(dataDir)}
 		return nil
 	}
 }
@@ -144,4 +145,17 @@ func (m *Module) GetAsset(name string) (*models.ThemeAsset, error) {
 		}
 	}
 	return nil, nil
+}
+
+func (m *Module) newFileStore(dataDir string) *FileStore {
+	f := &FileStore{dataDir: dataDir}
+	go func() {
+		for range time.Tick(10 * time.Second) {
+			err := f.updateThemeDirMap()
+			if err != nil {
+				m.Logger.Error(err)
+			}
+		}
+	}()
+	return f
 }
