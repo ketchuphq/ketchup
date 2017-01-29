@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/octavore/press/proto/press/packages"
-	"github.com/octavore/press/util/errors"
+	"github.com/octavore/ketchup/proto/ketchup/packages"
+	"github.com/octavore/ketchup/util/errors"
 )
 
 // FetchRegistry fetches

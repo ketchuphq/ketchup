@@ -15,9 +15,9 @@ import (
 
 	"github.com/octavore/naga/service"
 
-	"github.com/octavore/press/proto/press/packages"
-	"github.com/octavore/press/server/config"
-	"github.com/octavore/press/util/errors"
+	"github.com/octavore/ketchup/proto/ketchup/packages"
+	"github.com/octavore/ketchup/server/config"
+	"github.com/octavore/ketchup/util/errors"
 )
 
 // Module pkg manages downloading pkg

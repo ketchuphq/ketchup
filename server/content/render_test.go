@@ -7,7 +7,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	"github.com/octavore/press/proto/press/models"
+	"github.com/octavore/ketchup/proto/ketchup/models"
 )
 
 type renderTextContentCase struct {

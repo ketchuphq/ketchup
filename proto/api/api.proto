@@ -4,7 +4,7 @@ import "page.proto";
 import "route.proto";
 import "theme.proto";
 
-package press.api;
+package ketchup.api;
 
 enum ErrorCode {
     INTERNAL_SERVER_ERROR = 1;
@@ -27,19 +27,19 @@ message FieldError {
 }
 
 message UpdatePageRoutesRequest {
-    repeated press.models.Route routes = 1;
+    repeated ketchup.models.Route routes = 1;
 }
 
 message ListPageResponse {
-    repeated press.models.Page pages = 1;
+    repeated ketchup.models.Page pages = 1;
 }
 
 message ListRouteResponse {
-    repeated press.models.Route routes = 1;
+    repeated ketchup.models.Route routes = 1;
 }
 
 message ListThemeResponse {
-    repeated press.models.Theme themes = 1;
+    repeated ketchup.models.Theme themes = 1;
 }
 
 message TLSSettingsReponse {

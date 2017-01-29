@@ -14,7 +14,7 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/octavore/nagax/util/token"
 
-	"github.com/octavore/press/proto/press/models"
+	"github.com/octavore/ketchup/proto/ketchup/models"
 )
 
 const (

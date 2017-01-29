@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/octavore/press/server/config"
+	"github.com/octavore/ketchup/server/config"
 )
 
 const testDomain = "example.com"

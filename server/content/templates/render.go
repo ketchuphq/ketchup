@@ -3,9 +3,9 @@ package templates
 import (
 	"io"
 
-	"github.com/octavore/press/proto/press/models"
-	"github.com/octavore/press/server/content/engines"
-	"github.com/octavore/press/util/errors"
+	"github.com/octavore/ketchup/proto/ketchup/models"
+	"github.com/octavore/ketchup/server/content/engines"
+	"github.com/octavore/ketchup/util/errors"
 )
 
 // getTemplate returns the desired template. If the theme or template

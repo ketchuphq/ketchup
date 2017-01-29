@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package press.models;
+package ketchup.models;
 
 message ContentMultiple {
     enum DropdownType {

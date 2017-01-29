@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package press.packages;
+package ketchup.packages;
 
 message PackageRelease {
   optional string ketchup_min = 1;

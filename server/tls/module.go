@@ -14,9 +14,9 @@ import (
 	"github.com/octavore/nagax/logger"
 	"github.com/xenolf/lego/acme"
 
-	"github.com/octavore/press/server/config"
-	"github.com/octavore/press/server/router"
-	"github.com/octavore/press/util/errors"
+	"github.com/octavore/ketchup/server/config"
+	"github.com/octavore/ketchup/server/router"
+	"github.com/octavore/ketchup/util/errors"
 )
 
 const (

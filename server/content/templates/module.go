@@ -11,9 +11,9 @@ import (
 	"github.com/octavore/naga/service"
 	"github.com/octavore/nagax/logger"
 
-	"github.com/octavore/press/proto/press/models"
-	"github.com/octavore/press/server/config"
-	"github.com/octavore/press/util/errors"
+	"github.com/octavore/ketchup/proto/ketchup/models"
+	"github.com/octavore/ketchup/server/config"
+	"github.com/octavore/ketchup/util/errors"
 )
 
 const themeDir = "themes"

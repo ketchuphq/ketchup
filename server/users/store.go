@@ -1,7 +1,7 @@
 package users
 
 import (
-	"github.com/octavore/press/proto/press/models"
+	"github.com/octavore/ketchup/proto/ketchup/models"
 )
 
 // Create a user from email and hashedPassword. For nagax.users module.

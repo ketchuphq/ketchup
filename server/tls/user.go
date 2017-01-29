@@ -6,8 +6,9 @@ import (
 	"path"
 
 	"github.com/octavore/nagax/keystore"
-	"github.com/octavore/press/util/errors"
 	"github.com/xenolf/lego/acme"
+
+	"github.com/octavore/ketchup/util/errors"
 )
 
 type Registration struct {

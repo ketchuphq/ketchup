@@ -5,8 +5,8 @@ import (
 	"github.com/golang/protobuf/proto"
 	uuid "github.com/satori/go.uuid"
 
-	"github.com/octavore/press/proto/press/models"
-	"github.com/octavore/press/util/errors"
+	"github.com/octavore/ketchup/proto/ketchup/models"
+	"github.com/octavore/ketchup/util/errors"
 )
 
 const USER_BUCKET = "users"

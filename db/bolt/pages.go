@@ -5,8 +5,8 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/satori/go.uuid"
 
-	"github.com/octavore/press/db"
-	"github.com/octavore/press/proto/press/models"
+	"github.com/octavore/ketchup/db"
+	"github.com/octavore/ketchup/proto/ketchup/models"
 )
 
 const PAGE_BUCKET = "pages"

@@ -3,12 +3,12 @@ package main
 import (
 	"github.com/octavore/naga/service"
 
-	"github.com/octavore/press/admin"
-	"github.com/octavore/press/db/bolt"
-	"github.com/octavore/press/plugins/pkg"
-	"github.com/octavore/press/server/api"
-	"github.com/octavore/press/server/content"
-	"github.com/octavore/press/server/tls"
+	"github.com/octavore/ketchup/admin"
+	"github.com/octavore/ketchup/db/bolt"
+	"github.com/octavore/ketchup/plugins/pkg"
+	"github.com/octavore/ketchup/server/api"
+	"github.com/octavore/ketchup/server/content"
+	"github.com/octavore/ketchup/server/tls"
 )
 
 type App struct {

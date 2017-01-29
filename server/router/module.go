@@ -14,7 +14,7 @@ import (
 	"github.com/octavore/nagax/logger"
 	"github.com/octavore/nagax/router"
 
-	"github.com/octavore/press/proto/press/api"
+	"github.com/octavore/ketchup/proto/ketchup/api"
 )
 
 var ErrNotFound = fmt.Errorf("not found")

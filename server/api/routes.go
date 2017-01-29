@@ -9,10 +9,10 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 
-	"github.com/octavore/press/proto/press/api"
-	"github.com/octavore/press/proto/press/models"
-	"github.com/octavore/press/server/router"
-	"github.com/octavore/press/util/errors"
+	"github.com/octavore/ketchup/proto/ketchup/api"
+	"github.com/octavore/ketchup/proto/ketchup/models"
+	"github.com/octavore/ketchup/server/router"
+	"github.com/octavore/ketchup/util/errors"
 )
 
 var (

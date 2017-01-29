@@ -3,7 +3,7 @@ package db
 import (
 	"sort"
 
-	"github.com/octavore/press/proto/press/models"
+	"github.com/octavore/ketchup/proto/ketchup/models"
 )
 
 var _ sort.Interface = &sortPages{}

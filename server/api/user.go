@@ -4,14 +4,14 @@ import (
 	"net/http"
 
 	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
 	"github.com/julienschmidt/httprouter"
 	"github.com/octavore/nagax/users"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/octavore/press/proto/press/api"
-	"github.com/octavore/press/server/router"
-	"github.com/octavore/press/server/tls"
-	"github.com/octavore/press/util/errors"
+	"github.com/octavore/ketchup/proto/ketchup/api"
+	"github.com/octavore/ketchup/server/router"
+	"github.com/octavore/ketchup/server/tls"
+	"github.com/octavore/ketchup/util/errors"
 )
 
 func (m *Module) GetUser(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {

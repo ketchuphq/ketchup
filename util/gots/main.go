@@ -14,9 +14,9 @@ import (
 	"github.com/golang/protobuf/proto"
 	router_api "github.com/octavore/nagax/proto/nagax/router/api"
 
-	"github.com/octavore/press/proto/press/api"
-	"github.com/octavore/press/proto/press/models"
-	"github.com/octavore/press/proto/press/packages"
+	"github.com/octavore/ketchup/proto/ketchup/api"
+	"github.com/octavore/ketchup/proto/ketchup/models"
+	"github.com/octavore/ketchup/proto/ketchup/packages"
 )
 
 func main() {

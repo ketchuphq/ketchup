@@ -4,7 +4,7 @@ PROTO_FILES=$(shell find . -name "*.proto")
 # includes for all subfolders containing proto files, e.g. `-I./path/to/proto/folder`
 INCL_PROTO_DIR=$(shell find . -name "*.proto" -exec dirname {} \; | sort -u | sed -e 's/^/-I/')
 
-PROTO_PREFIX=import_prefix_proto=github.com/octavore/press/proto/
+PROTO_PREFIX=import_prefix_proto=github.com/octavore/ketchup/proto/
 
 protos:
 	@mkdir -p proto

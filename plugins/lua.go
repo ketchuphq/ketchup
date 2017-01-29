@@ -4,7 +4,7 @@ import (
 	"github.com/octavore/protobuf/proto"
 	"github.com/yuin/gopher-lua"
 
-	"github.com/octavore/press/proto/press/models"
+	"github.com/octavore/ketchup/proto/ketchup/models"
 )
 
 type PluginRouteLoader struct {

@@ -8,7 +8,7 @@ import (
 	git "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 
-	"github.com/octavore/press/proto/press/packages"
+	"github.com/octavore/ketchup/proto/ketchup/packages"
 )
 
 // Clone the given repo to {data_dir}/{themes}/{name}

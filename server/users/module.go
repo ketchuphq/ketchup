@@ -14,8 +14,8 @@ import (
 	"github.com/octavore/nagax/users/session"
 	"github.com/octavore/nagax/util/token"
 
-	"github.com/octavore/press/db"
-	"github.com/octavore/press/server/config"
+	"github.com/octavore/ketchup/db"
+	"github.com/octavore/ketchup/server/config"
 )
 
 // Module users is a largely a wrapper around nagax/users/databaseauth

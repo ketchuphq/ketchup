@@ -7,14 +7,14 @@ import (
 	"github.com/octavore/naga/service"
 	"github.com/octavore/nagax/logger"
 
-	"github.com/octavore/press/db"
-	"github.com/octavore/press/plugins/pkg"
-	"github.com/octavore/press/server/config"
-	"github.com/octavore/press/server/content"
-	"github.com/octavore/press/server/content/templates"
-	"github.com/octavore/press/server/router"
-	"github.com/octavore/press/server/tls"
-	"github.com/octavore/press/server/users"
+	"github.com/octavore/ketchup/db"
+	"github.com/octavore/ketchup/plugins/pkg"
+	"github.com/octavore/ketchup/server/config"
+	"github.com/octavore/ketchup/server/content"
+	"github.com/octavore/ketchup/server/content/templates"
+	"github.com/octavore/ketchup/server/router"
+	"github.com/octavore/ketchup/server/tls"
+	"github.com/octavore/ketchup/server/users"
 )
 
 type Module struct {

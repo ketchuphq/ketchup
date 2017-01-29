@@ -281,6 +281,6 @@ export abstract class ErrorResponse {
   }
 }
 
-export type ContentMultiple_DropdownType = 'unknown' | 'radio' | 'dropdown';
-export type ContentTextType = 'text' | 'markdown' | 'html';
+export type ContentTextType = 'html' | 'text' | 'markdown';
 export type Package_Type = 'unknown' | 'theme' | 'plugin';
+export type ContentMultiple_DropdownType = 'radio' | 'dropdown' | 'unknown';

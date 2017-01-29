@@ -7,11 +7,11 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/julienschmidt/httprouter"
 
-	"github.com/octavore/press/db"
-	"github.com/octavore/press/db/bolt"
-	"github.com/octavore/press/proto/press/api"
-	"github.com/octavore/press/proto/press/models"
-	"github.com/octavore/press/server/router"
+	"github.com/octavore/ketchup/db"
+	"github.com/octavore/ketchup/db/bolt"
+	"github.com/octavore/ketchup/proto/ketchup/api"
+	"github.com/octavore/ketchup/proto/ketchup/models"
+	"github.com/octavore/ketchup/server/router"
 )
 
 func (m *Module) getPage(par httprouter.Params, fn func(*models.Page) error) (*models.Page, error) {

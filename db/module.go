@@ -6,8 +6,8 @@ import (
 
 	"github.com/octavore/naga/service"
 
-	"github.com/octavore/press/proto/press/models"
-	"github.com/octavore/press/util/errors"
+	"github.com/octavore/ketchup/proto/ketchup/models"
+	"github.com/octavore/ketchup/util/errors"
 )
 
 // Backend interface for models
