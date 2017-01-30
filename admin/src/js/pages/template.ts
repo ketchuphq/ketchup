@@ -36,9 +36,9 @@ export default class TemplatePage extends MustAuthController {
         m('h1', [
           m('a[href=/admin/themes]', { config: m.route }, 'Themes'),
           m.trust(' &rsaquo; '),
-          m(`a[href=/admin/themes/${name}]`, { config: m.route }, name),
+          m(`a.unbold[href=/admin/themes/${name}]`, { config: m.route }, name),
           m.trust(' &rsaquo; '),
-          m.route.param('template')
+          m('span.unbold', m.route.param('template'))
         ]),
       ),
       m('pre', {

@@ -18,43 +18,45 @@ export default class ThemePage extends MustAuthController {
 
   static controller = ThemePage;
   static view(ctrl: ThemePage) {
+    if (!ctrl.theme()) {
+      return Layout('');
+    }
     let templateKeys = Object.keys(ctrl.theme().templates);
     let assetKeys = Object.keys(ctrl.theme().assets);
     return Layout(
-      !ctrl.theme() ? '' :
-        m('.theme', [
-          m('header',
-            m('h1', [
-              m('a[href=/admin/themes]', { config: m.route }, 'Themes'),
-              m.trust(' &rsaquo; '),
-              ctrl.theme().name
-            ]),
-          ),
-          m('h2', 'Templates'),
-          m('.table',
-            templateKeys.sort().map((name) => {
-              let t = ctrl.theme().templates[name];
+      m('.theme', [
+        m('header',
+          m('h1', [
+            m('a[href=/admin/themes]', { config: m.route }, 'Themes'),
+            m.trust(' &rsaquo; '),
+            m('span.unbold', ctrl.theme().name)
+          ]),
+        ),
+        m('h2', 'Templates'),
+        m('.table',
+          templateKeys.sort().map((name) => {
+            let t = ctrl.theme().templates[name];
+            return m('a.tr', {
+              config: m.route,
+              href: `/admin/themes/${ctrl.theme().name}/templates/${t.name}`
+            }, [
+                m('div', t.name),
+                m('div', t.engine)
+              ]);
+          })
+        ),
+        m('h2', 'Assets'),
+        m('.table',
+          assetKeys.length == 0 ?
+            m('.tr', 'no assets') :
+            assetKeys.sort().map((asset) => {
+              // todo: check for shadowed files
               return m('a.tr', {
-                config: m.route,
-                href: `/admin/themes/${ctrl.theme().name}/templates/${t.name}`
-              }, [
-                  m('div', t.name),
-                  m('div', t.engine)
-                ]);
+                href: `/${asset}`
+              }, asset);
             })
-          ),
-          m('h2', 'Assets'),
-          m('.table',
-            assetKeys.length == 0 ?
-              m('.tr',  'no assets') :
-              assetKeys.sort().map((asset) => {
-                // todo: check for shadowed files
-                return m('a.tr', {
-                  href: `/${asset}`
-                }, asset);
-              })
-          )
-        ])
+        )
+      ])
     );
   }
 }
