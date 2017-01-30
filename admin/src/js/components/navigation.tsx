@@ -2,6 +2,8 @@ import msx from 'lib/msx';
 import { AuthController } from 'components/auth';
 import Button from 'components/button';
 
+let retain = (_: any, __: any, context: Mithril.Context) => context.retain = true;
+
 export default class NavigationComponent extends AuthController {
   collapsed: Mithril.Property<boolean>;
   constructor() {
@@ -19,10 +21,15 @@ export default class NavigationComponent extends AuthController {
 
   static controller = NavigationComponent;
   link(url: string, text: string, opts: { onclick?: () => void, additionalClasses?: string, icon?: string } = {}) {
-    return m(`a.nav-link${opts.additionalClasses || ''}`, {
+    return m('a.nav-link', {
+      class: opts.additionalClasses || '',
       href: url,
-      config: m.route,
-      onclick: opts.onclick
+      config: (a, b, c, d) => {
+        c.retain = true;
+        return m.route(a, b, c, d);
+      },
+      onclick: opts.onclick,
+      key: `nav-${text.toLowerCase()}`,
     }, [
         !!opts.icon ? <span class={`typcn typcn-${opts.icon}`}></span> : '',
         <span class='nav-link__text'>{text}</span>
@@ -30,17 +37,20 @@ export default class NavigationComponent extends AuthController {
   }
 
   static view(ctrl: NavigationComponent) {
+    let navClass = 'navigation';
     if (!ctrl.user()) {
-      return m('.navigation', [
-        ctrl.link('/admin', 'K', { additionalClasses: '.nav-title' }),
-        ctrl.link('/admin/login', 'Login')
-      ]);
+      return <div class={navClass} key='navigation' config={retain}>
+        {ctrl.link('/admin', 'K', { additionalClasses: 'nav-title' })}
+        {ctrl.link('/admin/login', 'Login')}
+      </div>;
     }
 
-    let navClass = 'navigation';
-    navClass += ctrl.collapsed() ? ' navigation--hidden' : '';
-    return <div class={navClass}>
-      {ctrl.link('/admin', 'K', { additionalClasses: '.nav-title' })}
+    if (ctrl.collapsed()) {
+      navClass += ' navigation--hidden';
+    }
+
+    return <div class={navClass} key='navigation' config={retain}>
+      {ctrl.link('/admin', 'K', { additionalClasses: 'nav-title' })}
       <div class='nav-button'>
         <Button
           class='button--green button--center'
