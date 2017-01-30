@@ -1,5 +1,7 @@
 interface ButtonAttributes extends Mithril.Attributes {
   handler?: () => Mithril.Promise<any>;
+  onclick?: () => any;
+  config?: Mithril.ElementConfig;
 }
 
 export default class Button {
@@ -23,16 +25,17 @@ export default class Button {
   static controller = Button;
   static view = (ctrl: Button, config: ButtonAttributes, ...children: any[]) => {
     let c: ButtonAttributes = {
-      onclick: () => ctrl.handler(),
       ...config
     };
+    if (config.handler) {
+      c.onclick = ctrl.handler;
+    }
 
     let loader = null;
     if (ctrl.loading()) {
       c = { class: config.class + ' button--loading' };
       loader = m('.loader', [m('.loading0'), m('.loading1'), m('.loading2')]);
     }
-
     return m('a.button', c, [
       loader,
       m('.button__inner', children)
