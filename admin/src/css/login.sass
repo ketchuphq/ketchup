@@ -3,8 +3,10 @@
   width: 100%
   background: #bc3e4d;
 
-  .login-logo
+  .login-logo, .login-box
     width: 400px
+
+  .login-logo
     font-family: $logoFont
     font-size: 45px
     margin: 60px auto 45px
@@ -15,7 +17,6 @@
     background: white
     +standard-radius
     margin: 0 auto
-    width: 400px
     padding: 30px
     h1
       text-align: center
@@ -27,3 +28,8 @@
       margin-bottom: 15px
     .button
       margin-top: 12px
+
+@media (max-width: 480px)
+  .login
+    .login-logo, .login-box
+      width: 90%
