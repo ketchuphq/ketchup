@@ -29,7 +29,7 @@ gulp.task('js:webpack', () =>
   gulp.src('src/app.ts')
     .pipe(gulpWebpack(webpackConfig, webpack))
     .on('error', function(err) { this.emit('end') })
-    .pipe(gulp.dest('build/'))
+    .pipe(gulp.dest('build/js/'))
 )
 
 gulp.task('js:lint', () =>

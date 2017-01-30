@@ -24,7 +24,7 @@ gulp.task('css:sass', () =>
     //   gutil.log(`${details.name} compressed: ${(percent * 100).toFixed(2)}%`)
     // }))
     .pipe(sourcemaps.write())
-    .pipe(gulp.dest('./build'))
+    .pipe(gulp.dest('./build/css'))
 );
 
 gulp.task('css', ['css:internal', 'css:sass'])

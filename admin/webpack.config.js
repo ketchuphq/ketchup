@@ -7,7 +7,7 @@ module.exports = {
   devtool: 'source-map',
   output: {
     filename: '[name].js',
-    publicPath: '/admin/'
+    publicPath: '/admin/js/'
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
