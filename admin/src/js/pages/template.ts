@@ -8,10 +8,11 @@ export default class TemplatePage extends MustAuthController {
 
   constructor() {
     super();
-    this.template = m.prop<API.ThemeTemplate>();
-    Theme.getFullTemplate(m.route.param('name'), m.route.param('template')).then((t) => {
-      this.template(t);
-    });
+    this.template = m.prop<API.ThemeTemplate>({});
+    Theme.getFullTemplate(m.route.param('name'), m.route.param('template'))
+      .then((t) => {
+        this.template(t);
+      });
     // todo: catch
   }
 
@@ -31,6 +32,28 @@ export default class TemplatePage extends MustAuthController {
   static controller = TemplatePage;
   static view(ctrl: TemplatePage) {
     let name = m.route.param('name');
+
+    let lst: Mithril.VirtualElement[] = [];
+    let p = ctrl.template().placeholders;
+    if (p && p.length > 0) {
+      p.forEach((placeholder) => {
+        lst.push(m('.tr', placeholder.key))
+      });
+    }
+    if (!ctrl.template().hideContent) {
+      lst.push(m('.tr', 'content'));
+    }
+
+    let placeholders: Mithril.VirtualElement;
+    if (lst.length > 0) {
+      placeholders = m('div', [
+        m('h2', 'Fields'),
+        m('.table', lst)
+      ]);
+    }
+
+
+
     return Layout(m('.template', [
       m('header',
         m('h1', [
@@ -41,6 +64,8 @@ export default class TemplatePage extends MustAuthController {
           m('span.unbold', m.route.param('template'))
         ]),
       ),
+      placeholders,
+      m('h2', 'Template'),
       m('pre', {
         config: (el: HTMLElement, isInitialized: boolean) => {
           if (!isInitialized) {

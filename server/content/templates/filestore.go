@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
 	"github.com/octavore/nagax/util/token"
 
 	"github.com/octavore/ketchup/proto/ketchup/models"
@@ -92,12 +93,11 @@ func (f *FileStore) GetTemplate(theme *models.Theme, templateName string) (*mode
 	}
 	data := string(b)
 	ext := strings.TrimLeft(path.Ext(templateName), ".")
-	t := &models.ThemeTemplate{
-		Theme:  theme.Name,
-		Data:   &data,
-		Name:   &templateName,
-		Engine: &ext,
-	}
+	t := proto.Clone(theme.GetTemplates()[templateName]).(*models.ThemeTemplate)
+	t.Theme = theme.Name
+	t.Data = &data
+	t.Name = &templateName
+	t.Engine = &ext
 	return t, nil
 }
 
