@@ -37,7 +37,7 @@ export default class TemplatePage extends MustAuthController {
     let p = ctrl.template().placeholders;
     if (p && p.length > 0) {
       p.forEach((placeholder) => {
-        lst.push(m('.tr', placeholder.key))
+        lst.push(m('.tr', placeholder.key));
       });
     }
     if (!ctrl.template().hideContent) {
@@ -51,8 +51,6 @@ export default class TemplatePage extends MustAuthController {
         m('.table', lst)
       ]);
     }
-
-
 
     return Layout(m('.template', [
       m('header',
