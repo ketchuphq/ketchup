@@ -1,5 +1,6 @@
-$editorWidth: 960px
+$editorWidth: 1024px
 $navWidth: 240px
+$navHiddenWidth: 70px
 
 html, body
   height: 100%
@@ -30,12 +31,14 @@ p
   line-height: 1.6
 
 .container
+  width: $editorWidth
   display: flex
   min-height: 100%
   margin: 0 auto
   header
     h1
       margin-top: 0
+      margin-bottom: 30px
       a
         text-decoration: none
         &:hover
@@ -49,10 +52,10 @@ p
     animation: zoomIn 0.4s cubic-bezier(0.215, 0.61, 0.355, 1)
 
   &__body
-    width: $editorWidth - $navWidth
+    flex-grow: 1
 
 .container__body
-  padding: 32px 10px 10px
+  padding: 32px 30px 10px
   h1:first-child
     margin-top: 0
 

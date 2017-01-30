@@ -1,13 +1,16 @@
 .navigation
+  background: $slate1
   width: $navWidth
-  margin-right: 20px
-  box-shadow: 0 5px 10px rgba(0,0,0,0.1)
+  +basic-shadow
   align-self: flex-start
-  transition-property: 'width background box-shadow color'
-  transition-delay: 0s
-  transition-timing-function: ease-out
+  transition:
+  transition-property: width, background, box-shadow, color
   transition-duration: 0.3s
+  transition-timing-function: ease-in-out
+  transition-delay: 0s
 
+  a
+    color: white
   .typcn
     margin-right: 15px
     font-size: 1.5em
@@ -22,16 +25,16 @@
     padding: 8px 24px 12px
     white-space: nowrap
   .nav-link
-    transition-property: 'background'
-    transition-delay: 0s
-    transition-timing-function: ease-out
+    transition-property: background
     transition-duration: 0.1s
+    transition-timing-function: ease-in-out
+    transition-delay: 0s
     &--toggle
       margin-top: 20px
       text-align: center
       cursor: pointer
     &:hover
-      background-color: $slate10
+      background-color: $slate5
   .nav-title
     padding: 12px 24px 14px
     height: 60px
@@ -43,12 +46,7 @@
     font-weight: 500
 
   &--hidden
-    width: 70px
-    background: $slate1
-    .nav-link:hover
-      background: $slate5
-    a
-      color: white
+    width: $navHiddenWidth
     .nav-link__text
       display: none
     .nav-title .nav-link__text
