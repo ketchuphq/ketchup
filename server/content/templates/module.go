@@ -149,6 +149,10 @@ func (m *Module) GetAsset(name string) (*models.ThemeAsset, error) {
 
 func (m *Module) newFileStore(dataDir string) *FileStore {
 	f := &FileStore{dataDir: dataDir}
+	err := f.updateThemeDirMap()
+	if err != nil {
+		m.Logger.Error(err)
+	}
 	go func() {
 		for range time.Tick(10 * time.Second) {
 			err := f.updateThemeDirMap()
