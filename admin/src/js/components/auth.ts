@@ -32,6 +32,7 @@ class DummyStore {
 }
 
 let cachedUser: User = null;
+let dummyStore = new DummyStore();
 
 // AuthController is a super class for controllers which may require auth
 export class AuthController {
@@ -41,7 +42,7 @@ export class AuthController {
 
 
   constructor(user: User = null) {
-    this.store = store.disabled ? new DummyStore() : store;
+    this.store = store.disabled ? dummyStore : store;
     this.user = m.prop<User>(user || cachedUser);
     if (this.user()) {
       var deferred = m.deferred<User>();
