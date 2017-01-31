@@ -5,15 +5,12 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/satori/go.uuid"
 
-	"github.com/octavore/ketchup/db"
 	"github.com/octavore/ketchup/proto/ketchup/models"
 )
 
 const PAGE_BUCKET = "pages"
 
-var _ db.AddressableProto = &models.Page{}
-var _ db.TimestampedProto = &models.Page{}
-
+// GetPage returns a page from the database
 func (m *Module) GetPage(uuid string) (*models.Page, error) {
 	page := &models.Page{}
 	err := m.Get(PAGE_BUCKET, uuid, page)
@@ -23,7 +20,8 @@ func (m *Module) GetPage(uuid string) (*models.Page, error) {
 	return page, nil
 }
 
-// DeletePage also deletes related routes.
+// DeletePage deletes the page and (note!) also deletes
+// related routes.
 func (m *Module) DeletePage(page *models.Page) error {
 	err := m.delete(PAGE_BUCKET, page)
 	if err != nil {
@@ -44,6 +42,8 @@ func (m *Module) DeletePage(page *models.Page) error {
 	return nil
 }
 
+// UpdatePage updates (creating if necessary) a new page.
+// New pages and new content blocks will be assigned UUIDs
 func (m *Module) UpdatePage(page *models.Page) error {
 	if page.GetUuid() == "" {
 		page.Uuid = proto.String(uuid.NewV4().String())
@@ -57,6 +57,7 @@ func (m *Module) UpdatePage(page *models.Page) error {
 	return m.Update(PAGE_BUCKET, page)
 }
 
+// ListPages lists all the pages stored in the DB (unsorted).
 func (m *Module) ListPages() ([]*models.Page, error) {
 	lst := []*models.Page{}
 	err := m.Bolt.View(func(tx *bolt.Tx) error {

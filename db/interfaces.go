@@ -16,3 +16,10 @@ type TimestampedProto interface {
 	SetTimestamps(*models.Timestamp)
 	proto.Message
 }
+
+// make sure that the protos implement addressable and timestamp
+// interfaces
+var (
+	_ AddressableProto = &models.Page{}
+	_ TimestampedProto = &models.Page{}
+)
