@@ -1,3 +1,4 @@
+import { loading } from 'components/loading';
 import Theme from 'lib/theme';
 
 type ThemePickerCallback = (theme: string, template: string) => void;
@@ -5,6 +6,7 @@ type ThemePickerCallback = (theme: string, template: string) => void;
 export default class ThemePickerComponent {
   callback: ThemePickerCallback;
   themes: Mithril.Property<Theme[]>;
+  ready: Mithril.Property<boolean>;
   templates: Mithril.Property<string[]>;
   selectedTheme: Mithril.Property<string>;
   selectedTemplate: Mithril.Property<string>;
@@ -13,6 +15,7 @@ export default class ThemePickerComponent {
     this.callback = callback;
     this.themes = m.prop([]);
     this.templates = m.prop([]);
+    this.ready = m.prop(false);
 
     this.selectedTheme = m.prop(theme);
     this.selectedTemplate = m.prop(template);
@@ -22,7 +25,9 @@ export default class ThemePickerComponent {
         this.themes(themes);
         return this.selectTheme(theme, true);
       })
-      .then(() => this.selectedTemplate(template));
+      .then(() => this.selectedTemplate(template))
+      .then(() => this.ready(true))
+      .catch(() => this.ready(true));
   }
 
   selectTheme(name: string, initial = false) {
@@ -45,6 +50,9 @@ export default class ThemePickerComponent {
 
   static controller = ThemePickerComponent;
   static view(ctrl: ThemePickerComponent) {
+    if (!ctrl.ready()) {
+      return loading(true);
+    }
     return m('.theme-picker', [
       m('.control', [
         m('.label', 'Theme'),
