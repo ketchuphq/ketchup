@@ -1,5 +1,5 @@
 .page-max
-  height: 100%
+  min-height: 100%
   top: 0
   left: 0
   right: 0
@@ -21,15 +21,62 @@
       background: none
       border: none
 
+  .popover
+    .save-publish
+      margin-top: 15px
+      display: flex
+      align-items: stretch
+      .button
+        padding: 8px 10px
+        flex: 1
+        margin: 0
+        text-align: center
+        border-radius: 0
+        &:first-child
+          border-top-left-radius: 4px
+          border-bottom-left-radius: 4px
+        &:last-child
+          border-top-right-radius: 4px
+          border-bottom-right-radius: 4px
+
+
+  &--exit
+    animation: fadeIn 0.3s ease-in-out 0.1s
+    animation-direction: reverse
+
+  &__controls
+    input[type=text]
+      +input-text
+      width: 100%
+    input[type=text].large
+      +input-text-large
+      +input-text-shade
+      font-weight: 700
+      width: 100%
+    select
+      +input-select
+      width: 100%
+    textarea
+      +textarea
+      resize: vertical
+      width: 100%
+    .label
+      +label
+      margin-top: 15px
+    .controls:first-child .label
+      margin-top: 0
+
+.page-max__controls
+  > .button
+    position: relative
+    top: -6px
+    margin-right: 12px
+
 .page-max__controls, .page-editor__icons
   position: fixed
   top: 10px
   right: 10px
   z-index: 10
-  .button
-    position: relative
-    top: -6px
-    margin-right: 12px
   span.typcn, a.typcn
     font-size: 42px
     +transition(color)
