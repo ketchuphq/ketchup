@@ -1,7 +1,7 @@
 let webpack = require('webpack');
 module.exports = {
   entry: {
-    vendor: ['store', 'date-fns/format'],
+    vendor: ['store', 'date-fns/format', 'lodash/debounce'],
     app: 'app.ts'
   },
   devtool: 'source-map',

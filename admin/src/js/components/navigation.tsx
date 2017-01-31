@@ -1,17 +1,37 @@
 import msx from 'lib/msx';
 import { AuthController } from 'components/auth';
 import Button from 'components/button';
+// https://github.com/DefinitelyTyped/DefinitelyTyped/issues/13679
+var debounce: any = require('lodash/debounce');
 
 let retain = (_: any, __: any, context: Mithril.Context) => context.retain = true;
+
 
 export default class NavigationComponent extends AuthController {
   collapsed: Mithril.Property<boolean>;
   constructor() {
     super();
     this.collapsed = m.prop(this._userPromise.then(() =>
-      this.pref('hideMenu') || false
+      this.pref('hideMenu') || window.innerWidth <= 480
     )) as Mithril.Property<boolean>;
+
+    window.addEventListener('resize', this.resizeHandler);
+    this.resizeHandler();
   }
+
+  onunload() {
+    window.removeEventListener('resize', this.resizeHandler);
+  }
+
+  resizeHandler = debounce(() => {
+    if (window.innerWidth > 480) {
+      return;
+    }
+    m.startComputation();
+    this.setPref('hideMenu', true);
+    this.collapsed(true);
+    m.endComputation();
+  }, 300);
 
   toggle() {
     let collapsed = !this.collapsed();
