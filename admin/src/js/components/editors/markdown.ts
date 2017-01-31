@@ -35,7 +35,7 @@ export default class CodeMirrorComponent {
       require('codemirror/addon/display/placeholder');
       require('codemirror/addon/mode/overlay');
 
-      element.value = this.content.value;
+      element.value = this.content.value || '';
       this.codemirror = cm.fromTextArea(element, {
         mode: 'gfm',
         placeholder: 'start typing...',
