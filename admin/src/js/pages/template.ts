@@ -37,6 +37,9 @@ export default class TemplatePage extends MustAuthController {
     let p = ctrl.template().placeholders;
     if (p && p.length > 0) {
       p.forEach((placeholder) => {
+        if (placeholder.key == 'content') {
+          return;
+        }
         lst.push(m('.tr', placeholder.key));
       });
     }
