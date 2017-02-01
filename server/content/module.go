@@ -74,6 +74,7 @@ func (m *Module) servePage(pageUUID string) httprouter.Handle {
 		}
 		if err != nil {
 			m.Logger.Errorf("error serving page %s [%s]: %+v", req.URL.Path, pageUUID, err)
+			m.Router.InternalError(rw, err)
 		}
 	}
 }
@@ -114,5 +115,6 @@ func (m *Module) buildRouter() (http.Handler, map[string]bool, error) {
 			m.Logger.Errorf("unable to register %s", route.GetUuid())
 		}
 	}
+	m.Logger.Info("done rebuilding router")
 	return rt, activeRoutes, nil
 }
