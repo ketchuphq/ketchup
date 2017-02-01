@@ -10,13 +10,18 @@ import (
 	"github.com/octavore/ketchup/server/content/engines"
 )
 
+var noneTemplate = `<html>
+	<style>#c{max-width:600px;margin:0 auto;font-family:helvetica, sans-serif;}</style>
+	<div id='c'>{{.content}}</div>
+</html>`
+
 var noneTheme = &models.Theme{
 	Name: proto.String("none"),
 	Templates: map[string]*models.ThemeTemplate{
 		"html": &models.ThemeTemplate{
 			Name:   proto.String("html"),
 			Engine: proto.String(engines.EngineTypeHTML),
-			Data:   proto.String("<html>{{.content}}</html>"),
+			Data:   &noneTemplate,
 			Placeholders: []*models.ThemePlaceholder{
 				{
 					Key: proto.String("content"),
@@ -31,7 +36,7 @@ var noneTheme = &models.Theme{
 		"markdown": &models.ThemeTemplate{
 			Name:   proto.String("markdown"),
 			Engine: proto.String(engines.EngineTypeHTML),
-			Data:   proto.String("<html>{{.content}}</html>"),
+			Data:   &noneTemplate,
 			Placeholders: []*models.ThemePlaceholder{
 				{
 					Key: proto.String("content"),
