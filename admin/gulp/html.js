@@ -5,6 +5,14 @@ gulp.task('html', () =>
     .pipe(gulp.dest('./build'))
 );
 
+gulp.task('images', () =>
+  gulp.src('src/images/*.png')
+    .pipe(gulp.dest('./build/images'))
+);
+
 gulp.task('html:watch', () =>
-  gulp.watch('./src/html/**/*.html', ['html'])
+  gulp.watch([
+    'src/html/**/*.html',
+    'src/images/*.png'
+  ], ['html', 'images'])
 );

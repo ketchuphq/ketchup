@@ -16,6 +16,7 @@ var staticDirs = []string{
 	"/admin/js/",
 	"/admin/css/",
 	"/admin/vendor/",
+	"/admin/images/",
 }
 
 type Module struct {
