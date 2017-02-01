@@ -210,6 +210,13 @@ export default class PagePage extends MustAuthController {
         }
         if (!contentMap[p.key]) {
           filteredPlaceholders.push(p);
+        } else {
+          // update the oneof type of the content from the placeholder
+          // todo: exhaustively map fields
+          // todo: convert markdown <> css more elegantly
+          contentMap[p.key].multiple = p.multiple;
+          contentMap[p.key].text = p.text;
+          contentMap[p.key].short = p.short;
         }
       });
 
