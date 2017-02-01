@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -73,7 +72,7 @@ func (m *Module) InstallTheme(rw http.ResponseWriter, req *http.Request, par htt
 		return errors.Wrap(err)
 	}
 	if r.Package == "" {
-		return fmt.Errorf("Theme name is required.")
+		return errors.New("Theme name is required.")
 	}
 
 	// loop over all registry packages to find the theme package
@@ -85,14 +84,14 @@ func (m *Module) InstallTheme(rw http.ResponseWriter, req *http.Request, par htt
 	for _, p := range registry.GetPackages() {
 		if p.GetName() == r.Package {
 			if p.GetType() != packages.Package_theme {
-				return fmt.Errorf("%s is not a theme", r.Package)
+				return errors.New("%s is not a theme", r.Package)
 			}
 			pkg = p
 			break
 		}
 	}
 	if pkg == nil {
-		return fmt.Errorf("Theme %s not found", r.Package)
+		return errors.New("Theme %s not found", r.Package)
 	}
 
 	m.Logger.Infof("cloning package %s from %s", pkg.GetName(), pkg.GetVcsUrl())
