@@ -1,6 +1,7 @@
 package content
 
 import (
+	"encoding/json"
 	"html/template"
 	"reflect"
 	"testing"
@@ -54,14 +55,24 @@ func TestCreateContentMap(t *testing.T) {
 	page := &models.Page{
 		Contents: []*models.Content{
 			&models.Content{
-				Key:   proto.String(""),
-				Value: proto.String(""),
+				Key:   proto.String("k0"),
+				Value: proto.String("v0"),
 				Type: &models.Content_Short{
 					Short: nil,
 				},
 			},
 		},
 	}
-	// m := &Module{}
-	// contentMap, err := m.createContentMap(page)
+	m := &Module{}
+	cm, err := m.createContentMap(page)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := json.Marshal(cm)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(b) != `{"k0":"v0","title":""}` {
+		t.Error(string(b))
+	}
 }
