@@ -3,7 +3,6 @@
   width: $navWidth
   +basic-shadow
   align-self: flex-start
-  transition:
   transition-property: width, background, box-shadow, color
   transition-duration: 0.3s
   transition-timing-function: ease-in-out
@@ -25,10 +24,7 @@
     padding: 8px 24px 12px
     white-space: nowrap
   .nav-link
-    transition-property: background
-    transition-duration: 0.1s
-    transition-timing-function: ease-in-out
-    transition-delay: 0s
+    transition: background 0.1s ease-in-out 0s
     &--toggle
       margin-top: 20px
       text-align: center
