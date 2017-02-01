@@ -12,13 +12,12 @@ export default class SettingsPage extends MustAuthController {
   constructor() {
     super();
     this.settings = false;
-    m.startComputation();
     m.request({
       method: 'GET',
       url: '/api/v1/settings/tls',
     }).then((settings: API.TLSSettingsReponse) => {
       this.settings = settings;
-      m.endComputation();
+      m.redraw();
     });
   }
 

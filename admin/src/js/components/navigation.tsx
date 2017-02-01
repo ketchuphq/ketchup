@@ -27,10 +27,9 @@ export default class NavigationComponent extends AuthController {
     if (window.innerWidth > 480) {
       return;
     }
-    m.startComputation();
     this.setPref('hideMenu', true);
     this.collapsed(true);
-    m.endComputation();
+    m.redraw();
   }, 300);
 
   toggle() {
