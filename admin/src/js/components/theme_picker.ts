@@ -57,7 +57,11 @@ export default class ThemePickerComponent {
       m('.control', [
         m('.label', 'Theme'),
         m('select', {
-          value: ctrl.selectedTheme(),
+          config: (el: HTMLSelectElement, isInitialized: boolean) => {
+            if (!isInitialized) {
+              el.value = ctrl.selectedTheme();
+            }
+          },
           onchange: (e: Event) => {
             let target = e.target as HTMLInputElement;
             ctrl.selectTheme(target.value);
@@ -73,7 +77,11 @@ export default class ThemePickerComponent {
       m('.control', [
         m('.label', 'Template'),
         m('select', {
-          value: ctrl.selectedTemplate(),
+          config: (el: HTMLSelectElement, isInitialized: boolean) => {
+            if (!isInitialized) {
+              el.value = ctrl.selectedTemplate();
+            }
+          },
           onchange: (e: Event) => {
             let target = e.target as HTMLInputElement;
             ctrl.selectTemplate(target.value);
