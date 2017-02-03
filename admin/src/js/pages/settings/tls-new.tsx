@@ -1,9 +1,11 @@
+import msx from 'lib/msx';
 import * as API from 'lib/api';
 import { User } from 'components/auth';
 import { ModalContent, ModalComponent } from 'components/modal';
 import { add } from 'components/toaster';
 import Button from 'components/button';
 
+const leURL = 'https://acme-v01.api.letsencrypt.org/terms';
 const ipRegex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
 
 export default class TLSNewComponent {
@@ -29,11 +31,11 @@ export default class TLSNewComponent {
     return m.request({
       url: '/api/v1/settings/tls',
       method: 'POST',
-      data: <API.EnableTLSRequest>{
+      data: {
         tlsEmail: this.tlsEmail(),
         tlsDomain: this.tlsDomain(),
         agreed: true,
-      }
+      } as API.EnableTLSRequest
     })
       .catch((res: API.ErrorResponse) => {
         if (!res || !res.errors) {
@@ -44,7 +46,7 @@ export default class TLSNewComponent {
           title: 'Error',
           klass: 'modal--error',
           content: () => {
-            return m('p', res.errors[0].detail);
+            return <p>{res.errors[0].detail}</p>;
           }
         };
       });
@@ -54,45 +56,47 @@ export default class TLSNewComponent {
   static view = (ctrl: TLSNewComponent) => {
     let warning = null;
     if (ctrl.initialHost == '') {
-      warning = m('.tr', `It looks like you're not using a domain; please ensure that you've set up your DNS records correctly.`);
+      warning = <div class='tr'>
+        It looks like you're not using a domain; please ensure that you've set up your DNS records correctly.
+      </div>;
     }
-    return m('.table', [
-      warning,
-      m('.tr.tr--center', [
-        m('label', 'TLS Email'),
-        m('input.large[type=text]', {
-          value: ctrl.tlsEmail(),
-          onchange: m.withAttr('value', ctrl.tlsEmail)
-        })
-      ]),
-      m('.tr.tr--center', [
-        m('label', 'TLS Domain'),
-        m('input.large[type=text]', {
-          config: (el: HTMLInputElement, isInitialized: boolean) => {
+    return <div class='table'>
+      {warning}
+      <div class='tr tr--center'>
+        <label>TLS Email</label>
+        <input
+          class='large'
+          type='text'
+          value={ctrl.tlsEmail()}
+          onchange={m.withAttr('value', ctrl.tlsEmail)}
+        />
+      </div>
+      <div class='tr tr--center'>
+        <label>TLS Domain</label>
+        <input
+          class='large'
+          type='text'
+          config={(el: HTMLInputElement, isInitialized: boolean) => {
             if (!isInitialized) {
               el.value = ctrl.initialHost;
             }
-          },
-          onchange: m.withAttr('value', ctrl.tlsDomain)
-        })
-      ]),
-      m('.tr.tr--right.tr--tos', [
-        m('label[for=tos]', [
-          'I agree to ',
-          m('a', {
-            href: 'https://acme-v01.api.letsencrypt.org/terms',
-            target: '_blank'
-          }, `Let's Encrypt's Terms of Service`)
-        ]),
-        m('input#tos[type=checkbox]')
-      ]),
-      m('.tr.tr--right.tr--no-border', [
-        m.component(Button, {
-          class: 'button--green button--small',
-          handler: () => ctrl.register()
-        }, 'Enable TLS'),
-        m.component(ModalComponent, ctrl.modal),
-      ])
-    ]);
+          }}
+          onchange={m.withAttr('value', ctrl.tlsDomain)}
+        />
+      </div>
+      <div class='tr tr--right tr--tos'>
+        <label for='tos'>
+          I agree to <a href={leURL} target='_blank'>Let's Encrypt's Terms of Service</a>
+        </label>
+      </div>
+      <div class='tr tr--right tr--no-border'>
+        <Button
+          class='button--green button--small'
+          handler={() => ctrl.register()}>
+          Enable TLS
+        </Button>
+        {m.component(ModalComponent, ctrl.modal)}
+      </div>
+    </div>;
   }
 }
