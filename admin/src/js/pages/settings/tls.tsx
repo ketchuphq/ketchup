@@ -14,11 +14,13 @@ export default {
     </div>
     <div class='tr tr--center'>
       <label>TLS Agreement</label>
-      <a href={settings.termsOfService}>link</a>
+      <span class='input-text'>
+        <a href={settings.termsOfService}>link</a>
+      </span>
     </div>
     <div class='tr tr--center'>
       <label>Agreed On</label>
-      <span>{settings.agreedOn}</span>
+      <span class='input-text'>{settings.agreedOn}</span>
     </div>
   </div>
 };
