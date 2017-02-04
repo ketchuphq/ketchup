@@ -1,10 +1,16 @@
 import msx from 'lib/msx';
 
+export let hidePopover = () => {};
+
 export default class Popover {
   visible: Mithril.Property<boolean>;
 
   constructor() {
     this.visible = m.prop(false);
+    if (hidePopover != null) {
+      hidePopover();
+    }
+    hidePopover = () => this.visible(false);
   }
 
   static controller = Popover;

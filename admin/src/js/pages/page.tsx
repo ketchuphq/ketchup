@@ -3,7 +3,7 @@ import * as API from 'lib/api';
 import Page from 'lib/page';
 import Theme from 'lib/theme';
 import Layout from 'components/layout';
-import Popover from 'components/popover';
+import { hidePopover, default as Popover } from 'components/popover';
 import EditRoutesComponent from 'components/edit_route';
 import ThemePickerComponent from 'components/theme_picker';
 import * as Toaster from 'components/toaster';
@@ -96,36 +96,36 @@ export default class PagePage extends MustAuthController {
   renderSavePublish() {
     let saveButton = <a
       class='button button--small button--green'
-      onclick={(e: Event) => { e.stopPropagation(); this.save(); } }
-      >
+      onclick={(e: Event) => { e.stopPropagation(); this.save(); }}
+    >
       Save
     </a>;
 
     let unpublishButton = <a
       class='button button--small button--blue'
-      onclick={(e: Event) => { e.stopPropagation(); this.unpublish(); } }
-      >
+      onclick={(e: Event) => { e.stopPropagation(); this.unpublish(); }}
+    >
       Unpublish
     </a>;
 
     let viewButton = <a
       class='button button--small button--blue'
       href={this.page().defaultRoute}
-      >
+    >
       View
     </a>;
 
     let deleteButton = <a
       class='button button--small button--red'
-      onclick={(e: Event) => { e.stopPropagation(); this.delete(); } }
-      >
+      onclick={(e: Event) => { e.stopPropagation(); this.delete(); }}
+    >
       Delete
     </a>;
 
     let publishButton = <a
       class='button button--small button--blue'
-      onclick={(e: Event) => { e.stopPropagation(); this.publish(); } }
-      >
+      onclick={(e: Event) => { e.stopPropagation(); this.publish(); }}
+    >
       Publish
     </a>;
 
@@ -138,7 +138,7 @@ export default class PagePage extends MustAuthController {
   renderSettings() {
     let path = ['Path: ', <strong>{this.page().defaultRoute}</strong>, ', '];
     return <div class={!this.showControls() ? 'controlset' : 'controlset hidden'}>
-      <div class='infoset' onclick={() => { this.showControls(true); } }>
+      <div class='infoset' onclick={() => { this.showControls(true); }}>
         <div class='small black5'>
           {!this.page().defaultRoute ? '' : path}
           Theme: <strong>{this.page().theme}</strong>,
@@ -158,7 +158,7 @@ export default class PagePage extends MustAuthController {
           </div>
           {this.maximize() ? '' :
             <div class='control'
-              onclick={() => { this.showControls(false); } }>
+              onclick={() => { this.showControls(false); }}>
               close
             </div>}
         </div>
@@ -241,7 +241,7 @@ export default class PagePage extends MustAuthController {
   maxView() {
     let controls = [
       <a class='button button--green'
-        onclick={(e: Event) => { e.stopPropagation(); this.save(); } }>
+        onclick={(e: Event) => { e.stopPropagation(); this.save(); }}>
         Save
       </a>,
       <Popover>
@@ -260,9 +260,14 @@ export default class PagePage extends MustAuthController {
         if (e.target.className == 'page-max') {
           m.route('/admin/pages');
         }
-       }}>
+      }}>
         <div class='page-max__controls'>{controls}</div>
-        <div class='page-editor'>
+        <div class='page-editor'
+          config={(el, isInitialized) => {
+            if (!isInitialized) {
+              el.addEventListener('focus', () => hidePopover(), true);
+            }
+          }}>
           <div class='controls'>
             <input
               type='text'
@@ -270,7 +275,7 @@ export default class PagePage extends MustAuthController {
               placeholder='title...'
               value={this.page().title || ''}
               onchange={this.updatePageTitle}
-              />
+            />
           </div>
           {this.renderEditors()}
         </div>
@@ -303,7 +308,7 @@ export default class PagePage extends MustAuthController {
             placeholder='title...'
             value={ctrl.page().title || ''}
             onchange={ctrl.updatePageTitle}
-            />
+          />
         </div>
         {ctrl.renderSettings()}
         {ctrl.renderSettingsEditor()}
