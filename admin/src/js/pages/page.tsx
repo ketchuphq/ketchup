@@ -295,7 +295,7 @@ export default class PagePage extends MustAuthController {
         <div class='page-editor'
           config={(el, isInitialized) => {
             if (!isInitialized) {
-              el.addEventListener('focus', () => hidePopover(), true);
+              el.addEventListener('click', () => hidePopover());
             }
           }}>
           <div class='controls'>
