@@ -57,7 +57,7 @@ func (m *Module) UpdatePage(page *models.Page) error {
 	return m.Update(PAGE_BUCKET, page)
 }
 
-// ListPages lists all the pages stored in the DB (unsorted).
+// ListPages lists all the pages stored in the DB (unsorted), without contents
 func (m *Module) ListPages() ([]*models.Page, error) {
 	lst := []*models.Page{}
 	err := m.Bolt.View(func(tx *bolt.Tx) error {
@@ -67,6 +67,9 @@ func (m *Module) ListPages() ([]*models.Page, error) {
 			err := proto.Unmarshal(v, pb)
 			if err != nil {
 				return err
+			}
+			for _, c := range pb.Contents {
+				c.Value = nil
 			}
 			lst = append(lst, pb)
 			return nil
