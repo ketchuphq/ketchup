@@ -14,16 +14,18 @@ export default class PagePage extends MustAuthController {
   page: Mithril.Property<Page>;
   showControls: Mithril.Property<boolean>;
   template: Mithril.Property<API.ThemeTemplate>;
-  maximize: Mithril.Property<boolean>;
+  maximized: Mithril.Property<boolean>;
   minimiseToSettings: Mithril.Property<boolean>;
+  _nextRoute: Mithril.Property<string>;
 
   constructor() {
     super();
     this.showControls = m.prop(false);
-    this.maximize = m.prop(true);
+    this.maximized = m.prop(true);
     this.page = m.prop<Page>();
     this.template = m.prop<API.ThemeTemplate>();
     this.minimiseToSettings = m.prop(false);
+    this._nextRoute = m.prop<string>();
     let pageUUID = m.route.param('id');
     if (pageUUID) {
       Page.get(pageUUID)
@@ -156,7 +158,7 @@ export default class PagePage extends MustAuthController {
           <div class='control'>
             {this.page() ? m.component(EditRoutesComponent, this.page()) : null}
           </div>
-          {this.maximize() ? '' :
+          {this.maximized() ? '' :
             <div class='control'
               onclick={() => { this.showControls(false); }}>
               close
@@ -251,16 +253,44 @@ export default class PagePage extends MustAuthController {
     ];
     if (!this.minimiseToSettings()) {
       controls.push(
-        <a class='typcn typcn-times' href='/admin/pages' config={m.route} />
+        <a class='typcn typcn-times'
+          href='/admin/pages'
+          onclick={(e: MouseEvent) => {
+            e.preventDefault();
+            this._nextRoute('/admin/pages');
+          }}
+        />
       );
     }
 
+    let pageMaxClasses = 'page-max animate-fade-in';
+    if (this._nextRoute()) {
+      pageMaxClasses = 'page-max animate-zoom-away';
+    }
+
     return Layout(
-      <div class='page-max' onclick={(e: any) => {
-        if (e.target.className == 'page-max') {
-          m.route('/admin/pages');
-        }
-      }}>
+      <div class={pageMaxClasses}
+        onclick={(e: any) => {
+          if (e.target.className == 'page-max') {
+            m.route('/admin/pages');
+          }
+        }}
+        config={(el, isInitialized) => {
+          if (!isInitialized) {
+            el.addEventListener('animationend', (ev: AnimationEvent) => {
+              // old animation is removed, otherwise new animations won't fire.
+              if (ev.animationName == 'fadeIn') {
+                el.classList.add('animate-fade-in-complete');
+                el.classList.remove('animate-fade-in');
+              }
+              // navigate away after zoomAway animation completes
+              if (ev.animationName == 'zoomAway') {
+                m.route(this._nextRoute());
+              }
+            });
+          }
+        }}
+      >
         <div class='page-max__controls'>{controls}</div>
         <div class='page-editor'
           config={(el, isInitialized) => {
@@ -289,12 +319,12 @@ export default class PagePage extends MustAuthController {
 
   static controller = PagePage;
   static view(ctrl: PagePage) {
-    if (ctrl.maximize()) {
+    if (ctrl.maximized()) {
       return ctrl.maxView();
     }
     let maximize = () => {
       ctrl.minimiseToSettings(true);
-      ctrl.maximize(true);
+      ctrl.maximized(true);
     }
     return Layout(
       <div class='page-editor'>
