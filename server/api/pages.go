@@ -43,6 +43,20 @@ func (m *Module) GetPage(rw http.ResponseWriter, req *http.Request, par httprout
 	return router.Proto(rw, page)
 }
 
+func (m *Module) GetRenderedPage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+	page, err := m.getPage(par, func(*models.Page) error { return nil })
+	if err != nil {
+		return err
+	}
+
+	contents, err := m.Content.CreateContentMap(page)
+	if err != nil {
+		return err
+	}
+
+	return m.Router.JSON(rw, http.StatusOK, contents)
+}
+
 // ListPages returns all pages, sorted by updated at.
 // todo: pagination, filtering
 func (m *Module) ListPages(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {

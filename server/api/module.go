@@ -43,6 +43,7 @@ func (m *Module) Init(c *service.Config) {
 			handle       users.Handle
 		}{
 			{"/api/v1/pages/:uuid", methodGet, m.GetPage},
+			{"/api/v1/pages/:uuid/contents", methodGet, m.GetRenderedPage},
 			{"/api/v1/pages/:uuid/routes", methodGet, m.ListRoutesByPage},
 			{"/api/v1/pages", methodGet, m.ListPages},
 			{"/api/v1/routes", methodGet, m.ListRoutes},
