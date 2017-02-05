@@ -11,7 +11,7 @@ import (
 )
 
 func (m *Module) render(w io.Writer, page *models.Page) error {
-	contents, err := m.createContentMap(page)
+	contents, err := m.CreateContentMap(page)
 	if err != nil {
 		return err
 	}
@@ -20,7 +20,7 @@ func (m *Module) render(w io.Writer, page *models.Page) error {
 
 type contentMap map[string]interface{}
 
-func (m *Module) createContentMap(page *models.Page) (contentMap, error) {
+func (m *Module) CreateContentMap(page *models.Page) (contentMap, error) {
 	contents := map[string]interface{}{}
 	contents["title"] = page.GetTitle()
 	var err error

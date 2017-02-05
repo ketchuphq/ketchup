@@ -64,7 +64,7 @@ func TestCreateContentMap(t *testing.T) {
 		},
 	}
 	m := &Module{}
-	cm, err := m.createContentMap(page)
+	cm, err := m.CreateContentMap(page)
 	if err != nil {
 		t.Fatal(err)
 	}
