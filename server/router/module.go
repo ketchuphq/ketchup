@@ -15,6 +15,8 @@ import (
 	"github.com/octavore/nagax/router"
 
 	"github.com/octavore/ketchup/proto/ketchup/api"
+	"github.com/octavore/ketchup/server/router/middleware/gzip"
+	logger2 "github.com/octavore/ketchup/server/router/middleware/logger"
 )
 
 var ErrNotFound = fmt.Errorf("not found")
@@ -25,12 +27,23 @@ type Module struct {
 }
 
 func (m *Module) Init(c *service.Config) {
+	c.Setup = func() error {
+		m.Module.Middleware.Set(
+			logger2.New(m.Logger.Infof),
+			gzip.Default,
+		)
+		return nil
+	}
 }
 
 func (m *Module) Subrouter(path string) *httprouter.Router {
 	r := httprouter.New()
 	m.Handle(path, r)
 	return r
+}
+
+func (m *Module) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+	m.Middleware.ServeHTTP(rw, req)
 }
 
 func Proto(rw http.ResponseWriter, pb proto.Message) error {

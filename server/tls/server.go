@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/unrolled/secure"
 )
 
 func (m *Module) loadTLSConfig() (*tls.Config, error) {
@@ -43,11 +45,13 @@ func (m *Module) loadTLSConfig() (*tls.Config, error) {
 	return tlsConfig, nil
 }
 
-// StartTLSProxy starts the tls proxy
+// StartTLSProxy starts the tls proxy on port 443. SSL is terminated
+// and the connection in passed to the Router.
 func (m *Module) StartTLSProxy() error {
 	if m.serverStarted {
 		return nil
 	}
+
 	tlsConfig, err := m.loadTLSConfig()
 	if err != nil {
 		return err
@@ -65,6 +69,11 @@ func (m *Module) StartTLSProxy() error {
 		Handler:      m.Router,
 		TLSConfig:    tlsConfig, // needed for http/2
 	}
+
+	// register middleware for https redirection
+	https := secure.New(secure.Options{SSLRedirect: true})
+	m.Router.Middleware.Prepend(https.HandlerFuncWithNext)
+
 	m.serverStarted = true
 	return server.Serve(l)
 }
