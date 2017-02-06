@@ -2,13 +2,16 @@ package api
 
 import (
 	"net/http"
+	"reflect"
 
+	"github.com/gorilla/schema"
 	"github.com/julienschmidt/httprouter"
 	"github.com/octavore/naga/service"
 	"github.com/octavore/nagax/logger"
 
 	"github.com/octavore/ketchup/db"
 	"github.com/octavore/ketchup/plugins/pkg"
+	"github.com/octavore/ketchup/proto/ketchup/api"
 	"github.com/octavore/ketchup/server/config"
 	"github.com/octavore/ketchup/server/content"
 	"github.com/octavore/ketchup/server/content/templates"
@@ -27,6 +30,8 @@ type Module struct {
 	TLS       *tls.Module
 	Logger    *logger.Module
 	Pkg       *pkg.Module
+
+	decoder *schema.Decoder
 }
 
 const (
@@ -37,6 +42,16 @@ const (
 
 func (m *Module) Init(c *service.Config) {
 	c.Setup = func() error {
+		m.decoder = schema.NewDecoder()
+		m.decoder.SetAliasTag("json")
+		m.decoder.IgnoreUnknownKeys(true)
+		m.decoder.RegisterConverter(
+			api.ListPageRequest_all,
+			func(val string) reflect.Value {
+				v := api.ListPageRequest_ListPageFilter_value[val]
+				return reflect.ValueOf(v)
+			})
+
 		r := m.Router.Subrouter("/api/v1/")
 		routes := []struct {
 			path, method string

@@ -59,8 +59,18 @@ func (m *Module) GetRenderedPage(rw http.ResponseWriter, req *http.Request, par 
 
 // ListPages returns all pages, sorted by updated at.
 // todo: pagination, filtering
+// todo: error handling?
 func (m *Module) ListPages(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
-	pages, err := m.DB.ListPages()
+	opts := &api.ListPageRequest{}
+	err := req.ParseForm()
+	if err != nil {
+		return err
+	}
+	err = m.decoder.Decode(opts, req.Form)
+	if err != nil {
+		return err
+	}
+	pages, err := m.DB.ListPages(opts)
 	if err != nil {
 		return err
 	}

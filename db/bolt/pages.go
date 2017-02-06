@@ -5,6 +5,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/satori/go.uuid"
 
+	"github.com/octavore/ketchup/proto/ketchup/api"
 	"github.com/octavore/ketchup/proto/ketchup/models"
 )
 
@@ -58,8 +59,10 @@ func (m *Module) UpdatePage(page *models.Page) error {
 }
 
 // ListPages lists all the pages stored in the DB (unsorted), without contents
-func (m *Module) ListPages() ([]*models.Page, error) {
+func (m *Module) ListPages(opts *api.ListPageRequest) ([]*models.Page, error) {
 	lst := []*models.Page{}
+	filter := opts.GetOptions().GetPreset()
+
 	err := m.Bolt.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(PAGE_BUCKET))
 		return b.ForEach(func(_, v []byte) error {
@@ -67,6 +70,15 @@ func (m *Module) ListPages() ([]*models.Page, error) {
 			err := proto.Unmarshal(v, pb)
 			if err != nil {
 				return err
+			}
+			if filter == api.ListPageRequest_draft && pb.GetPublishedAt() != 0 {
+				return nil
+			}
+			if filter == api.ListPageRequest_published && pb.GetPublishedAt() == 0 {
+				return nil
+			}
+			if pb.GetPublishedAt() == 0 {
+				pb.PublishedAt = nil
 			}
 			for _, c := range pb.Contents {
 				c.Value = nil
