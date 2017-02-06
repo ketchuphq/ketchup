@@ -14,11 +14,15 @@ import (
 // Clone the given repo to {data_dir}/{themes}/{name}
 func (m *Module) Clone(p *packages.Package) error {
 	packagePath := m.Config.DataPath(path.Join(themeDir, p.GetName()), "")
-	r, err := git.NewFilesystemRepository(path.Join(packagePath, ".git"))
+	return m.clone(packagePath, p.GetVcsUrl())
+}
+
+func (m *Module) clone(dest, url string) error {
+	r, err := git.NewFilesystemRepository(path.Join(dest, ".git"))
 	if err != nil {
 		return err
 	}
-	err = r.Clone(&git.CloneOptions{URL: p.GetVcsUrl()})
+	err = r.Clone(&git.CloneOptions{URL: url})
 	if err != nil {
 		return err
 	}
@@ -40,7 +44,7 @@ func (m *Module) Clone(p *packages.Package) error {
 	defer iter.Close()
 
 	return iter.ForEach(func(f *object.File) error {
-		pth := path.Join(packagePath, f.Name)
+		pth := path.Join(dest, f.Name)
 		err := os.MkdirAll(path.Dir(pth), 0700)
 		if err != nil {
 			return err

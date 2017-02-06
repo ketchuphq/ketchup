@@ -11,7 +11,7 @@ import (
 
 // FetchRegistry fetches
 func (m *Module) FetchDefaultRegistry() (*packages.Registry, error) {
-	return m.FetchRegistry(defaultRegistryURL)
+	return m.FetchRegistry(m.RegistryURL)
 }
 func (m *Module) FetchRegistry(registryURL string) (*packages.Registry, error) {
 	res, err := http.Get(registryURL)
