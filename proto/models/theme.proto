@@ -19,6 +19,7 @@ message ThemeTemplate {
     optional string theme = 3;
     optional string engine = 4 [default='html']; // can have custom engines
     optional bool hideContent = 5 [default=false];
+    optional string description = 6;
     repeated ThemePlaceholder placeholders = 10; // placeholders
     // maybe an option for extensions?
     optional string data = 11;
