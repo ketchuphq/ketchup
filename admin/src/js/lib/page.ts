@@ -2,6 +2,7 @@ import * as m from 'mithril';
 import * as API from 'lib/api';
 import { default as Route } from 'lib/route';
 import * as dateFormat from 'date-fns/format';
+import { serialize } from 'lib/params';
 
 const dateHumanFormat = 'MMM Do, h:mma';
 
@@ -144,12 +145,15 @@ export default class Page extends API.Page {
       });
   }
 
-  static list(): Mithril.Promise<Page[]> {
+  static list(filter: API.ListPageRequest_ListPageFilter = 'all'): Mithril.Promise<Page[]> {
+    let q = serialize({
+      options: { preset: filter }
+    } as API.ListPageRequest);
     return m.request({
       method: 'GET',
-      url: '/api/v1/pages'
+      url: `/api/v1/pages?${q}`,
     })
-      .then((data: { pages: API.Page[] }) => {
+      .then((data: API.ListPageResponse) => {
         if (!data.pages) {
           return [];
         }
