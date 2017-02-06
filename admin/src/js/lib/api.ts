@@ -1,4 +1,4 @@
-// DO NOT EDIT! This file is generated automatically by util/gots/main.go
+// DO NOT EDIT! This file is generated automatically by pbts (github.com/octavore/pbts)
 
 export abstract class Page {
   uuid?: string;
@@ -33,18 +33,18 @@ export abstract class Content {
   // skipped field: type
   
   // oneof types:
+  multiple?: ContentMultiple;
   short?: ContentString;
   text?: ContentText;
-  multiple?: ContentMultiple;
   static copy(from: Content, to?: Content): Content {
     to = to || {};
     to.uuid = from.uuid;
     to.key = from.key;
     to.value = from.value;
     to.timestamps = from.timestamps;
+    to.multiple = from.multiple;
     to.short = from.short;
     to.text = from.text;
-    to.multiple = from.multiple;
     return to;
   }
 }
@@ -99,6 +99,7 @@ export abstract class ThemeTemplate {
   theme?: string;
   engine?: string;
   hideContent?: boolean;
+  description?: string;
   placeholders?: ThemePlaceholder[];
   data?: string;
   static copy(from: ThemeTemplate, to?: ThemeTemplate): ThemeTemplate {
@@ -108,6 +109,7 @@ export abstract class ThemeTemplate {
     to.theme = from.theme;
     to.engine = from.engine;
     to.hideContent = from.hideContent;
+    to.description = from.description;
     to.placeholders = from.placeholders;
     to.data = from.data;
     return to;
@@ -119,15 +121,15 @@ export abstract class ThemePlaceholder {
   // skipped field: type
   
   // oneof types:
+  multiple?: ContentMultiple;
   short?: ContentString;
   text?: ContentText;
-  multiple?: ContentMultiple;
   static copy(from: ThemePlaceholder, to?: ThemePlaceholder): ThemePlaceholder {
     to = to || {};
     to.key = from.key;
+    to.multiple = from.multiple;
     to.short = from.short;
     to.text = from.text;
-    to.multiple = from.multiple;
     return to;
   }
 }
@@ -257,6 +259,42 @@ export abstract class EnableTLSRequest {
   }
 }
 
+export abstract class ListPageRequest {
+  list?: ListOptions;
+  options?: ListPageRequest_ListPageOptions;
+  static copy(from: ListPageRequest, to?: ListPageRequest): ListPageRequest {
+    to = to || {};
+    to.list = from.list;
+    to.options = from.options;
+    return to;
+  }
+}
+
+export abstract class ListPageRequest_ListPageOptions {
+  preset?: ListPageRequest_ListPageFilter;
+  static copy(from: ListPageRequest_ListPageOptions, to?: ListPageRequest_ListPageOptions): ListPageRequest_ListPageOptions {
+    to = to || {};
+    to.preset = from.preset;
+    return to;
+  }
+}
+
+export abstract class ListPageResponse {
+  pages?: Page[];
+  static copy(from: ListPageResponse, to?: ListPageResponse): ListPageResponse {
+    to = to || {};
+    to.pages = from.pages;
+    return to;
+  }
+}
+
+export abstract class ListOptions {
+  static copy(from: ListOptions, to?: ListOptions): ListOptions {
+    to = to || {};
+    return to;
+  }
+}
+
 export abstract class Error {
   code?: string;
   title?: string;
@@ -281,6 +319,7 @@ export abstract class ErrorResponse {
   }
 }
 
-export type ContentTextType = 'html' | 'text' | 'markdown';
 export type Package_Type = 'unknown' | 'theme' | 'plugin';
+export type ListPageRequest_ListPageFilter = 'all' | 'published' | 'draft';
 export type ContentMultiple_DropdownType = 'radio' | 'dropdown' | 'unknown';
+export type ContentTextType = 'text' | 'markdown' | 'html';
