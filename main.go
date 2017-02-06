@@ -25,5 +25,6 @@ type App struct {
 func (p *App) Init(c *service.Config) {}
 
 func main() {
+	service.EnvVarName = "KETCHUP_ENV"
 	service.Run(&App{})
 }
