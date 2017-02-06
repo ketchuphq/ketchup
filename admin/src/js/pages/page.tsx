@@ -271,8 +271,8 @@ export default class PagePage extends MustAuthController {
     return Layout(
       <div class={pageMaxClasses}
         onclick={(e: any) => {
-          if (e.target.className == 'page-max') {
-            m.route('/admin/pages');
+          if (e.target.classList.contains('page-max')) {
+            this._nextRoute('/admin/pages');
           }
         }}
         config={(el, isInitialized) => {
