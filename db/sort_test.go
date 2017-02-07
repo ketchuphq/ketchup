@@ -9,9 +9,9 @@ import (
 
 func TestSort(t *testing.T) {
 	now := time.Now()
-	nowUnix := now.Unix()
-	nowPlus1 := now.Add(time.Minute).Unix()
-	nowPlus2 := now.Add(time.Minute * 2).Unix()
+	nowUnix := now.UnixNano() / 1e6
+	nowPlus1 := now.Add(time.Minute).UnixNano() / 1e6
+	nowPlus2 := now.Add(time.Minute*2).UnixNano() / 1e6
 	pages := []*models.Page{
 		{Timestamps: &models.Timestamp{UpdatedAt: &nowUnix}},
 		{Timestamps: &models.Timestamp{UpdatedAt: &nowPlus2}},
