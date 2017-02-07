@@ -123,7 +123,7 @@ export default class Page extends API.Page {
     if (!this.timestamps) {
       return '';
     }
-    let t = new Date(parseInt(this.timestamps.createdAt) * 1000);
+    let t = new Date(parseInt(this.timestamps.createdAt));
     return dateFormat(t, dateHumanFormat);
   }
 
@@ -131,7 +131,7 @@ export default class Page extends API.Page {
     if (!this.timestamps) {
       return '';
     }
-    let t = new Date(parseInt(this.timestamps.updatedAt) * 1000);
+    let t = new Date(parseInt(this.timestamps.updatedAt));
     return dateFormat(t, dateHumanFormat);
   }
 

@@ -12,8 +12,8 @@ import "content.proto";
 // }
 
 message Timestamp {
-    optional int64 created_at = 1;
-    optional int64 updated_at = 2;
+    optional int64 created_at = 1; // millis
+    optional int64 updated_at = 2; // millis
 }
 
 message Page {

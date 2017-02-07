@@ -103,7 +103,7 @@ func TestReloadNew(t *testing.T) {
 	}
 
 	// found because published
-	page.PublishedAt = proto.Int64(time.Now().Unix())
+	page.PublishedAt = proto.Int64(time.Now().UnixNano() / 1e6)
 	err = m.DB.UpdatePage(page)
 	if err != nil {
 		t.Fatal(err)
@@ -137,7 +137,7 @@ func TestReloadNew(t *testing.T) {
 	if !strings.Contains(rw.Body.String(), "<strong>hello world</strong>") {
 		t.Fatal("unexpected response", rw.Code, rw.Body.String())
 	}
-	page.PublishedAt = proto.Int64(time.Now().Unix())
+	page.PublishedAt = proto.Int64(time.Now().UnixNano() / 1e6)
 	m.DB.UpdatePage(page)
 
 	// updating route should work

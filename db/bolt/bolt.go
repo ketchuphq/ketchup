@@ -125,11 +125,12 @@ func (m *Module) Update(bucket string, pb db.AddressableProto) error {
 		if ts == nil {
 			ts = &models.Timestamp{}
 		}
-		now := time.Now().Unix()
+		// convert time to millis
+		nowMillis := time.Now().UnixNano() / 1e6
 		if ts.GetCreatedAt() == 0 {
-			ts.CreatedAt = proto.Int64(now)
+			ts.CreatedAt = proto.Int64(nowMillis)
 		}
-		ts.UpdatedAt = proto.Int64(now)
+		ts.UpdatedAt = proto.Int64(nowMillis)
 		tsp.SetTimestamps(ts)
 	}
 

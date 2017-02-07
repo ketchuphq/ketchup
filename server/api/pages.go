@@ -105,8 +105,8 @@ func (m *Module) PublishPage(rw http.ResponseWriter, req *http.Request, par http
 		}
 
 		// set published at to current time
-		now := time.Now().Unix()
-		page.PublishedAt = &now
+		nowMillis := time.Now().UnixNano() / 1e6
+		page.PublishedAt = &nowMillis
 		err := m.DB.UpdatePage(page)
 		if err != nil {
 			return err
