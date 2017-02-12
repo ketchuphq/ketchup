@@ -50,17 +50,22 @@ export default class PagesPage extends MustAuthController {
       </h2>
       <div class='table'>
         {ctrl.pages().map((page) => {
-          let status = page.isPublished ? '' : 'draft ';
-          let time = page.formattedUpdatedAt;
-          if (time && !page.isPublished) {
-            time = '@ ' + time;
+          let status = null;
+          let klass = '';
+          if (page.isPublished) {
+            status = <div class='label small'>published</div>;
+          } else {
+            status = <div class='label label--gray small'>draft</div>;
+            klass = 'page--draft';
           }
-          return <a class='tr'
+
+          return <a class='tr tr--center'
             href={`/admin/pages/${page.uuid}`}
             config={m.route}
           >
-            <div>{page.title || 'untitled'}</div>
-            <div class='small black5'>{`${status} ${time}`}</div>
+            <div class={`tr__expand ${klass}`}>{page.title || 'untitled'}</div>
+            {status}
+            <div class='page--date'>{`${page.formattedUpdatedAt}`}</div>
           </a>;
         })}
       </div>
