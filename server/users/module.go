@@ -33,8 +33,8 @@ type Handle func(rw http.ResponseWriter, req *http.Request, par httprouter.Param
 
 // Init implements service.Init
 func (m *Module) Init(c *service.Config) {
-	registerSetPassword(m)
-	registerUserAdd(m)
+	c.AddCommand(registerSetPassword(m))
+	c.AddCommand(registerUserAdd(m))
 
 	c.Setup = func() error {
 		m.DBAuth.Configure(
