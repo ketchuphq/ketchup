@@ -13,6 +13,9 @@ type Module struct {
 }
 
 func (m *Module) Init(c *service.Config) {
+	m.registerExportCommand(c)
+	m.registerImportCommand(c)
+
 	c.Start = func() {
 		if m.Backend == nil {
 			panic("backend not configured")
