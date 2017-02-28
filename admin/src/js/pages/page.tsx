@@ -269,12 +269,15 @@ export default class PagePage extends MustAuthController {
     }
 
     return Layout(
+      // click to hide is disabled because dragging from inside
+      // a textbox to outside the box triggers a click on the
+      // outer element, and this code does not handle that case correctly.
+      // onclick={(e: any) => {
+      //     if (e.target.classList.contains('page-max')) {
+      //       this._nextRoute('/admin/pages');
+      //     }
+      //   }}
       <div class={pageMaxClasses}
-        onclick={(e: any) => {
-          if (e.target.classList.contains('page-max')) {
-            this._nextRoute('/admin/pages');
-          }
-        }}
         config={(el, isInitialized) => {
           if (!isInitialized) {
             el.addEventListener('animationend', (ev: AnimationEvent) => {
