@@ -5,7 +5,11 @@
     "jsxFactory": "msx",
     "noImplicitAny": true,
     "noUnusedParameters": true,
-    "noUnusedLocals": true,
+    "lib": [
+      "dom",
+      "es5",
+      "es2015.promise"
+    ],
     "target": "es5",
     "sourceMap": true,
     "baseUrl": "./src/js",

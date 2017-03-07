@@ -1,16 +1,19 @@
 import msx from 'lib/msx';
 import * as API from 'lib/api';
+import * as m from 'mithril';
+import * as stream from 'mithril/stream';
 import Page from 'lib/page';
-import Layout from 'components/layout';
 import { MustAuthController } from 'components/auth';
 
+let _: Mithril.Component<{}, PagesPage> = PagesPage;
+
 export default class PagesPage extends MustAuthController {
-  pages: Mithril.Property<Page[]>;
-  viewOption: Mithril.Property<API.ListPageRequest_ListPageFilter>;
+  pages: Mithril.Stream<Page[]>;
+  viewOption: Mithril.Stream<API.ListPageRequest_ListPageFilter>;
   constructor() {
     super();
-    this.pages = m.prop([]);
-    this.viewOption = m.prop<API.ListPageRequest_ListPageFilter>('all');
+    this.pages = stream([]);
+    this.viewOption = stream<API.ListPageRequest_ListPageFilter>('all');
     this.fetch(this.viewOption());
   }
 
@@ -23,8 +26,12 @@ export default class PagesPage extends MustAuthController {
       });
   }
 
-  static controller = PagesPage;
-  static view(ctrl: PagesPage) {
+  static oninit(v: Mithril.Vnode<{}, PagesPage>) {
+    v.state = new PagesPage();
+  };
+
+  static view(v: Mithril.Vnode<{}, PagesPage>) {
+    let ctrl = v.state;
     let tab = (v: API.ListPageRequest_ListPageFilter, desc?: string) => {
       let classes = 'tab-el';
       if (ctrl.viewOption() == v) {
@@ -34,7 +41,7 @@ export default class PagesPage extends MustAuthController {
         {desc || v}
       </span>;
     };
-    return Layout(<div class='pages'>
+    return <div class='pages'>
       <header>
         <a class='button button--green button--center' href='/admin/compose' config={m.route}>
           Compose
@@ -69,6 +76,6 @@ export default class PagesPage extends MustAuthController {
           </a>;
         })}
       </div>
-    </div>);
+    </div>;
   }
 }

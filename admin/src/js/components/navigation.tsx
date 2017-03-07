@@ -1,19 +1,21 @@
 import msx from 'lib/msx';
+import * as m from 'mithril';
+import * as stream from 'mithril/stream';
 import { AuthController } from 'components/auth';
 import Button from 'components/button';
 // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/13679
 var debounce: any = require('lodash/debounce');
 
-let retain = (_: any, __: any, context: Mithril.Context) => context.retain = true;
-
+let _: Mithril.Component<{}, NavigationComponent> = NavigationComponent;
 
 export default class NavigationComponent extends AuthController {
-  collapsed: Mithril.Property<boolean>;
+  collapsed: Mithril.Stream<boolean>;
   constructor() {
     super();
-    this.collapsed = m.prop(this._userPromise.then(() =>
-      this.pref('hideMenu') || window.innerWidth <= 480
-    )) as Mithril.Property<boolean>;
+    this.collapsed = stream(true);
+    this._userPromise.then(() =>
+      this.collapsed(this.pref('hideMenu') || window.innerWidth <= 480)
+    );
 
     window.addEventListener('resize', this.resizeHandler);
     this.resizeHandler();
@@ -38,27 +40,26 @@ export default class NavigationComponent extends AuthController {
     this.collapsed(collapsed);
   }
 
-  static controller = NavigationComponent;
   link(url: string, text: string, opts: { onclick?: () => void, additionalClasses?: string, icon?: string } = {}) {
-    return m('a.nav-link', {
-      class: opts.additionalClasses || '',
-      href: url,
-      config: (a, b, c, d) => {
-        c.retain = true;
-        return m.route(a, b, c, d);
-      },
-      onclick: opts.onclick,
-      key: `nav-${text.toLowerCase()}`,
-    }, [
-        !!opts.icon ? <span class={`typcn typcn-${opts.icon}`}></span> : '',
-        <span class='nav-link__text'>{text}</span>
-      ]);
+    return <a class={`nav-link ${opts.additionalClasses}`}
+      href={url}
+      oncreate={m.route.link}
+      onclick={opts.onclick}
+    >
+      {!!opts.icon ? <span class={`typcn typcn-${opts.icon}`}></span> : ''}
+      <span class='nav-link__text'>{text}</span>
+    </a>;
   }
 
-  static view(ctrl: NavigationComponent) {
+  static oninit(v: Mithril.Vnode<{}, NavigationComponent>) {
+    v.state = new NavigationComponent();
+  }
+
+  static view(v: Mithril.Vnode<{}, NavigationComponent>) {
+    let ctrl = v.state;
     let navClass = 'navigation';
     if (!ctrl.user()) {
-      return <div class={navClass} key='navigation' config={retain}>
+      return <div class={navClass} key='navigation'>
         {ctrl.link('/admin', 'K', { additionalClasses: 'nav-title' })}
         {ctrl.link('/admin/login', 'Login')}
       </div>;
@@ -68,13 +69,13 @@ export default class NavigationComponent extends AuthController {
       navClass += ' navigation--hidden';
     }
 
-    return <div class={navClass} key='navigation' config={retain}>
+    return <div class={navClass} key='navigation'>
       {ctrl.link('/admin', 'K', { additionalClasses: 'nav-title' })}
       <div class='nav-button'>
         <Button
           class='button--green button--center'
           href='/admin/compose'
-          config={m.route}>
+          >
           <span class='typcn typcn-edit' />
           <span class='nav-link__text'>Compose</span>
         </Button>

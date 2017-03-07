@@ -1,4 +1,6 @@
-import * as store from 'store';
+let store = require('store/dist/store.modern') as StoreJSStatic;
+import * as m from 'mithril';
+import * as stream from 'mithril/stream';
 import * as Toaster from 'components/toaster';
 
 export interface User {
@@ -36,18 +38,18 @@ let dummyStore = new DummyStore();
 
 // AuthController is a super class for controllers which may require auth
 export class AuthController {
-  user: Mithril.BasicProperty<User>;
-  _userPromise: Mithril.Promise<User>;
+  user: Mithril.Stream<User>;
+  _userPromise: Promise<User>;
   store: Storer;
 
 
   constructor(user: User = null) {
     this.store = store.disabled ? dummyStore : store;
-    this.user = m.prop<User>(user || cachedUser);
+    this.user = stream(user || cachedUser);
     if (this.user()) {
-      var deferred = m.deferred<User>();
-      deferred.resolve(this.user());
-      this._userPromise = deferred.promise;
+      this._userPromise = new Promise<User>((resolve) => {
+        resolve(this.user());
+      });
     } else {
       this._userPromise = m.request({
         method: 'GET',

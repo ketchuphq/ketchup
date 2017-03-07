@@ -1,22 +1,26 @@
+import * as m from 'mithril';
+import * as stream from 'mithril/stream';
 import * as Toaster from 'components/toaster';
 import { AuthController, User } from 'components/auth';
 
+let _: Mithril.Component<{}, LoginPage> = LoginPage;
+
 export default class LoginPage extends AuthController {
-  email: Mithril.BasicProperty<string>;
-  password: Mithril.BasicProperty<string>;
-  showReset: Mithril.BasicProperty<boolean>;
+  email: Mithril.Stream<string>;
+  password: Mithril.Stream<string>;
+  showReset: Mithril.Stream<boolean>;
 
   constructor() {
     super();
     this._userPromise
       .then((user?: User) => {
         if (!!user) {
-          m.route('/admin');
+          m.route.set('/admin');
         }
       });
-    this.email = m.prop('');
-    this.password = m.prop('');
-    this.showReset = m.prop(false);
+    this.email = stream('');
+    this.password = stream('');
+    this.showReset = stream(false);
   }
 
   login() {
@@ -33,8 +37,11 @@ export default class LoginPage extends AuthController {
     });
   }
 
-  static controller = LoginPage;
-  static view(ctrl: LoginPage) {
+  static oninit(v: Mithril.Vnode<{}, LoginPage>) {
+    v.state = new LoginPage();
+  }
+  static view(v: Mithril.Vnode<{}, LoginPage>) {
+    let ctrl = v.state;
     return m('.login',
       Toaster.render(),
       m('.login-logo', 'Ketchup'),

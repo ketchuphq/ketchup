@@ -59,7 +59,7 @@ export default class Page extends API.Page {
     this.contents.push(API.Content.copy(c));
   }
 
-  save(): Mithril.Promise<API.Page> {
+  save(): Promise<API.Page> {
     return m.request({
       method: 'POST',
       url: `/api/v1/pages`,
@@ -67,14 +67,14 @@ export default class Page extends API.Page {
     });
   }
 
-  delete(): Mithril.Promise<API.Page> {
+  delete(): Promise<API.Page> {
     return m.request({
       method: 'DELETE',
       url: `/api/v1/pages/${this.uuid}`,
     });
   }
 
-  publish(): Mithril.Promise<API.Page> {
+  publish(): Promise<API.Page> {
     return m.request({
       method: 'POST',
       url: `/api/v1/pages/${this.uuid}/publish`,
@@ -84,7 +84,7 @@ export default class Page extends API.Page {
     });
   }
 
-  unpublish(): Mithril.Promise<API.Page> {
+  unpublish(): Promise<API.Page> {
     return m.request({
       method: 'POST',
       url: `/api/v1/pages/${this.uuid}/unpublish`,
@@ -135,7 +135,7 @@ export default class Page extends API.Page {
     return dateFormat(t, dateHumanFormat);
   }
 
-  static get(uuid: string): Mithril.Promise<Page> {
+  static get(uuid: string): Promise<Page> {
     return m.request({
       method: 'GET',
       url: `/api/v1/pages/${uuid}`
@@ -145,7 +145,7 @@ export default class Page extends API.Page {
       });
   }
 
-  static list(filter: API.ListPageRequest_ListPageFilter = 'all'): Mithril.Promise<Page[]> {
+  static list(filter: API.ListPageRequest_ListPageFilter = 'all'): Promise<Page[]> {
     let q = serialize({
       options: { preset: filter }
     } as API.ListPageRequest);
