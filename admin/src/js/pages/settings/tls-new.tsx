@@ -1,30 +1,36 @@
 import msx from 'lib/msx';
+import * as m from 'mithril';
 import * as API from 'lib/api';
 import { User } from 'components/auth';
-import { ModalContent, ModalComponent } from 'components/modal';
+import { ModalAttrs, ModalComponent } from 'components/modal';
 import { add } from 'components/toaster';
 import Button from 'components/button';
 
 const leURL = 'https://acme-v01.api.letsencrypt.org/terms';
 const ipRegex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
 
+interface TLSNewComponentAttrs {
+  user: User;
+  email: string;
+  domain: string;
+}
+
 export default class TLSNewComponent {
   initialHost: string;
-  tlsEmail: Mithril.BasicProperty<string>;
-  tlsDomain: Mithril.BasicProperty<string>;
-  modal: ModalContent;
+  tlsEmail: string;
+  tlsDomain: string;
+  modal: ModalAttrs;
 
-  constructor(user: User, email: string, domain: string) {
-    this.tlsEmail = m.prop<string>(email || user.email);
-
-    this.initialHost = domain || window.location.hostname;
+  constructor(attrs: TLSNewComponentAttrs) {
+    this.tlsEmail = attrs.email || attrs.user.email;
+    this.initialHost = attrs.domain || window.location.hostname;
     if (this.initialHost.match(ipRegex)) {
       this.initialHost = '';
     }
     if (this.initialHost == 'localhost') {
       this.initialHost = '';
     }
-    this.tlsDomain = m.prop<string>(this.initialHost);
+    this.tlsDomain = this.initialHost;
   }
 
   register() {
@@ -32,8 +38,8 @@ export default class TLSNewComponent {
       url: '/api/v1/settings/tls',
       method: 'POST',
       data: {
-        tlsEmail: this.tlsEmail(),
-        tlsDomain: this.tlsDomain(),
+        tlsEmail: this.tlsEmail,
+        tlsDomain: this.tlsDomain,
         agreed: true,
       } as API.EnableTLSRequest
     })
@@ -52,8 +58,12 @@ export default class TLSNewComponent {
       });
   }
 
-  static controller = TLSNewComponent;
-  static view = (ctrl: TLSNewComponent) => {
+  static oninit(v: Mithril.Vnode<TLSNewComponentAttrs, TLSNewComponent>) {
+    v.state = new TLSNewComponent(v.attrs);
+  };
+
+  static view(v: Mithril.Vnode<TLSNewComponentAttrs, TLSNewComponent>) {
+    let ctrl = v.state;
     let warning = null;
     if (ctrl.initialHost == '') {
       warning = <div class='tr'>
@@ -67,8 +77,8 @@ export default class TLSNewComponent {
         <input
           class='large'
           type='text'
-          value={ctrl.tlsEmail()}
-          onchange={m.withAttr('value', ctrl.tlsEmail)}
+          value={ctrl.tlsEmail}
+          onchange={m.withAttr('value', (e) => ctrl.tlsEmail = e)}
         />
       </div>
       <div class='tr tr--center'>
@@ -81,7 +91,7 @@ export default class TLSNewComponent {
               el.value = ctrl.initialHost;
             }
           }}
-          onchange={m.withAttr('value', ctrl.tlsDomain)}
+          onchange={m.withAttr('value', (v) => ctrl.tlsDomain = v)}
         />
       </div>
       <div class='tr tr--right tr--tos'>
@@ -95,7 +105,7 @@ export default class TLSNewComponent {
           handler={() => ctrl.register()}>
           Enable TLS
         </Button>
-        {m.component(ModalComponent, ctrl.modal)}
+        {m(ModalComponent, ctrl.modal)}
       </div>
     </div>;
   }

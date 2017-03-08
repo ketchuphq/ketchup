@@ -1,24 +1,30 @@
 import msx from 'lib/msx';
+import * as m from 'mithril';
 import Theme from 'lib/theme';
-import Layout from 'components/layout';
 import { MustAuthController } from 'components/auth';
 
-export default class ThemePage extends MustAuthController {
-  themes: Mithril.Property<Theme[]>;
+let _: Mithril.Component<{}, ThemesPage> = ThemesPage;
+
+export default class ThemesPage extends MustAuthController {
+  themes: Theme[];
 
   constructor() {
     super();
-    this.themes = m.prop([]);
-    Theme.list().then((themes) => this.themes(themes));
+    this.themes = [];
+    Theme.list().then((themes) => this.themes = themes);
   }
 
-  static controller = ThemePage;
-  static view(ctrl: ThemePage) {
-    return Layout(<div class='themes'>
+  static oninit(v: Mithril.Vnode<{}, ThemesPage>) {
+    v.state = new ThemesPage();
+  };
+
+  static view(v: Mithril.Vnode<{}, ThemesPage>) {
+    let ctrl = v.state;
+    return <div class='themes'>
       <header>
         <a class='button button--green button--center'
           href='/admin/themes/install'
-          config={m.route}
+          oncreate={m.route.link}
         >
           Get More
         </a>
@@ -27,15 +33,15 @@ export default class ThemePage extends MustAuthController {
 
       <h2>Installed themes</h2>
       <div class='table'>
-        {ctrl.themes().map((theme) => {
+        {ctrl.themes.map((theme) => {
           return <a class='tr'
             href={`/admin/themes/${theme.name}`}
-            config={m.route}
+            oncreate={m.route.link}
           >
             {theme.name || 'untitled'}
           </a>;
         })}
       </div>
-    </div>);
+    </div>;
   }
 }

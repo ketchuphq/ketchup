@@ -43,7 +43,7 @@ export default class PagesPage extends MustAuthController {
     };
     return <div class='pages'>
       <header>
-        <a class='button button--green button--center' href='/admin/compose' config={m.route}>
+        <a class='button button--green button--center' href='/admin/compose' oncreate={m.route.link}>
           Compose
         </a>
         <h1>Pages</h1>
@@ -68,7 +68,7 @@ export default class PagesPage extends MustAuthController {
 
           return <a class='tr tr--center'
             href={`/admin/pages/${page.uuid}`}
-            config={m.route}
+            oncreate={m.route.link}
           >
             <div class={`tr__expand ${klass}`}>{page.title || 'untitled'}</div>
             {status}

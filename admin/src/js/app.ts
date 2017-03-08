@@ -6,10 +6,10 @@ import HomePage from 'pages/home';
 import PagesPage from 'pages/pages';
 // import PagePage from 'pages/page';
 import LoginPage from 'pages/login';
-// import ThemePage from 'pages/theme';
-// import ThemesPage from 'pages/themes';
-// import TemplatePage from 'pages/template';
-// import SettingsPage from 'pages/settings';
+import ThemePage from 'pages/theme';
+import ThemesPage from 'pages/themes';
+import TemplatePage from 'pages/template';
+import SettingsPage from 'pages/settings';
 // import InstallThemePage from 'pages/install-theme';
 
 import * as WebFont from 'webfontloader';
@@ -22,12 +22,12 @@ export let routes: Mithril.RouteDefs = {
 
   // '/admin/pages/:id': PagePage,
   // '/admin/compose': PagePage,
-  // '/admin/themes': ThemesPage,
+  '/admin/themes': Layout(ThemesPage),
   // '/admin/themes/install': InstallThemePage,
-  // '/admin/themes/:name': ThemePage,
-  // '/admin/themes/:name/templates/:template': TemplatePage,
+  '/admin/themes/:name': Layout(ThemePage),
+  '/admin/themes/:name/templates/:template': Layout(TemplatePage),
   '/admin/login': LoginPage,
-  // '/admin/settings': SettingsPage
+  '/admin/settings': Layout(SettingsPage)
 };
 
 document.addEventListener('DOMContentLoaded', () => {
