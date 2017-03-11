@@ -22,9 +22,9 @@ export let routes: Mithril.RouteDefs = {
   '/admin/pages/:id': Layout(PagePage),
   '/admin/compose': Layout(PagePage),
   '/admin/themes': Layout(ThemesPage),
-  // '/admin/themes/install': InstallThemePage,
   '/admin/themes/:name': Layout(ThemePage),
   '/admin/themes/:name/templates/:template': Layout(TemplatePage),
+  // '/admin/themes-install': Layout(InstallThemePage),
   '/admin/login': LoginPage,
   '/admin/settings': Layout(SettingsPage)
 };

@@ -23,7 +23,7 @@ export default class ThemesPage extends MustAuthController {
     return <div class='themes'>
       <header>
         <a class='button button--green button--center'
-          href='/admin/themes/install'
+          href='/admin/themes-install'
           oncreate={m.route.link}
         >
           Get More
