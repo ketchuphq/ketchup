@@ -16,6 +16,12 @@
       true,
       "never"
     ],
+    "no-unused-variable": [
+      true,
+      {
+        "ignore-pattern": "(^_|msx)"
+      }
+    ],
     "arrow-parens": true
   }
 }
