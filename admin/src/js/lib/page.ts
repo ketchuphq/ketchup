@@ -6,7 +6,7 @@ import { serialize } from 'lib/params';
 
 const dateHumanFormat = 'MMM Do, h:mma';
 
-const defaultContent: API.Content = {
+export const defaultContent: API.Content = {
   uuid: null,
   text: { type: 'html' },
   key: 'content',

@@ -55,7 +55,6 @@ export default class CodeMirrorComponent {
       // this.codemirror.setOption('fullscreen', 'true')
       // this.codemirror.refresh()
       this.codemirror.on('change', (instance) => {
-        console.log(instance.getValue());
         this.content.value = instance.getValue();
       });
     }, 'codemirror');

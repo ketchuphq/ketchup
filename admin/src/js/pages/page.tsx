@@ -4,11 +4,13 @@ import * as API from 'lib/api';
 import Page from 'lib/page';
 import Theme from 'lib/theme';
 import { hidePopover, default as Popover } from 'components/popover';
-import EditRoutesComponent from 'components/edit_route';
-import ThemePickerComponent from 'components/theme_picker';
 import * as Toaster from 'components/toaster';
-import { renderEditor } from 'components/content';
 import { MustAuthController } from 'components/auth';
+
+import PageThemePickerComponent from 'pages/page/theme_picker';
+import PageEditRoutesComponent from 'pages/page/edit_route';
+import PageButtonsComponent from 'pages/page/buttons';
+import PageEditorsComponent from 'pages/page/editors';
 
 export default class PagePage extends MustAuthController {
   page: Page;
@@ -26,30 +28,28 @@ export default class PagePage extends MustAuthController {
     this.minimiseToSettings = false;
     let pageUUID = m.route.param('id');
     if (pageUUID) {
-      Page.get(pageUUID)
-        .then((page) => {
-          if (!!page.theme) {
-            Theme.get(page.theme).then((t) => {
-              this.template = t.getTemplate(page.template);
-            });
-          }
-          page.getRoutes()
-            .then(() => {
-              this.page = page;
-            });
-        });
+      Page.get(pageUUID).then((page) => {
+        this.updateThemeTemplate(page.theme, page.template)
+          .then(() => page.getRoutes())
+          .then(() => {
+            this.page = page;
+            m.redraw();
+          });
+      });
     } else {
-      this.page = new Page;
+      this.page = new Page();
+      this.updateThemeTemplate(this.page.theme, this.page.template);
     }
   }
 
   updateThemeTemplate(theme: string, template: string) {
-    let page = this.page;
-    page.theme = theme;
-    page.template = template;
-    this.page = page;
-    Theme.get(theme).then((t) => {
+    if (this.page) {
+      this.page.theme = theme;
+      this.page.template = template;
+    }
+    return Theme.get(theme).then((t) => {
       this.template = t.getTemplate(template);
+      m.redraw();
     });
   }
 
@@ -93,48 +93,11 @@ export default class PagePage extends MustAuthController {
     });
   }
 
-  renderSavePublish() {
-    let saveButton = <a
-      class='button button--small button--green'
-      onclick={(e: Event) => { e.stopPropagation(); this.save(); }}
-    >
-      Save
-    </a>;
-
-    let unpublishButton = <a
-      class='button button--small button--blue'
-      onclick={(e: Event) => { e.stopPropagation(); this.unpublish(); }}
-    >
-      Unpublish
-    </a>;
-
-    let viewButton = <a
-      class='button button--small button--blue'
-      href={this.page.defaultRoute}
-    >
-      View
-    </a>;
-
-    let deleteButton = <a
-      class='button button--small button--red'
-      onclick={(e: Event) => { e.stopPropagation(); this.delete(); }}
-    >
-      Delete
-    </a>;
-
-    let publishButton = <a
-      class='button button--small button--blue'
-      onclick={(e: Event) => { e.stopPropagation(); this.publish(); }}
-    >
-      Publish
-    </a>;
-
-    return <div class='save-publish'>
-      {saveButton}
-      {!this.page.uuid ? '' : deleteButton}
-      {this.page.isPublished ? [unpublishButton] : publishButton}
-    </div>;
+  maximize() {
+    this.minimiseToSettings = true;
+    this.maximized = true;
   }
+
   renderSettings() {
     let path = ['Path: ', <strong>{this.page.defaultRoute}</strong>, ', '];
     return <div class={!this.showControls ? 'controlset' : 'controlset hidden'}>
@@ -144,7 +107,7 @@ export default class PagePage extends MustAuthController {
           Theme: <strong>{this.page.theme}</strong>,
           Template: <strong>{this.page.template}</strong>
         </div>
-        {this.renderSavePublish()}
+        <PageButtonsComponent page={this.page} callbacks={this} />
       </div>
     </div>;
   }
@@ -154,7 +117,7 @@ export default class PagePage extends MustAuthController {
       <div class='settings'>
         <div class='controls'>
           <div class='control'>
-            {this.page ? m(EditRoutesComponent, this.page) : null}
+            {this.page ? m(PageEditRoutesComponent, this.page) : null}
           </div>
           {this.maximized ? '' :
             <div class='control'
@@ -163,77 +126,14 @@ export default class PagePage extends MustAuthController {
             </div>}
         </div>
         <div class='controls'>
-          {m(ThemePickerComponent, {
+          {m(PageThemePickerComponent, {
             theme: this.page.theme,
             template: this.page.template,
             callback: this.updateThemeTemplate.bind(this)
           })}
         </div>
       </div>
-      {this.renderSavePublish()}
-    </div>;
-  }
-
-  // todo: if not part of the theme, show delete button
-  renderEditors() {
-    if (!this.page) {
-      return <div></div>;
-    }
-
-    let contentMap: { [key: string]: API.Content } = {};
-    let mainContent: API.Content;
-    let contents: API.Content[] = [];
-    (this.page.contents || []).forEach((c) => {
-      contentMap[c.key] = c;
-      if (c.key != 'content') {
-        contents.push(c);
-      } else {
-        mainContent = c;
-      }
-    });
-
-    let placeholders: API.ThemePlaceholder[] = [];
-    let filteredPlaceholders: API.ThemePlaceholder[] = [];
-    let hideContent = false;
-
-    if (this.template) {
-      hideContent = this.template.hideContent;
-      placeholders = (this.template.placeholders || []);
-      let placeholderOrder: { [key: string]: number } = {};
-
-      placeholders.forEach((p, i) => {
-        placeholderOrder[p.key] = i;
-        if (p.key == 'content' && !mainContent.value) {
-          API.ContentText.copy(p.text, mainContent.text);
-          // todo: if p.text is not set, set mainContent.text to html?
-        }
-        if (!contentMap[p.key]) {
-          filteredPlaceholders.push(p);
-        } else {
-          // update the oneof type of the content from the placeholder
-          // todo: exhaustively map fields
-          // todo: convert markdown <> css more elegantly
-          contentMap[p.key].multiple = p.multiple;
-          contentMap[p.key].text = p.text;
-          contentMap[p.key].short = p.short;
-        }
-      });
-
-      contents.sort((a, b) => {
-        if (placeholderOrder[a.key] < placeholderOrder[b.key]) {
-          return - 1;
-        }
-        if (placeholderOrder[a.key] > placeholderOrder[b.key]) {
-          return 1;
-        }
-        return 0;
-      });
-    }
-
-    return <div>
-      {contents.map((c) => renderEditor(this.page, c, false))}
-      {filteredPlaceholders.map((p) => renderEditor(this.page, p, false))}
-      {!hideContent && mainContent ? renderEditor(this.page, mainContent, true) : null}
+      <PageButtonsComponent page={this.page} callbacks={this} />
     </div>;
   }
 
@@ -300,17 +200,15 @@ export default class PagePage extends MustAuthController {
             class='large'
             placeholder='title...'
             value={this.page.title || ''}
-            onchange={this.updatePageTitle}
+            onchange={m.withAttr('value', (v: string) => {
+              this.page.title = v;
+            })}
           />
         </div>
-        {this.renderEditors()}
+        <PageEditorsComponent page={this.page} template={this.template} />
       </div>
     </div>;
   }
-
-  updatePageTitle = m.withAttr('value', (v: string) => {
-    this.page.title = v;
-  });
 
   static oninit(v: Mithril.Vnode<{}, PagePage>) {
     v.state = new PagePage();
@@ -324,13 +222,9 @@ export default class PagePage extends MustAuthController {
     if (ctrl.maximized) {
       return ctrl.maxView();
     }
-    let maximize = () => {
-      ctrl.minimiseToSettings = true;
-      ctrl.maximized = true;
-    }
     return <div class='page-editor'>
       <div class='page-editor__icons'>
-        <span class='typcn typcn-arrow-maximise' onclick={maximize} />
+        <span class='typcn typcn-arrow-maximise' onclick={ctrl.maximize} />
       </div>
       <div class='controls'>
         <input
@@ -340,12 +234,14 @@ export default class PagePage extends MustAuthController {
           oncreate={(v: Mithril.VnodeDOM<any, any>) => {
             (v.dom as HTMLInputElement).value = ctrl.page.title || '';
           }}
-          onchange={ctrl.updatePageTitle}
+          onchange={m.withAttr('value', (v: string) => {
+            ctrl.page.title = v;
+          })}
         />
       </div>
       {ctrl.renderSettings()}
       {ctrl.renderSettingsEditor()}
-      {ctrl.renderEditors()}
+      <PageEditorsComponent page={ctrl.page} template={ctrl.template} />
     </div>;
   }
 }
