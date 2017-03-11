@@ -2,14 +2,15 @@ import * as m from 'mithril';
 
 declare global {
   export namespace JSX {
-    type Element = Mithril.VirtualElement;
+    type Element = Mithril.Vnode<any, any>;
 
     interface IntrinsicElements {
-      [elemName: string]: Mithril.Attributes;
+      [elemName: string]: any;
     }
+
     interface ElementAttributesProperty {
       // http://www.typescriptlang.org/docs/handbook/jsx.html
-      config: any;
+      _attrs: any;
     }
   }
 }
