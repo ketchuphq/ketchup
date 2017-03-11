@@ -12,6 +12,7 @@ interface ButtonAttrs {
 }
 
 export default class Button {
+  private _attrs: ButtonAttrs;
   loading: Mithril.Stream<boolean>;
   handler: () => void;
 

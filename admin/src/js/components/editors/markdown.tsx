@@ -1,22 +1,31 @@
+import msx from 'lib/msx';
 import * as API from 'lib/api';
+
+let _: Mithril.Component<CodeMirrorAttrs, CodeMirrorComponent> = CodeMirrorComponent;
+
+interface CodeMirrorAttrs {
+  readonly id?: string;
+  readonly content: API.Content;
+  readonly short?: boolean;
+}
 
 export default class CodeMirrorComponent {
   codemirror: CodeMirror.Editor;
   content: API.Content;
   element: HTMLElement;
-  dark: Mithril.BasicProperty<boolean>;
   id: string;
+  short: boolean;
 
-  constructor(_id: string, content: API.Content, readonly short: boolean = false) {
-    this.content = content;
-    this.id = `#codemirror-${_id}`;
-    this.dark = m.prop(false);
+  constructor(attrs: CodeMirrorAttrs) {
+    this.content = attrs.content;
+    this.short = attrs.short;
+    this.id = `codemirror-${attrs.id}`;
   }
 
   get klass(): string {
-    let k = '.codemirror';
+    let k = 'codemirror';
     if (this.short) {
-      return k + '.codemirror-short';
+      return k + 'codemirror-short';
     }
     return k;
   }
@@ -46,19 +55,24 @@ export default class CodeMirrorComponent {
       // this.codemirror.setOption('fullscreen', 'true')
       // this.codemirror.refresh()
       this.codemirror.on('change', (instance) => {
+        console.log(instance.getValue());
         this.content.value = instance.getValue();
       });
     }, 'codemirror');
   }
 
-  static controller = CodeMirrorComponent;
-  static view(ctrl: CodeMirrorComponent) {
-    return m(ctrl.id + ctrl.klass, m('textarea', {
-      config: (el: HTMLTextAreaElement, isInitialized: boolean) => {
-        if (!isInitialized) {
-          ctrl.initializeCodeMirror(el);
-        }
-      }
-    }));
+  static oninit(v: Mithril.Vnode<CodeMirrorAttrs, CodeMirrorComponent>) {
+    v.state = new CodeMirrorComponent(v.attrs);
+  };
+
+  static view(v: Mithril.Vnode<CodeMirrorAttrs, CodeMirrorComponent>) {
+    let ctrl = v.state;
+    return <div id={ctrl.id} class={ctrl.klass}>
+      <textarea
+        oncreate={(v: Mithril.VnodeDOM<any, any>) => {
+          ctrl.initializeCodeMirror(v.dom as HTMLTextAreaElement);
+        }}
+      />
+    </div>;
   }
 }

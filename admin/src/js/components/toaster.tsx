@@ -1,3 +1,5 @@
+import msx from 'lib/msx';
+import * as m from 'mithril';
 const sweepInterval = 500;
 let toasts: Toast[] = [];
 
@@ -41,24 +43,29 @@ export function add(message: string, klass: ToastType = 'green') {
 }
 
 export function render() {
-  return m('.toast-wrapper',
-    {
-      key: 'toaster',
-      className: toasts.length == 0 ? 'toast-wrapper--hidden' : '',
-      config: (el: HTMLElement, isInitialized: boolean) => {
-        // prevents animation on route change
-        if (!isInitialized) {
-          for (var i = 0; i < el.children.length; i++) {
-            var element = el.children[i];
-            element.classList.add('toast--noanimate');
-          }
+  let klass = 'toast-wrapper';
+  if (toasts.length == 0) {
+    klass += ' toast-wrapper--hidden'
+  }
+  return <div
+    class={klass}
+    config={(el: HTMLElement, isInitialized: boolean) => {
+      // prevents animation on route change
+      if (!isInitialized) {
+        for (var i = 0; i < el.children.length; i++) {
+          var element = el.children[i];
+          element.classList.add('toast--noanimate');
         }
       }
-    },
-    toasts.map((t) =>
-      m('.toast.toast--enter', {
-        key: t.key,
-        className: [t.getClass(), t.expired() ? 'toast--expired' : ''].join(' '),
-      }, m('.contents', t.message))
-    ));
+    }}
+  >
+    {toasts.map((t) =>
+      <div
+        key={t.key}
+        class={['toast toast--enter', t.getClass(), t.expired() ? 'toast--expired' : ''].join(' ')}
+      >
+        <div class='contents'>{t.message}</div>
+      </div>
+    )}
+  </div>;
 }

@@ -1,3 +1,4 @@
+import * as m from 'mithril';
 import * as API from 'lib/api';
 import Page from 'lib/page';
 import EditorComponent from 'components/editors/editor';
@@ -26,19 +27,19 @@ function textEditor(_: Page, c: API.Content, hideLabel: boolean = false) {
     case 'html':
       return control(
         hideLabel ? '' : m('.label', c.key),
-        m.component(EditorComponent, c)
+        m(EditorComponent, { content: c })
       );
 
     case 'markdown':
       return control(
         hideLabel ? '' : m('.label', c.key),
-        m.component(CodeMirrorComponent, null, c) // todo: assign id?
+        m(CodeMirrorComponent, { content: c }) // todo: assign id?
       );
 
     case 'text':
       return control(
         hideLabel ? '' : m('.label', c.key),
-        m.component(TextEditorComponent, null, c) // todo: assign id?
+        m(TextEditorComponent, { content: c }) // todo: assign id?
       );
 
     default:
@@ -51,7 +52,7 @@ function shortEditor(page: Page, c: API.Content, hideLabel: boolean = false) {
     case 'html':
       return control(
         hideLabel ? '' : m('.label', c.key),
-        m.component(QuillComponent, c, true)
+        m(QuillComponent, { content: c })
       );
 
     case 'text':
@@ -59,7 +60,9 @@ function shortEditor(page: Page, c: API.Content, hideLabel: boolean = false) {
       return control(
         hideLabel ? '' : m('.label', c.key),
         m('input[type=text]', {
-          value: c.value ? c.value : '',
+          oncreate: (v: Mithril.VnodeDOM<any, any>) => {
+            (v.dom as HTMLTextAreaElement).value = c.value || '';
+          },
           onchange: (e: EventTarget) => {
             c.value = (e as any).target.value;
             page.updateContent(c);

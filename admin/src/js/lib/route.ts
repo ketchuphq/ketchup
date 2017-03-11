@@ -1,3 +1,4 @@
+import * as m from 'mithril';
 import * as API from 'lib/api';
 
 export default class Route implements API.Route {
@@ -5,7 +6,6 @@ export default class Route implements API.Route {
   path: string;
   file?: string;
   pageUuid?: string;
-  // delegate?: string;
 
   constructor(config?: API.Route) {
     if (config) {
@@ -13,11 +13,10 @@ export default class Route implements API.Route {
       this.path = config.path;
       this.file = config.file;
       this.pageUuid = config.pageUuid;
-      // this.delegate = config.delegate;
     }
   }
 
-  save() {
+  save(): Promise<any> {
     return m.request({
       method: 'POST',
       url: '/api/v1/routes',
@@ -40,7 +39,7 @@ export default class Route implements API.Route {
     return s;
   }
 
-  static list() {
+  static list(): Promise<Route[]> {
     return m.request({
       method: 'GET',
       url: '/api/v1/routes'
@@ -54,7 +53,7 @@ export default class Route implements API.Route {
   }
 
   static saveList(routes: Route[], pageUUID: string) {
-    let chain: Mithril.Promise<void> = null;
+    let chain: Promise<void> = null;
     routes.map((r) => {
       r.pageUuid = pageUUID;
       if (!chain) {

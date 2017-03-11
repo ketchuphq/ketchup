@@ -4,7 +4,7 @@ import Layout from 'components/layout';
 import HomePage from 'pages/home';
 // import RoutesPage from 'pages/routes';
 import PagesPage from 'pages/pages';
-// import PagePage from 'pages/page';
+import PagePage from 'pages/page';
 import LoginPage from 'pages/login';
 import ThemePage from 'pages/theme';
 import ThemesPage from 'pages/themes';
@@ -19,9 +19,8 @@ export let routes: Mithril.RouteDefs = {
   '/admin': Layout(HomePage),
   // '/admin/routes': RoutesPage,
   '/admin/pages': Layout(PagesPage),
-
-  // '/admin/pages/:id': PagePage,
-  // '/admin/compose': PagePage,
+  '/admin/pages/:id': Layout(PagePage),
+  '/admin/compose': Layout(PagePage),
   '/admin/themes': Layout(ThemesPage),
   // '/admin/themes/install': InstallThemePage,
   '/admin/themes/:name': Layout(ThemePage),

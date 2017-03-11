@@ -1,8 +1,8 @@
 import msx from 'lib/msx';
+import * as m from 'mithril';
 import * as API from 'lib/api';
 import Page from 'lib/page';
 import Theme from 'lib/theme';
-import Layout from 'components/layout';
 import { hidePopover, default as Popover } from 'components/popover';
 import EditRoutesComponent from 'components/edit_route';
 import ThemePickerComponent from 'components/theme_picker';
@@ -11,55 +11,53 @@ import { renderEditor } from 'components/content';
 import { MustAuthController } from 'components/auth';
 
 export default class PagePage extends MustAuthController {
-  page: Mithril.Property<Page>;
-  showControls: Mithril.Property<boolean>;
-  template: Mithril.Property<API.ThemeTemplate>;
-  maximized: Mithril.Property<boolean>;
-  minimiseToSettings: Mithril.Property<boolean>;
-  _nextRoute: Mithril.Property<string>;
+  page: Page;
+  showControls: boolean;
+  template: API.ThemeTemplate;
+  maximized: boolean;
+  minimiseToSettings: boolean;
+  _nextRoute: string;
+  _clickStart: DOMTokenList; // keep track of click location to prevent firing on drag
 
   constructor() {
     super();
-    this.showControls = m.prop(false);
-    this.maximized = m.prop(true);
-    this.page = m.prop<Page>();
-    this.template = m.prop<API.ThemeTemplate>();
-    this.minimiseToSettings = m.prop(false);
-    this._nextRoute = m.prop<string>();
+    this.showControls = false;
+    this.maximized = true;
+    this.minimiseToSettings = false;
     let pageUUID = m.route.param('id');
     if (pageUUID) {
       Page.get(pageUUID)
         .then((page) => {
           if (!!page.theme) {
             Theme.get(page.theme).then((t) => {
-              this.template(t.getTemplate(page.template));
+              this.template = t.getTemplate(page.template);
             });
           }
           page.getRoutes()
             .then(() => {
-              this.page(page);
+              this.page = page;
             });
         });
     } else {
-      this.page(new Page());
+      this.page = new Page;
     }
   }
 
   updateThemeTemplate(theme: string, template: string) {
-    let page = this.page();
+    let page = this.page;
     page.theme = theme;
     page.template = template;
-    this.page(page);
+    this.page = page;
     Theme.get(theme).then((t) => {
-      this.template(t.getTemplate(template));
+      this.template = t.getTemplate(template);
     });
   }
 
   save() {
-    this.page().save().then((page: API.Page) => {
-      this.page().uuid = page.uuid;
-      window.history.replaceState(null, this.page().title, `/admin/pages/${page.uuid}`);
-      return this.page().saveRoutes();
+    this.page.save().then((page: API.Page) => {
+      this.page.uuid = page.uuid;
+      window.history.replaceState(null, this.page.title, `/admin/pages/${page.uuid}`);
+      return this.page.saveRoutes();
     })
       .then(() => {
         Toaster.add('Page successfully saved');
@@ -75,23 +73,23 @@ export default class PagePage extends MustAuthController {
 
   publish() {
     // todo: handle case where not saved yet
-    this.page().publish().then(() => {
+    this.page.publish().then(() => {
       Toaster.add('Page published');
       m.redraw();
     });
   }
 
   unpublish() {
-    this.page().unpublish().then(() => {
+    this.page.unpublish().then(() => {
       Toaster.add('Page unpublished');
       m.redraw();
     });
   }
 
   delete() {
-    this.page().delete().then(() => {
+    this.page.delete().then(() => {
       Toaster.add('Page deleted', 'error');
-      m.route('/admin/pages');
+      m.route.set('/admin/pages');
     });
   }
 
@@ -112,7 +110,7 @@ export default class PagePage extends MustAuthController {
 
     let viewButton = <a
       class='button button--small button--blue'
-      href={this.page().defaultRoute}
+      href={this.page.defaultRoute}
     >
       View
     </a>;
@@ -133,18 +131,18 @@ export default class PagePage extends MustAuthController {
 
     return <div class='save-publish'>
       {saveButton}
-      {!this.page().uuid ? '' : deleteButton}
-      {this.page().isPublished ? [unpublishButton] : publishButton}
+      {!this.page.uuid ? '' : deleteButton}
+      {this.page.isPublished ? [unpublishButton] : publishButton}
     </div>;
   }
   renderSettings() {
-    let path = ['Path: ', <strong>{this.page().defaultRoute}</strong>, ', '];
-    return <div class={!this.showControls() ? 'controlset' : 'controlset hidden'}>
-      <div class='infoset' onclick={() => { this.showControls(true); }}>
+    let path = ['Path: ', <strong>{this.page.defaultRoute}</strong>, ', '];
+    return <div class={!this.showControls ? 'controlset' : 'controlset hidden'}>
+      <div class='infoset' onclick={() => { this.showControls = true; }}>
         <div class='small black5'>
-          {!this.page().defaultRoute ? '' : path}
-          Theme: <strong>{this.page().theme}</strong>,
-          Template: <strong>{this.page().template}</strong>
+          {!this.page.defaultRoute ? '' : path}
+          Theme: <strong>{this.page.theme}</strong>,
+          Template: <strong>{this.page.template}</strong>
         </div>
         {this.renderSavePublish()}
       </div>
@@ -152,25 +150,24 @@ export default class PagePage extends MustAuthController {
   }
 
   renderSettingsEditor(show: boolean = false) {
-    return <div class={this.showControls() || show ? 'controlset' : 'controlset hidden'}>
+    return <div class={this.showControls || show ? 'controlset' : 'controlset hidden'}>
       <div class='settings'>
         <div class='controls'>
           <div class='control'>
-            {this.page() ? m.component(EditRoutesComponent, this.page()) : null}
+            {this.page ? m(EditRoutesComponent, this.page) : null}
           </div>
-          {this.maximized() ? '' :
+          {this.maximized ? '' :
             <div class='control'
-              onclick={() => { this.showControls(false); }}>
+              onclick={() => { this.showControls = false; }}>
               close
             </div>}
         </div>
         <div class='controls'>
-          {m.component(
-            ThemePickerComponent,
-            this.page().theme,
-            this.page().template,
-            this.updateThemeTemplate.bind(this)
-          )}
+          {m(ThemePickerComponent, {
+            theme: this.page.theme,
+            template: this.page.template,
+            callback: this.updateThemeTemplate.bind(this)
+          })}
         </div>
       </div>
       {this.renderSavePublish()}
@@ -179,14 +176,14 @@ export default class PagePage extends MustAuthController {
 
   // todo: if not part of the theme, show delete button
   renderEditors() {
-    if (!this.page()) {
+    if (!this.page) {
       return <div></div>;
     }
 
     let contentMap: { [key: string]: API.Content } = {};
     let mainContent: API.Content;
     let contents: API.Content[] = [];
-    (this.page().contents || []).forEach((c) => {
+    (this.page.contents || []).forEach((c) => {
       contentMap[c.key] = c;
       if (c.key != 'content') {
         contents.push(c);
@@ -199,9 +196,9 @@ export default class PagePage extends MustAuthController {
     let filteredPlaceholders: API.ThemePlaceholder[] = [];
     let hideContent = false;
 
-    if (this.template()) {
-      hideContent = this.template().hideContent;
-      placeholders = (this.template().placeholders || []);
+    if (this.template) {
+      hideContent = this.template.hideContent;
+      placeholders = (this.template.placeholders || []);
       let placeholderOrder: { [key: string]: number } = {};
 
       placeholders.forEach((p, i) => {
@@ -234,9 +231,9 @@ export default class PagePage extends MustAuthController {
     }
 
     return <div>
-      {contents.map((c) => renderEditor(this.page(), c, false))}
-      {filteredPlaceholders.map((p) => renderEditor(this.page(), p, false))}
-      {!hideContent && mainContent ? renderEditor(this.page(), mainContent, true) : null}
+      {contents.map((c) => renderEditor(this.page, c, false))}
+      {filteredPlaceholders.map((p) => renderEditor(this.page, p, false))}
+      {!hideContent && mainContent ? renderEditor(this.page, mainContent, true) : null}
     </div>;
   }
 
@@ -251,102 +248,104 @@ export default class PagePage extends MustAuthController {
         <div>{this.renderSettingsEditor(true)}</div>
       </Popover>
     ];
-    if (!this.minimiseToSettings()) {
+    if (!this.minimiseToSettings) {
       controls.push(
         <a class='typcn typcn-times'
           href='/admin/pages'
           onclick={(e: MouseEvent) => {
             e.preventDefault();
-            this._nextRoute('/admin/pages');
+            this._nextRoute = '/admin/pages';
           }}
         />
       );
     }
 
     let pageMaxClasses = 'page-max animate-fade-in';
-    if (this._nextRoute()) {
+    if (this._nextRoute) {
       pageMaxClasses = 'page-max animate-zoom-away';
     }
 
-    return Layout(
-      // click to hide is disabled because dragging from inside
-      // a textbox to outside the box triggers a click on the
-      // outer element, and this code does not handle that case correctly.
-      // onclick={(e: any) => {
-      //     if (e.target.classList.contains('page-max')) {
-      //       this._nextRoute('/admin/pages');
-      //     }
-      //   }}
-      <div class={pageMaxClasses}
-        config={(el, isInitialized) => {
-          if (!isInitialized) {
-            el.addEventListener('animationend', (ev: AnimationEvent) => {
-              // old animation is removed, otherwise new animations won't fire.
-              if (ev.animationName == 'fadeIn') {
-                el.classList.add('animate-fade-in-complete');
-                el.classList.remove('animate-fade-in');
-              }
-              // navigate away after zoomAway animation completes
-              if (ev.animationName == 'zoomAway') {
-                m.route(this._nextRoute());
-              }
-            });
+    return <div class={pageMaxClasses}
+      onclick={(e: any) => {
+        if (e.target.classList.contains('page-max') && this._clickStart && this._clickStart.contains('page-max')) {
+          this._nextRoute = '/admin/pages';
+        }
+      }}
+      oncreate={(v: Mithril.VnodeDOM<any, any>) => {
+        v.dom.addEventListener('mousedown', (ev: any) => {
+          this._clickStart = ev.target.classList;
+        })
+        v.dom.addEventListener('animationend', (ev: AnimationEvent) => {
+          // old animation is removed, otherwise new animations won't fire.
+          if (ev.animationName == 'fadeIn') {
+            v.dom.classList.add('animate-fade-in-complete');
+            v.dom.classList.remove('animate-fade-in');
           }
+          // navigate away after zoomAway animation completes
+          if (ev.animationName == 'zoomAway') {
+            m.route.set(this._nextRoute);
+          }
+        });
+      }}
+    >
+      <div class='page-max__controls'>{controls}</div>
+      <div class='page-editor'
+        oncreate={(v: Mithril.VnodeDOM<any, any>) => {
+          v.dom.addEventListener('click', () => hidePopover());
         }}
       >
-        <div class='page-max__controls'>{controls}</div>
-        <div class='page-editor'
-          config={(el, isInitialized) => {
-            if (!isInitialized) {
-              el.addEventListener('click', () => hidePopover());
-            }
-          }}>
-          <div class='controls'>
-            <input
-              type='text'
-              class='large'
-              placeholder='title...'
-              value={this.page().title || ''}
-              onchange={this.updatePageTitle}
-            />
-          </div>
-          {this.renderEditors()}
+        <div class='controls'>
+          <input
+            type='text'
+            class='large'
+            placeholder='title...'
+            value={this.page.title || ''}
+            onchange={this.updatePageTitle}
+          />
         </div>
+        {this.renderEditors()}
       </div>
-    );
+    </div>;
   }
 
   updatePageTitle = m.withAttr('value', (v: string) => {
-    this.page().title = v;
+    this.page.title = v;
   });
 
-  static controller = PagePage;
-  static view(ctrl: PagePage) {
-    if (ctrl.maximized()) {
+  static oninit(v: Mithril.Vnode<{}, PagePage>) {
+    v.state = new PagePage();
+  };
+
+  static view(v: Mithril.Vnode<{}, PagePage>) {
+    let ctrl = v.state;
+    if (!ctrl.page) {
+      return; // loading
+    }
+    if (ctrl.maximized) {
       return ctrl.maxView();
     }
     let maximize = () => {
-      ctrl.minimiseToSettings(true);
-      ctrl.maximized(true);
+      ctrl.minimiseToSettings = true;
+      ctrl.maximized = true;
     }
-    return Layout(
-      <div class='page-editor'>
-        <div class='page-editor__icons'>
-          <span class='typcn typcn-arrow-maximise' onclick={maximize} />
-        </div>
-        <div class='controls'>
-          <input
-            class='large'
-            type='text'
-            placeholder='title...'
-            value={ctrl.page().title || ''}
-            onchange={ctrl.updatePageTitle}
-          />
-        </div>
-        {ctrl.renderSettings()}
-        {ctrl.renderSettingsEditor()}
-        {ctrl.renderEditors()}
+    return <div class='page-editor'>
+      <div class='page-editor__icons'>
+        <span class='typcn typcn-arrow-maximise' onclick={maximize} />
       </div>
-    );
+      <div class='controls'>
+        <input
+          class='large'
+          type='text'
+          placeholder='title...'
+          oncreate={(v: Mithril.VnodeDOM<any, any>) => {
+            (v.dom as HTMLInputElement).value = ctrl.page.title || '';
+          }}
+          onchange={ctrl.updatePageTitle}
+        />
+      </div>
+      {ctrl.renderSettings()}
+      {ctrl.renderSettingsEditor()}
+      {ctrl.renderEditors()}
+    </div>;
   }
 }
