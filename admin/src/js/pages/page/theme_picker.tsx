@@ -86,10 +86,8 @@ export default class ThemePickerComponent {
       <div class='control'>
         <div class='label'>Template</div>
         <select
-          oncreate={(el: HTMLSelectElement, isInitialized: boolean) => {
-            if (!isInitialized) {
-              el.value = ctrl.selectedTemplate;
-            }
+          oncreate={(v: Mithril.VnodeDOM<any, any>) => {
+            (v.dom as HTMLSelectElement).value = ctrl.selectedTemplate;
           }}
           onchange={(e: Event) => {
             let target = e.target as HTMLInputElement;
