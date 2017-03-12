@@ -1,6 +1,5 @@
 let store = require('store/dist/store.modern') as StoreJSStatic;
 import * as m from 'mithril';
-import * as stream from 'mithril/stream';
 import * as Toaster from 'components/toaster';
 
 export interface User {
@@ -38,17 +37,16 @@ let dummyStore = new DummyStore();
 
 // AuthController is a super class for controllers which may require auth
 export class AuthController {
-  user: Mithril.Stream<User>;
+  user: User;
   _userPromise: Promise<User>;
   store: Storer;
 
-
   constructor(user: User = null) {
     this.store = store.disabled ? dummyStore : store;
-    this.user = stream(user || cachedUser);
-    if (this.user()) {
+    this.user = user || cachedUser;
+    if (this.user) {
       this._userPromise = new Promise<User>((resolve) => {
-        resolve(this.user());
+        resolve(this.user);
       });
     } else {
       this._userPromise = m.request({
@@ -59,8 +57,7 @@ export class AuthController {
         if (!res.uuid) {
           throw new Error('not logged in');
         }
-        this.user(res);
-        cachedUser = res;
+        this.user = cachedUser = res;
         return res;
       }).catch(() => {
         cachedUser = null;
@@ -83,14 +80,14 @@ export class AuthController {
   }
 
   private get storeKey(): string {
-    if (!this.user()) {
+    if (!this.user) {
       return null;
     }
-    return `user-${this.user().uuid}`;
+    return `user-${this.user.uuid}`;
   }
 
   private getPrefs(): Preferences {
-    if (!this.user()) {
+    if (!this.user) {
       return null;
     }
     let prefs: Preferences = this.store.get(this.storeKey);
@@ -104,7 +101,7 @@ export class AuthController {
   }
 
   pref<K extends keyof Preferences>(key: K): Preferences[K] {
-    if (!this.user()) {
+    if (!this.user) {
       return; // error
     }
     let prefs: Preferences = this.getPrefs();
@@ -115,7 +112,7 @@ export class AuthController {
   }
 
   setPref<K extends keyof Preferences>(key: K, val: Preferences[K]) {
-    if (!this.user()) {
+    if (!this.user) {
       return; // error
     }
     let prefs: Preferences = this.getPrefs();

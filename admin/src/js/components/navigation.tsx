@@ -1,22 +1,19 @@
 import msx from 'lib/msx';
 import * as m from 'mithril';
-import * as stream from 'mithril/stream';
 import { AuthController } from 'components/auth';
 import Button from 'components/button';
+let store = require('store/dist/store.modern') as StoreJSStatic;
+
 // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/13679
 var debounce: any = require('lodash/debounce');
 
 let _: Mithril.Component<{}, NavigationComponent> = NavigationComponent;
 
 export default class NavigationComponent extends AuthController {
-  collapsed: Mithril.Stream<boolean>;
+  collapsed: boolean;
   constructor() {
     super();
-    this.collapsed = stream(true);
-    this._userPromise.then(() =>
-      this.collapsed(this.pref('hideMenu') || window.innerWidth <= 480)
-    );
-
+    this.collapsed = store.get('hideMenu') || window.innerWidth <= 480;
     window.addEventListener('resize', this.resizeHandler);
     this.resizeHandler();
   }
@@ -29,15 +26,15 @@ export default class NavigationComponent extends AuthController {
     if (window.innerWidth > 480) {
       return;
     }
-    this.setPref('hideMenu', true);
-    this.collapsed(true);
+    store.set('hideMenu', true);
+    this.collapsed = true;
     m.redraw();
   }, 300);
 
   toggle() {
-    let collapsed = !this.collapsed();
-    this.setPref('hideMenu', collapsed);
-    this.collapsed(collapsed);
+    let collapsed = !this.collapsed;
+    store.set('hideMenu', collapsed);
+    this.collapsed = collapsed;
   }
 
   link(url: string, text: string, opts: { onclick?: () => void, additionalClasses?: string, icon?: string } = {}) {
@@ -58,18 +55,18 @@ export default class NavigationComponent extends AuthController {
   static view(v: Mithril.Vnode<{}, NavigationComponent>) {
     let ctrl = v.state;
     let navClass = 'navigation';
-    if (!ctrl.user()) {
-      return <div class={navClass} key='navigation'>
+    if (ctrl.collapsed) {
+      navClass += ' navigation--hidden';
+    }
+
+    if (!ctrl.user) {
+      return <div class={navClass}>
         {ctrl.link('/admin', 'K', { additionalClasses: 'nav-title' })}
         {ctrl.link('/admin/login', 'Login')}
       </div>;
     }
 
-    if (ctrl.collapsed()) {
-      navClass += ' navigation--hidden';
-    }
-
-    return <div class={navClass} key='navigation'>
+    return <div class={navClass}>
       {ctrl.link('/admin', 'K', { additionalClasses: 'nav-title' })}
       <div class='nav-button'>
         <Button
@@ -85,7 +82,7 @@ export default class NavigationComponent extends AuthController {
       {ctrl.link('/admin/settings', 'Settings', { icon: 'spanner-outline' })}
       {ctrl.link('/admin/logout', 'Logout', { onclick: () => ctrl.logout(), icon: 'weather-night' })}
       <a class='nav-link nav-link--toggle' onclick={() => ctrl.toggle()}>
-        <span class={`typcn typcn-arrow-${ctrl.collapsed() ? 'maximise' : 'minimise'}`} />
+        <span class={`typcn typcn-arrow-${ctrl.collapsed ? 'maximise' : 'minimise'}`} />
       </a>
     </div>;
   }

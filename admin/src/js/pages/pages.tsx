@@ -1,6 +1,6 @@
 import msx from 'lib/msx';
-import * as API from 'lib/api';
 import * as m from 'mithril';
+import * as API from 'lib/api';
 import * as stream from 'mithril/stream';
 import Page from 'lib/page';
 import { MustAuthController } from 'components/auth';

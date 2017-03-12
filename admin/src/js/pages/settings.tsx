@@ -35,7 +35,7 @@ export default class SettingsPage extends MustAuthController {
       tlsSection = m('div', 'loading...');
     } else if (Object.keys(settings).length == 0 || !settings.hasCertificate) {
       tlsSection = m(TLSNewComponent, {
-        user: v.state.user(),
+        user: v.state.user,
         email: settings.tlsEmail,
         domain: settings.tlsDomain
       });
