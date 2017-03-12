@@ -4,7 +4,6 @@ import * as API from 'lib/api';
 let _: Mithril.Component<CodeMirrorAttrs, CodeMirrorComponent> = CodeMirrorComponent;
 
 interface CodeMirrorAttrs {
-  readonly id?: string;
   readonly content: API.Content;
   readonly short?: boolean;
 }
@@ -19,15 +18,14 @@ export default class CodeMirrorComponent {
   constructor(attrs: CodeMirrorAttrs) {
     this.content = attrs.content;
     this.short = attrs.short;
-    this.id = `codemirror-${attrs.id}`;
+    this.id = `codemirror-${Math.random().toString().slice(2, 10)}`;
   }
 
   get klass(): string {
-    let k = 'codemirror';
-    if (this.short) {
-      return k + 'codemirror-short';
-    }
-    return k;
+    return [
+      'codemirror',
+      this.short ? 'codemirror-short' : 'codemirror-long'
+    ].join(' ');
   }
 
   initializeCodeMirror(element: HTMLTextAreaElement) {
