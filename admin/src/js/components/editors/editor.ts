@@ -26,9 +26,9 @@ export default class EditorComponent {
     let ctrl = v.state;
     let data = { elementId: ctrl._id, content: v.attrs.content };
     if (ctrl.editor == 'quill') {
-      return m(QuillComponent, data);
+      return m('.editor', m(QuillComponent, data));
     }
-    return m('div', [
+    return m('.editor', [
       m('div', m('a.small', { onclick: () => ctrl.editor = 'quill' }, 'show editor')),
       m(TextEditorComponent, data)
     ]);
