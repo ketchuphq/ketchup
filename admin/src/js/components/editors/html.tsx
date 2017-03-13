@@ -39,10 +39,11 @@ export default class QuillComponent {
           toolbar: `#${this.id}-toolbar`
         }
       });
-      this.quill.on('text-change', () => {
+      let updateContent = () => {
         let editor = element.getElementsByClassName('ql-editor')[0];
         this.content.value = editor.innerHTML;
-      });
+      }
+      this.quill.on('text-change', updateContent.bind(this));
     }, 'quill');
   }
 
