@@ -3,9 +3,6 @@
   "scripts": {
     "develop-sass": "node-sass css/app.sass build/app.css -w css",
     "develop": "watchify js/app.ts -p tsify --debug --outfile build/app.js",
-    "compile-test": "tsc --outDir .test --module commonjs",
-    "compile-watch": "tsc -w --outDir .test --module commonjs",
-    "test": "NODE_PATH=.test/js/ mocha .test/test/chai.js .test/**/*.test.js"
   },
   "devDependencies": {
     "@types/chai": "^3.4.35",
