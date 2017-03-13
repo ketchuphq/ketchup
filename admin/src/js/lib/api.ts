@@ -16,7 +16,9 @@ export abstract class Page {
     to.title = from.title;
     to.theme = from.theme;
     to.template = from.template;
-    to.timestamps = from.timestamps;
+    if ('timestamps' in from) {
+      to.timestamps = Timestamp.copy(from.timestamps || {}, to.timestamps || {});
+    }
     to.publishedAt = from.publishedAt;
     to.contents = from.contents;
     to.metadata = from.metadata;
@@ -41,10 +43,18 @@ export abstract class Content {
     to.uuid = from.uuid;
     to.key = from.key;
     to.value = from.value;
-    to.timestamps = from.timestamps;
-    to.multiple = from.multiple;
-    to.short = from.short;
-    to.text = from.text;
+    if ('timestamps' in from) {
+      to.timestamps = Timestamp.copy(from.timestamps || {}, to.timestamps || {});
+    }
+    if ('multiple' in from) {
+      to.multiple = ContentMultiple.copy(from.multiple || {}, to.multiple || {});
+    }
+    if ('short' in from) {
+      to.short = ContentString.copy(from.short || {}, to.short || {});
+    }
+    if ('text' in from) {
+      to.text = ContentText.copy(from.text || {}, to.text || {});
+    }
     return to;
   }
 }
@@ -127,9 +137,15 @@ export abstract class ThemePlaceholder {
   static copy(from: ThemePlaceholder, to?: ThemePlaceholder): ThemePlaceholder {
     to = to || {};
     to.key = from.key;
-    to.multiple = from.multiple;
-    to.short = from.short;
-    to.text = from.text;
+    if ('multiple' in from) {
+      to.multiple = ContentMultiple.copy(from.multiple || {}, to.multiple || {});
+    }
+    if ('short' in from) {
+      to.short = ContentString.copy(from.short || {}, to.short || {});
+    }
+    if ('text' in from) {
+      to.text = ContentText.copy(from.text || {}, to.text || {});
+    }
     return to;
   }
 }
@@ -201,7 +217,9 @@ export abstract class Package {
     to.description = from.description;
     to.readme = from.readme;
     to.vcsUrl = from.vcsUrl;
-    to.releases = from.releases;
+    if ('releases' in from) {
+      to.releases = PackageRelease.copy(from.releases || {}, to.releases || {});
+    }
     to.labels = from.labels;
     return to;
   }
@@ -264,8 +282,12 @@ export abstract class ListPageRequest {
   options?: ListPageRequest_ListPageOptions;
   static copy(from: ListPageRequest, to?: ListPageRequest): ListPageRequest {
     to = to || {};
-    to.list = from.list;
-    to.options = from.options;
+    if ('list' in from) {
+      to.list = ListOptions.copy(from.list || {}, to.list || {});
+    }
+    if ('options' in from) {
+      to.options = ListPageRequest_ListPageOptions.copy(from.options || {}, to.options || {});
+    }
     return to;
   }
 }
@@ -289,7 +311,7 @@ export abstract class ListPageResponse {
 }
 
 export abstract class ListOptions {
-  static copy(from: ListOptions, to?: ListOptions): ListOptions {
+  static copy(_: ListOptions, to?: ListOptions): ListOptions {
     to = to || {};
     return to;
   }
@@ -319,7 +341,7 @@ export abstract class ErrorResponse {
   }
 }
 
-export type Package_Type = 'unknown' | 'theme' | 'plugin';
-export type ListPageRequest_ListPageFilter = 'all' | 'published' | 'draft';
-export type ContentMultiple_DropdownType = 'radio' | 'dropdown' | 'unknown';
-export type ContentTextType = 'text' | 'markdown' | 'html';
+export type ContentMultiple_DropdownType = 'dropdown' | 'radio' | 'unknown';
+export type ContentTextType = 'html' | 'markdown' | 'text';
+export type ListPageRequest_ListPageFilter = 'all' | 'draft' | 'published';
+export type Package_Type = 'plugin' | 'theme' | 'unknown';
