@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+import "page.proto";
+import "route.proto";
+
+package ketchup.models.export;
+
+message Export {
+  repeated Page pages = 1;
+  repeated Route routes = 2;
+}

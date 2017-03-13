@@ -22,7 +22,7 @@ type Timestamp struct {
 func (m *Timestamp) Reset()                    { *m = Timestamp{} }
 func (m *Timestamp) String() string            { return proto.CompactTextString(m) }
 func (*Timestamp) ProtoMessage()               {}
-func (*Timestamp) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{0} }
+func (*Timestamp) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{0} }
 
 func (m *Timestamp) GetCreatedAt() int64 {
 	if m != nil && m.CreatedAt != nil {
@@ -54,7 +54,7 @@ type Page struct {
 func (m *Page) Reset()                    { *m = Page{} }
 func (m *Page) String() string            { return proto.CompactTextString(m) }
 func (*Page) ProtoMessage()               {}
-func (*Page) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{1} }
+func (*Page) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{1} }
 
 func (m *Page) GetUuid() string {
 	if m != nil && m.Uuid != nil {
@@ -136,7 +136,7 @@ type Content struct {
 func (m *Content) Reset()                    { *m = Content{} }
 func (m *Content) String() string            { return proto.CompactTextString(m) }
 func (*Content) ProtoMessage()               {}
-func (*Content) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{2} }
+func (*Content) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{2} }
 
 type IsContent_Type interface {
 	IsContent_Type()
@@ -370,9 +370,9 @@ func (m *Content) SetTimestamps(v *Timestamp) {
 	m.Timestamps = v
 }
 
-func init() { proto.RegisterFile("page.proto", fileDescriptor3) }
+func init() { proto.RegisterFile("page.proto", fileDescriptor4) }
 
-var fileDescriptor3 = []byte{
+var fileDescriptor4 = []byte{
 	// 406 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xa4, 0x91, 0xdf, 0x8a, 0xd3, 0x40,
 	0x14, 0xc6, 0x9b, 0x26, 0x5d, 0x93, 0x93, 0x56, 0x64, 0x10, 0x1c, 0x2b, 0x8b, 0x31, 0x57, 0xbd,
