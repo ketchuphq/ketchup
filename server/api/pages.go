@@ -89,6 +89,10 @@ func (m *Module) UpdatePage(rw http.ResponseWriter, req *http.Request, par httpr
 	if err != nil {
 		return err
 	}
+	removeUnusedContents(page)
+	if page.GetPublishedAt() == 0 {
+		page.PublishedAt = nil
+	}
 	err = m.DB.UpdatePage(page)
 	if err != nil {
 		return err
@@ -146,4 +150,15 @@ func (m *Module) DeletePage(rw http.ResponseWriter, req *http.Request, par httpr
 		return err
 	}
 	return m.DB.DeletePage(page)
+}
+
+// removed contents which have no value set.
+func removeUnusedContents(page *models.Page) {
+	contents := []*models.Content{}
+	for _, content := range page.Contents {
+		if content.GetValue() != "" || content.GetKey() == "content" {
+			contents = append(contents, content)
+		}
+	}
+	page.Contents = contents
 }
