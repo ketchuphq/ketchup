@@ -2,7 +2,10 @@
   "private": true,
   "scripts": {
     "develop-sass": "node-sass css/app.sass build/app.css -w css",
-    "develop": "watchify js/app.ts -p tsify --debug --outfile build/app.js"
+    "develop": "watchify js/app.ts -p tsify --debug --outfile build/app.js",
+    "compile-test": "tsc --outDir .test --module commonjs",
+    "compile-watch": "tsc -w --outDir .test --module commonjs",
+    "test": "NODE_PATH=.test/js/ mocha .test/test/chai.js .test/**/*.test.js"
   },
   "devDependencies": {
     "@types/chai": "^3.4.35",
@@ -24,16 +27,19 @@
     "date-fns": "^1.28.0",
     "gulp": "^3.9.1",
     "gulp-clean-css": "^3.0.3",
+    "gulp-mocha": "^4.1.0",
     "gulp-plumber": "^1.1.0",
     "gulp-sass": "^3.1.0",
     "gulp-shell": "^0.6.1",
     "gulp-sourcemaps": "^2.4.1",
     "gulp-tslint": "^7.1.0",
+    "gulp-typescript": "^3.1.5",
     "gutil": "^1.6.4",
     "highlight.js": "^9.9.0",
     "lodash": "^4.17.4",
     "lodash.debounce": "^4.0.8",
     "mithril": "^1.0.1",
+    "mithril-query": "^2.1.0",
     "mocha": "^3.2.0",
     "node-sass": "^4.5.0",
     "quill": "^1.2.2",

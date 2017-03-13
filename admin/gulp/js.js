@@ -3,6 +3,8 @@ var webpack = require('webpack');
 var gulpWebpack = require('webpack-stream');
 var gutil = require('gutil');
 var tslint = require('gulp-tslint');
+var tsc = require('gulp-typescript');
+var mocha = require('gulp-mocha')
 
 let webpackCache = {}
 let webpackConfig = require('../webpack.config')
@@ -46,4 +48,29 @@ gulp.task('js', ['js:internal', 'js:lint', 'js:webpack'])
 
 gulp.task('js:watch', () =>
   gulp.watch('src/js/**/*.ts*', ['js'])
+);
+
+gulp.task('js:test:compile', () => {
+  let ts = tsc.createProject(
+    'tsconfig.json', {
+      module: 'commonjs',
+      outDir: '.test/'
+    }
+  )
+  return gulp.src('src/**/*.ts*')
+    .pipe(ts())
+    .pipe(gulp.dest('.test/'))
+})
+
+gulp.task('js:test:mocha', () => {
+  process.env.NODE_PATH = '.test/js/';
+  return gulp.src(['.test/test/chai.js', '.test/**/*.test.js'], { read: false })
+    .pipe(mocha())
+    .on('error', gutil.log)
+})
+
+gulp.task('js:test', ['js:test:compile', 'js:test:mocha'])
+
+gulp.task('js:test:watch', () =>
+  gulp.watch('src/js/**/*.ts*', ['js:test:compile', 'js:test:mocha'])
 );
