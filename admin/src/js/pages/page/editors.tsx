@@ -12,37 +12,52 @@ interface PageEditorsAttrs {
 
 export default class PageEditorsComponent {
   private readonly _attrs: PageEditorsAttrs;
-  constructor() { }
-  static view({ attrs: { page, template } }: Mithril.Vnode<PageEditorsAttrs, {}>) {
+  contentMap: { [key: string]: API.Content };
+
+  constructor() {
+    this.contentMap = {};
+  }
+
+  static oninit(v: Mithril.Vnode<PageEditorsAttrs, PageEditorsComponent>) {
+    v.state = new PageEditorsComponent();
+  }
+
+  static view({ attrs: { page, template }, state }: Mithril.Vnode<PageEditorsAttrs, PageEditorsComponent>) {
+    let contentMap = state.contentMap;
     if (!page || !template) {
       return;
     }
 
-    let contentMap: { [key: string]: API.Content } = {};
     let placeholderContents: API.Content[] = [];
     let pageContents: API.Content[] = [];
 
     // 1. get template placeholders
     if (template && template.placeholders) {
       template.placeholders.forEach((p) => {
-        let content: API.Content = API.Content.copy(p, {});
-        contentMap[p.key] = content;
-        placeholderContents.push(content);
+        if (contentMap[p.key]) {
+          Object.keys(p).forEach((k: keyof API.ThemePlaceholder) => {
+            contentMap[p.key][k] = p[k];
+          })
+        } else {
+          contentMap[p.key] = API.Content.copy(p, {});
+        }
+        contentMap[p.key] = API.Content.copy(p, {});
+        placeholderContents.push(contentMap[p.key]);
       });
     }
 
     // 2. get page contents
-    (page.contents || []).forEach((c) => {
+    (page.contents || []).forEach((content) => {
       // update the oneof type of the content from the placeholder
       // todo: exhaustively map fields; convert markdown <> css more elegantly
       // this block updates the existing key
-      if (contentMap[c.key]) {
-        contentMap[c.key].uuid = c.uuid;
-        contentMap[c.key].timestamps = c.timestamps;
-        contentMap[c.key].value = c.value;
+      if (contentMap[content.key]) {
+        contentMap[content.key].uuid = content.uuid;
+        contentMap[content.key].timestamps = content.timestamps;
+        contentMap[content.key].value = content.value;
       } else {
-        contentMap[c.key] = c;
-        pageContents.push(c);
+        contentMap[content.key] = content;
+        pageContents.push(content);
       }
     });
 
@@ -53,6 +68,8 @@ export default class PageEditorsComponent {
     if (template.hideContent !== false) {
       if (!contentMap[mainKey]) {
         contentMap[mainKey] = API.Content.copy(defaultContent, {});
+      }
+      if (page.contents.every((c) => c.key != mainKey)) {
         page.contents.push(contentMap[mainKey]);
       }
       mainContent = renderEditor(page, contentMap[mainKey], true);
@@ -60,8 +77,8 @@ export default class PageEditorsComponent {
 
     return <div>
       {placeholderContents
-        .filter((c) => c.key != mainKey)
-        .map((p) => renderEditor(page, p, false))}
+        .filter((content) => content.key != mainKey)
+        .map((content) => renderEditor(page, content, false))}
       {mainContent}
     </div>;
   }
