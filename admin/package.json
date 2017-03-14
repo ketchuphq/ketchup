@@ -1,9 +1,5 @@
 {
   "private": true,
-  "scripts": {
-    "develop-sass": "node-sass css/app.sass build/app.css -w css",
-    "develop": "watchify js/app.ts -p tsify --debug --outfile build/app.js",
-  },
   "devDependencies": {
     "@types/chai": "^3.4.35",
     "@types/chai-as-promised": "0.0.29",
