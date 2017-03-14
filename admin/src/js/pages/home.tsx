@@ -13,14 +13,13 @@ export default class HomePage extends MustAuthController {
     return <div class='home'>
       <header>
         <img src='/admin/images/k.png' />
-        <h1>Ketchup!</h1>
       </header>
-      <p>Welcome to Ketchup.</p>
+      <h2>Welcome to Ketchup.</h2>
       <Button
-        class='button--green button--center'
+        class='button--green-2 button--center'
         href='/admin/compose'
       >
-        Compose
+        Write a new post &rarr;
       </Button>
     </div>;
   }
