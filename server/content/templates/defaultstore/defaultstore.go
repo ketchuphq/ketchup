@@ -1,4 +1,4 @@
-package templates
+package defaultstore
 
 import (
 	"errors"
@@ -52,30 +52,30 @@ var noneTheme = &models.Theme{
 	Assets: map[string]*models.ThemeAsset{},
 }
 
-type defaultStore struct{}
+type DefaultStore struct{}
 
-func (d *defaultStore) List() ([]*models.Theme, error) {
+func (d *DefaultStore) List() ([]*models.Theme, error) {
 	return []*models.Theme{noneTheme}, nil
 }
 
-func (d *defaultStore) Add(io.Reader) (*models.Theme, error) {
+func (d *DefaultStore) Add(io.Reader) (*models.Theme, error) {
 	return nil, errors.New("templates: cannot add to default store")
 }
 
-func (d *defaultStore) Get(themeName string) (*models.Theme, error) {
+func (d *DefaultStore) Get(themeName string) (*models.Theme, error) {
 	if themeName == "" || themeName == noneTheme.GetName() {
 		return noneTheme, nil
 	}
 	return nil, nil
 }
 
-func (d *defaultStore) GetTemplate(t *models.Theme, template string) (*models.ThemeTemplate, error) {
+func (d *DefaultStore) GetTemplate(t *models.Theme, template string) (*models.ThemeTemplate, error) {
 	if t.GetName() != "" && t.GetName() != noneTheme.GetName() {
 		return nil, nil
 	}
 	return t.Templates[template], nil
 }
 
-func (d *defaultStore) GetAsset(t *models.Theme, asset string) (*models.ThemeAsset, error) {
+func (d *DefaultStore) GetAsset(t *models.Theme, asset string) (*models.ThemeAsset, error) {
 	return nil, nil
 }

@@ -16,7 +16,7 @@ import (
 	dummydb "github.com/octavore/ketchup/db/dummy"
 	"github.com/octavore/ketchup/proto/ketchup/models"
 	"github.com/octavore/ketchup/server/content/templates"
-	dummytmpl "github.com/octavore/ketchup/server/content/templates/dummy"
+	dummytmpl "github.com/octavore/ketchup/server/content/templates/dummystore"
 	"github.com/octavore/ketchup/server/router"
 )
 

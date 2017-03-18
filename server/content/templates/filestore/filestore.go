@@ -1,4 +1,4 @@
-package templates
+package filestore
 
 import (
 	"archive/tar"
@@ -10,6 +10,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
@@ -28,6 +29,24 @@ const (
 type FileStore struct {
 	dataDir     string
 	themeDirMap map[string]string // maps theme name to dir
+}
+
+// New returns a new file store which updates periodically
+func New(dataDir string, updateInterval time.Duration, log func(args ...interface{})) *FileStore {
+	f := &FileStore{dataDir: dataDir}
+	err := f.updateThemeDirMap()
+	if err != nil {
+		log(err)
+	}
+	go func() {
+		for range time.Tick(updateInterval) {
+			err := f.updateThemeDirMap()
+			if err != nil {
+				log(err)
+			}
+		}
+	}()
+	return f
 }
 
 func (f *FileStore) readConfig(themeConfigPath string) (*models.Theme, error) {
@@ -243,7 +262,7 @@ func (f *FileStore) List() ([]*models.Theme, error) {
 	return themes, nil
 }
 
-// Add a new theme to the store
+// Add a new theme to the store. Expects a reader for a tgz file.
 func (f *FileStore) Add(data io.Reader) (*models.Theme, error) {
 	tmpDir := token.New32()
 	pth, err := f.extract(data, tmpDir)
