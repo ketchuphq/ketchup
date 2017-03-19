@@ -45,7 +45,7 @@ export function add(message: string, klass: ToastType = 'green') {
 export function render() {
   let klass = 'toast-wrapper';
   if (toasts.length == 0) {
-    klass += ' toast-wrapper--hidden'
+    klass += ' toast-wrapper--hidden';
   }
   return <div
     class={klass}

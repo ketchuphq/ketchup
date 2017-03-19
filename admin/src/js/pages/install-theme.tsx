@@ -45,8 +45,8 @@ export default class InstallThemePage extends MustAuthController {
           ctrl.installing = null;
           m.redraw();
         });
-      }
-    }
+      };
+    };
     if (ctrl.themes) {
       themes = ctrl.themes.packages.map((p: API.Package) =>
         <div class='tr'>

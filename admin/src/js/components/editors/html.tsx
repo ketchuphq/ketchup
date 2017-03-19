@@ -1,5 +1,4 @@
 import msx from 'lib/msx';
-import * as m from 'mithril';
 import * as API from 'lib/api';
 
 let _: Mithril.Component<QuillAttrs, QuillComponent> = QuillComponent;
@@ -42,7 +41,7 @@ export default class QuillComponent {
       let updateContent = () => {
         let editor = element.getElementsByClassName('ql-editor')[0];
         this.content.value = editor.innerHTML;
-      }
+      };
       this.quill.on('text-change', updateContent.bind(this));
     }, 'quill');
   }

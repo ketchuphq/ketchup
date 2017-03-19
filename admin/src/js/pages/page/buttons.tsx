@@ -1,5 +1,4 @@
 import msx from 'lib/msx';
-import * as m from 'mithril';
 import Page from 'lib/page';
 
 interface Callbacks {

@@ -1,5 +1,4 @@
 import { assert } from 'chai';
-import * as m from 'mithril';
 import * as mq from 'mithril-query';
 import * as API from 'lib/api';
 import PageEditorsComponent from './editors';
@@ -32,5 +31,5 @@ describe('EditorsTest', function() {
         enteredValue
       );
     });
-  })
+  });
 });

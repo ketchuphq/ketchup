@@ -1,4 +1,4 @@
-import * as m from 'mithril';
+import * as _ from 'mithril';
 
 declare global {
   export namespace JSX {

@@ -37,7 +37,7 @@ export default class PageEditorsComponent {
         if (contentMap[p.key]) {
           Object.keys(p).forEach((k: keyof API.ThemePlaceholder) => {
             contentMap[p.key][k] = p[k];
-          })
+          });
         } else {
           contentMap[p.key] = API.Content.copy(p, {});
         }

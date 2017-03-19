@@ -174,7 +174,7 @@ export default class PagePage extends MustAuthController {
       oncreate={(v: Mithril.VnodeDOM<any, any>) => {
         v.dom.addEventListener('mousedown', (ev: any) => {
           this._clickStart = ev.target.classList;
-        })
+        });
         v.dom.addEventListener('animationend', (ev: AnimationEvent) => {
           // old animation is removed, otherwise new animations won't fire.
           if (ev.animationName == 'fadeIn') {
