@@ -52,6 +52,7 @@ export default class QuillComponent {
 
   static view(v: Mithril.Vnode<QuillAttrs, QuillComponent>) {
     let ctrl = v.state;
+    ctrl.content = v.attrs.content; // for some reason we lose the reference
     return <div class={ctrl.klass}>
       <div id={`${ctrl.id}-toolbar`}>
         <div class='ql-formats'>

@@ -64,6 +64,7 @@ export default class CodeMirrorComponent {
 
   static view(v: Mithril.Vnode<CodeMirrorAttrs, CodeMirrorComponent>) {
     let ctrl = v.state;
+    ctrl.content = v.attrs.content; // for some reason we lose the reference
     return <div id={ctrl.id} class={ctrl.klass}>
       <textarea
         oncreate={(v: Mithril.VnodeDOM<any, any>) => {
