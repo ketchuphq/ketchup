@@ -35,7 +35,7 @@ gulp.task('js:webpack', () =>
 )
 
 gulp.task('js:lint', () =>
-  gulp.src('src/js/**/*.ts')
+  gulp.src(['src/js/**/*.ts', 'src/js/**/*.tsx'])
     .pipe(tslint({
       formatter: 'verbose'
     }))
