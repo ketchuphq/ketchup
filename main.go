@@ -5,7 +5,6 @@ import (
 
 	"github.com/octavore/ketchup/admin"
 	"github.com/octavore/ketchup/db/bolt"
-	"github.com/octavore/ketchup/plugins/pkg"
 	"github.com/octavore/ketchup/server/api"
 	"github.com/octavore/ketchup/server/content"
 	"github.com/octavore/ketchup/server/tls"
@@ -16,7 +15,6 @@ type App struct {
 	API     *api.Module
 	Admin   *admin.Module
 	TLS     *tls.Module
-	Package *pkg.Module
 
 	// configures backend module
 	Bolt *bolt.Module

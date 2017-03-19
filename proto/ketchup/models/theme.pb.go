@@ -13,6 +13,9 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
+// A Theme can be entirely contained within a theme proto,
+// however more usually `data` will be omitted for
+// ThemeTemplate and ThemeAsset.
 type Theme struct {
 	Uuid             *string                   `protobuf:"bytes,1,opt,name=uuid" json:"uuid,omitempty"`
 	Name             *string                   `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`

@@ -9,9 +9,7 @@ package pkg
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
-	"path"
 	"regexp"
 	"strings"
 
@@ -30,38 +28,14 @@ type Module struct {
 }
 
 const (
-	defaultRegistryURL = "http://themes.ketchuphq.com/registry.json"
-	devRegistryURL     = "http://localhost:8000/registry.json"
-	githubPattern      = `https://github.com/{user}/{repo}`
-	bitbucketPattern   = `https://bitbucket.org/{user}/{repo}`
-	githubAPI          = "https://api.github.com/repos/{user}/{repo}/tags"
-	bitbucketAPI       = "https://api.bitbucket.org/2.0/repositories/{user}/{repo}/refs/tags"
-	themeDir           = "themes"
+	githubPattern    = `https://github.com/{user}/{repo}`
+	bitbucketPattern = `https://bitbucket.org/{user}/{repo}`
+	githubAPI        = "https://api.github.com/repos/{user}/{repo}/tags"
+	bitbucketAPI     = "https://api.bitbucket.org/2.0/repositories/{user}/{repo}/refs/tags"
 )
 
 func (m *Module) Init(c *service.Config) {
-	c.AddCommand(&service.Command{
-		Keyword:    "themes:get <package name> <git url>",
-		ShortUsage: "get the theme",
-		Usage:      "get the theme",
-		Run: func(ctx *service.CommandContext) {
-			p := m.Config.DataPath(path.Join(themeDir, ctx.Args[0]), "")
-			log.Println("downloading to", p)
-			err := m.clone(p, ctx.Args[1])
-			if err != nil {
-				panic(err)
-			}
-		},
-	})
-
-	c.Setup = func() error {
-		if c.Env().IsDevelopment() {
-			m.RegistryURL = devRegistryURL
-		} else {
-			m.RegistryURL = defaultRegistryURL
-		}
-		return nil
-	}
+	// todo: keep track of all registries
 }
 
 // FetchPackage fetches information about the given package

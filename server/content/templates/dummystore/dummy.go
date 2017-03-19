@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/golang/protobuf/jsonpb"
+
 	"github.com/octavore/ketchup/proto/ketchup/models"
 )
 

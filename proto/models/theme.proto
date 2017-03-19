@@ -5,6 +5,9 @@ package ketchup.models;
 import "page.proto";
 import "content.proto";
 
+// A Theme can be entirely contained within a theme proto,
+// however more usually `data` will be omitted for
+// ThemeTemplate and ThemeAsset.
 message Theme {
     optional string uuid = 1;
     optional string name = 2;

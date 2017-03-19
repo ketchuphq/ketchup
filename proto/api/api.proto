@@ -72,3 +72,7 @@ message EnableTLSRequest {
     optional string tls_domain = 2;
     optional bool agreed = 3;
 }
+
+message InstallThemeRequest {
+    optional string name = 1;
+}

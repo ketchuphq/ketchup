@@ -8,7 +8,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 
 	"github.com/octavore/ketchup/proto/ketchup/api"
-	"github.com/octavore/ketchup/proto/ketchup/packages"
 	"github.com/octavore/ketchup/server/router"
 	"github.com/octavore/ketchup/util/errors"
 )
@@ -31,6 +30,9 @@ func (m *Module) GetTheme(rw http.ResponseWriter, req *http.Request, par httprou
 	if theme == nil {
 		return router.ErrNotFound
 	}
+	// m.DB.GetThemeByName(name
+	// m.Templates
+	// additional data for a theme: which store it is in?
 	return router.Proto(rw, theme)
 }
 
@@ -50,19 +52,16 @@ func (m *Module) GetTemplate(rw http.ResponseWriter, req *http.Request, par http
 }
 
 func (m *Module) ThemeRegistry(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
-	lst, err := m.Pkg.FetchDefaultRegistry()
+	r, err := m.Templates.Registry()
 	if err != nil {
 		return err
 	}
-	return m.Router.ProtoOK(rw, lst)
+	return m.Router.ProtoOK(rw, r)
 }
 
-type InstallThemeRequest struct {
-	Package string `json:"package"`
-}
-
+// InstallTheme installs a theme from a registry
 func (m *Module) InstallTheme(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
-	r := &InstallThemeRequest{}
+	r := &api.InstallThemeRequest{}
 	b, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		return errors.Wrap(err)
@@ -71,33 +70,25 @@ func (m *Module) InstallTheme(rw http.ResponseWriter, req *http.Request, par htt
 	if err != nil {
 		return errors.Wrap(err)
 	}
-	if r.Package == "" {
+
+	if r.GetName() == "" {
 		return errors.New("Theme name is required.")
 	}
 
-	// loop over all registry packages to find the theme package
-	registry, err := m.Pkg.FetchDefaultRegistry()
+	// search the registry for the theme package
+	// install the package
+	p, err := m.Templates.SearchRegistry(r.GetName())
 	if err != nil {
-		return err
+		return errors.New("error searching registry: %s", err)
 	}
-	var pkg *packages.Package
-	for _, p := range registry.GetPackages() {
-		if p.GetName() == r.Package {
-			if p.GetType() != packages.Package_theme {
-				return errors.New("%s is not a theme", r.Package)
-			}
-			pkg = p
-			break
-		}
-	}
-	if pkg == nil {
-		return errors.New("Theme %s not found", r.Package)
+	if p == nil {
+		return errors.New("Theme %s not found", r.GetName())
 	}
 
-	m.Logger.Infof("cloning package %s from %s", pkg.GetName(), pkg.GetVcsUrl())
-	err = m.Pkg.Clone(pkg)
+	m.Logger.Infof("cloning package %s from %s", p.GetName(), p.GetVcsUrl())
+	err = m.Templates.InstallThemeFromPackage(p)
 	if err != nil {
-		return err
+		return errors.New("error searching registry: %s", err)
 	}
 
 	return nil

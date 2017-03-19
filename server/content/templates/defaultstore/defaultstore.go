@@ -2,7 +2,6 @@ package defaultstore
 
 import (
 	"errors"
-	"io"
 
 	"github.com/golang/protobuf/proto"
 
@@ -58,8 +57,8 @@ func (d *DefaultStore) List() ([]*models.Theme, error) {
 	return []*models.Theme{noneTheme}, nil
 }
 
-func (d *DefaultStore) Add(io.Reader) (*models.Theme, error) {
-	return nil, errors.New("templates: cannot add to default store")
+func (d *DefaultStore) Add(*models.Theme) error {
+	return errors.New("templates: cannot add to default store")
 }
 
 func (d *DefaultStore) Get(themeName string) (*models.Theme, error) {

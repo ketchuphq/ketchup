@@ -10,7 +10,6 @@ import (
 	"github.com/octavore/nagax/logger"
 
 	"github.com/octavore/ketchup/db"
-	"github.com/octavore/ketchup/plugins/pkg"
 	"github.com/octavore/ketchup/proto/ketchup/api"
 	"github.com/octavore/ketchup/server/config"
 	"github.com/octavore/ketchup/server/content"
@@ -29,7 +28,6 @@ type Module struct {
 	Config    *config.Module
 	TLS       *tls.Module
 	Logger    *logger.Module
-	Pkg       *pkg.Module
 
 	decoder *schema.Decoder
 }
