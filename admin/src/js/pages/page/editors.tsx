@@ -72,13 +72,13 @@ export default class PageEditorsComponent {
       if (page.contents.every((c) => c.key != mainKey)) {
         page.contents.push(contentMap[mainKey]);
       }
-      mainContent = renderEditor(page, contentMap[mainKey], true);
+      mainContent = renderEditor(contentMap[mainKey], true);
     }
 
     return <div>
       {placeholderContents
         .filter((content) => content.key != mainKey)
-        .map((content) => renderEditor(page, content, false))}
+        .map((content) => renderEditor(content, false))}
       {mainContent}
     </div>;
   }

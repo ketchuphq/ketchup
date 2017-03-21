@@ -10,6 +10,7 @@ interface TextEditorAttrs {
 }
 
 export default class TextEditorComponent {
+  private readonly _attrs: TextEditorAttrs
   content: API.Content;
   element: HTMLElement;
   id: string;

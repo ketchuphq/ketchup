@@ -10,6 +10,7 @@ interface EditorComponentAttrs {
 }
 
 export default class EditorComponent {
+  private readonly _attrs: EditorComponentAttrs;
   editor: EditorType;
   _id: string;
 

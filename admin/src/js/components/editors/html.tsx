@@ -9,6 +9,7 @@ interface QuillAttrs {
 }
 
 export default class QuillComponent {
+  private readonly _attrs: QuillAttrs;
   quill: Quill.Quill;
   content: API.Content;
   id: string;

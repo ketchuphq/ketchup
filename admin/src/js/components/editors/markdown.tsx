@@ -9,6 +9,7 @@ interface CodeMirrorAttrs {
 }
 
 export default class CodeMirrorComponent {
+  private readonly _attrs: CodeMirrorAttrs;
   codemirror: CodeMirror.Editor;
   content: API.Content;
   element: HTMLElement;
