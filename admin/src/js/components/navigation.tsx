@@ -1,11 +1,11 @@
+import debounce from 'lodash-es/debounce';
 import msx from 'lib/msx';
 import * as m from 'mithril';
 import { AuthController } from 'components/auth';
 import Button from 'components/button';
 let store = require('store/dist/store.modern') as StoreJSStatic;
 
-// https://github.com/DefinitelyTyped/DefinitelyTyped/issues/13679
-var debounce: any = require('lodash/debounce');
+
 
 let _: Mithril.Component<{}, NavigationComponent> = NavigationComponent;
 
