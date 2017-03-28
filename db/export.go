@@ -18,7 +18,7 @@ var marshaler = &jsonpb.Marshaler{
 func (m *Module) registerExportCommand(c *service.Config) {
 	c.AddCommand(&service.Command{
 		Keyword:    "db:export <output file>",
-		ShortUsage: "export pages and routes to file ( as json)",
+		ShortUsage: "export pages and routes to file (as json)",
 		Run: func(ctx *service.CommandContext) {
 			var wr io.WriteCloser = os.Stdout
 			if len(ctx.Args) > 0 {
