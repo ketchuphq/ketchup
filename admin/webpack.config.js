@@ -5,6 +5,8 @@ module.exports = {
       'store/dist/store.modern',
       'date-fns/format',
       'lodash-es/debounce',
+      'lodash-es/cloneDeep',
+      'lodash-es/isEqual'
     ],
     app: 'app.ts'
   },

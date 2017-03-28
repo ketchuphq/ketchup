@@ -1,45 +1,55 @@
+import cloneDeep from 'lodash-es/cloneDeep';
+import isEqual from 'lodash-es/isEqual';
+
 import msx from 'lib/msx';
 import * as m from 'mithril';
 import * as API from 'lib/api';
 import Page from 'lib/page';
 import Theme from 'lib/theme';
 import { hidePopover, default as Popover } from 'components/popover';
-import * as Toaster from 'components/toaster';
 import { MustAuthController } from 'components/auth';
+import { ConfirmModalComponent } from 'components/modal';
 
 import PageThemePickerComponent from 'pages/page/theme_picker';
 import PageEditRoutesComponent from 'pages/page/edit_route';
 import PageButtonsComponent from 'pages/page/buttons';
+import PageSaveButtonComponent from 'pages/page/save_button';
 import PageEditorsComponent from 'pages/page/editors';
 
 export default class PagePage extends MustAuthController {
   page: Page;
   showControls: boolean;
   template: API.ThemeTemplate;
-  maximized: boolean;
-  minimiseToSettings: boolean;
   _nextRoute: string;
   _clickStart: DOMTokenList; // keep track of click location to prevent firing on drag
+  dirty: boolean;
+
+  initialContent: API.Content[];
 
   constructor() {
     super();
     this.showControls = false;
-    this.maximized = true;
-    this.minimiseToSettings = false;
+    this.dirty = false;
     let pageUUID = m.route.param('id');
     if (pageUUID) {
-      Page.get(pageUUID).then((page) => {
-        this.updateThemeTemplate(page.theme, page.template)
-          .then(() => page.getRoutes())
-          .then(() => {
-            this.page = page;
-            m.redraw();
-          });
-      });
+      Page.get(pageUUID)
+        .then((page) => this.updatePage(page))
+        .then((page) => {
+          this.initialContent = cloneDeep(page.contents);
+          return page;
+        })
+        .then((page) => page.getRoutes());
     } else {
-      this.page = new Page();
-      this.updateThemeTemplate(this.page.theme, this.page.template);
+      this.updatePage(new Page());
     }
+  }
+
+  updatePage(page: Page) {
+    return this.updateThemeTemplate(page.theme, page.template)
+      .then(() => this.page = page)
+      .then(() => this.updateContent())
+      .then(() => m.redraw())
+      .then(() => page);
   }
 
   updateThemeTemplate(theme: string, template: string) {
@@ -53,160 +63,63 @@ export default class PagePage extends MustAuthController {
     });
   }
 
-  save() {
-    this.page.save().then((page: API.Page) => {
-      this.page.uuid = page.uuid;
-      window.history.replaceState(null, this.page.title, `/admin/pages/${page.uuid}`);
-      return this.page.saveRoutes();
-    })
-      .then(() => {
-        Toaster.add('Page successfully saved');
-      })
-      .catch((err: any) => {
-        if (err.detail) {
-          Toaster.add(err.detail, 'error');
-        } else {
-          Toaster.add('Internal server error.', 'error');
-        }
-      });
-  }
+  updateContent() {
+    // todo: keep old content temporarily
+    let contentMap: { [key: string]: API.Content } = {};
+    let placeholderContents: API.Content[] = [];
+    let placeholderContentMap: { [key: string]: boolean } = {};
 
-  publish() {
-    // todo: handle case where not saved yet
-    this.page.publish().then(() => {
-      Toaster.add('Page published');
-      m.redraw();
+    (this.page.contents || []).forEach((c) => {
+      if (c.uuid || c.value) {
+        contentMap[c.key] = c;
+      }
     });
-  }
-
-  unpublish() {
-    this.page.unpublish().then(() => {
-      Toaster.add('Page unpublished');
-      m.redraw();
+    (this.template.placeholders || []).forEach((p) => {
+      if (contentMap[p.key]) {
+        Object.keys(p).forEach((k: keyof API.ThemePlaceholder) => {
+          if (p[k]) {
+            contentMap[p.key][k] = p[k];
+          }
+        });
+        placeholderContents.push(contentMap[p.key]);
+      } else {
+        placeholderContents.push(API.Content.copy(p, {}));
+      }
+      placeholderContentMap[p.key] = true;
     });
-  }
 
-  delete() {
-    this.page.delete().then(() => {
-      Toaster.add('Page deleted', 'error');
-      m.route.set('/admin/pages');
+    let pageContents: API.Content[] = [];
+    (this.page.contents || []).forEach((c) => {
+      if (c.key == 'content' && this.template.hideContent) {
+        return;
+      }
+      if (contentMap[c.key] && !placeholderContentMap[c.key]) {
+        pageContents.push(c);
+      }
     });
+    this.page.contents = pageContents.concat(placeholderContents);
   }
 
-  maximize() {
-    this.minimiseToSettings = true;
-    this.maximized = true;
-  }
-
-  renderSettings() {
-    let path = ['Path: ', <strong>{this.page.defaultRoute}</strong>, ', '];
-    return <div class={!this.showControls ? 'controlset' : 'controlset hidden'}>
-      <div class='infoset' onclick={() => { this.showControls = true; }}>
-        <div class='small black5'>
-          {!this.page.defaultRoute ? '' : path}
-          Theme: <strong>{this.page.theme}</strong>,
-          Template: <strong>{this.page.template}</strong>
-        </div>
-        <PageButtonsComponent page={this.page} callbacks={this} />
-      </div>
-    </div>;
-  }
-
-  renderSettingsEditor(show: boolean = false) {
+  renderSettings(show: boolean = false) {
     return <div class={this.showControls || show ? 'controlset' : 'controlset hidden'}>
       <div class='settings'>
         <div class='controls'>
           <div class='control'>
             {this.page ? m(PageEditRoutesComponent, this.page) : null}
           </div>
-          {this.maximized ? '' :
-            <div class='control'
-              onclick={() => { this.showControls = false; }}>
-              close
-            </div>}
         </div>
         <div class='controls'>
-          {m(PageThemePickerComponent, {
-            theme: this.page.theme,
-            template: this.page.template,
-            callback: this.updateThemeTemplate.bind(this)
-          })}
-        </div>
-      </div>
-      <PageButtonsComponent page={this.page} callbacks={this} />
-    </div>;
-  }
-
-  maxView() {
-    let controls = [
-      <a class='button button--green'
-        onclick={(e: Event) => { e.stopPropagation(); this.save(); }}>
-        Save
-      </a>,
-      <Popover>
-        <span class='typcn typcn-cog' />
-        <div>{this.renderSettingsEditor(true)}</div>
-      </Popover>
-    ];
-    if (!this.minimiseToSettings) {
-      controls.push(
-        <a class='typcn typcn-times'
-          href='/admin/pages'
-          onclick={(e: MouseEvent) => {
-            e.preventDefault();
-            this._nextRoute = '/admin/pages';
-          }}
-        />
-      );
-    }
-
-    let pageMaxClasses = 'page-max animate-fade-in';
-    if (this._nextRoute) {
-      pageMaxClasses = 'page-max animate-zoom-away';
-    }
-
-    return <div class={pageMaxClasses}
-      onclick={(e: any) => {
-        if (e.target.classList.contains('page-max') && this._clickStart && this._clickStart.contains('page-max')) {
-          this._nextRoute = '/admin/pages';
-        }
-      }}
-      oncreate={(v: Mithril.VnodeDOM<any, any>) => {
-        v.dom.addEventListener('mousedown', (ev: any) => {
-          this._clickStart = ev.target.classList;
-        });
-        v.dom.addEventListener('animationend', (ev: AnimationEvent) => {
-          // old animation is removed, otherwise new animations won't fire.
-          if (ev.animationName == 'fadeIn') {
-            v.dom.classList.add('animate-fade-in-complete');
-            v.dom.classList.remove('animate-fade-in');
-          }
-          // navigate away after zoomAway animation completes
-          if (ev.animationName == 'zoomAway') {
-            m.route.set(this._nextRoute);
-          }
-        });
-      }}
-    >
-      <div class='page-max__controls'>{controls}</div>
-      <div class='page-editor'
-        oncreate={(v: Mithril.VnodeDOM<any, any>) => {
-          v.dom.addEventListener('click', () => hidePopover());
-        }}
-      >
-        <div class='controls'>
-          <input
-            type='text'
-            class='large'
-            placeholder='title...'
-            value={this.page.title || ''}
-            onchange={m.withAttr('value', (v: string) => {
-              this.page.title = v;
-            })}
+          <PageThemePickerComponent
+            theme={this.page.theme}
+            template={this.page.template}
+            callback={(theme, template) => {
+              this.updateThemeTemplate(theme, template)
+                .then(() => this.updateContent());
+            }}
           />
         </div>
-        <PageEditorsComponent page={this.page} template={this.template} />
       </div>
+      <PageButtonsComponent page={this.page} />
     </div>;
   }
 
@@ -219,29 +132,84 @@ export default class PagePage extends MustAuthController {
     if (!ctrl.page) {
       return; // loading
     }
-    if (ctrl.maximized) {
-      return ctrl.maxView();
+
+    let controls = [
+      <PageSaveButtonComponent page={ctrl.page} />,
+      <Popover>
+        <span class='typcn typcn-cog' />
+        <div>{ctrl.renderSettings(true)}</div>
+      </Popover>,
+      <a class='typcn typcn-times'
+        href='/admin/pages'
+        onclick={(e: MouseEvent) => {
+          e.preventDefault();
+          ctrl._nextRoute = '/admin/pages';
+        }}
+      />
+    ];
+
+    let pageMaxClasses = 'page-max animate-fade-in';
+    if (ctrl._nextRoute) {
+      pageMaxClasses = 'page-max animate-zoom-away';
     }
-    return <div class='page-editor'>
-      <div class='page-editor__icons'>
-        <span class='typcn typcn-arrow-maximise' onclick={ctrl.maximize} />
+
+    return <div class={pageMaxClasses}
+      onclick={(e: any) => {
+        let validClick = e.target.classList.contains('page-max') && ctrl._clickStart && ctrl._clickStart.contains('page-max');
+        ctrl.dirty = ctrl.dirty || !isEqual(ctrl.initialContent, ctrl.page.contents);
+        if (validClick) {
+          if (ctrl.dirty) {
+            ConfirmModalComponent.confirm({
+              title: 'You have unsaved changes',
+              content: () => 'do you want to save or close?',
+              confirmText: 'Save',
+              cancelText: 'Cancel'
+            })
+              .then(() => { console.log('woot'); })
+              .catch(() => { console.log('woops'); });
+            return;
+            // confirm
+          }
+          ctrl._nextRoute = '/admin/pages';
+        }
+      }}
+      oncreate={(v: Mithril.VnodeDOM<any, any>) => {
+        v.dom.addEventListener('mousedown', (ev: any) => {
+          ctrl._clickStart = ev.target.classList;
+        });
+        v.dom.addEventListener('animationend', (ev: AnimationEvent) => {
+          // old animation is removed, otherwise new animations won't fire.
+          if (ev.animationName == 'fadeIn') {
+            v.dom.classList.add('animate-fade-in-complete');
+            v.dom.classList.remove('animate-fade-in');
+          }
+          // navigate away after zoomAway animation completes
+          if (ev.animationName == 'zoomAway') {
+            m.route.set(ctrl._nextRoute);
+          }
+        });
+      }}
+    >
+      <ConfirmModalComponent />
+      <div class='page-max__controls'>{controls}</div>
+      <div class='page-editor'
+        oncreate={(v: Mithril.VnodeDOM<any, any>) => {
+          v.dom.addEventListener('click', () => hidePopover());
+        }}
+      >
+        <div class='controls'>
+          <input
+            type='text'
+            class='large'
+            placeholder='title...'
+            value={ctrl.page.title || ''}
+            onchange={m.withAttr('value', (v: string) => {
+              ctrl.page.title = v;
+            })}
+          />
+        </div>
+        <PageEditorsComponent contents={ctrl.page.contents} />
       </div>
-      <div class='controls'>
-        <input
-          class='large'
-          type='text'
-          placeholder='title...'
-          oncreate={(v: Mithril.VnodeDOM<any, any>) => {
-            (v.dom as HTMLInputElement).value = ctrl.page.title || '';
-          }}
-          onchange={m.withAttr('value', (v: string) => {
-            ctrl.page.title = v;
-          })}
-        />
-      </div>
-      {ctrl.renderSettings()}
-      {ctrl.renderSettingsEditor()}
-      <PageEditorsComponent page={ctrl.page} template={ctrl.template} />
     </div>;
   }
 }
