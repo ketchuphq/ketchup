@@ -11,6 +11,7 @@ $modalPadding: 15px
   flex-direction: column
   align-items: center
   animation: fadeIn 0.2s;
+  z-index: 90
 
   .modal-pad
     height: 20%
@@ -22,15 +23,35 @@ $modalPadding: 15px
     min-height: 200px
     background: white
     box-shadow: 0 5px 15px rgba(0,0,0,0.2)
-    padding: $modalPadding
     +standard-radius
     overflow: hidden
-    &__contents__title
-      margin: (-$modalPadding) (-$modalPadding) 0
+    display: flex
+    flex-direction: column
+    &__title, &__content
+      padding: $modalPadding
+    &__title
       background: $slate1
       color: white
-      padding: $modalPadding
-      margin-bottom: $modalPadding
+    &__content
+      flex-grow: 1
+    &__controls
+      display: flex
+      .modal-button
+        flex-grow: 1
+        padding: $modalPadding
+        text-align: center
+        +transition(background, 0.3s)
+        cursor: pointer
+        user-select: none
+        background: $slate3
+        color: white
+        &:hover
+          background: $slate2
+        &--green
+          background: $green
+          &:hover
+            background: $green2
+
 
     &.modal--error
       .modal__contents__title
