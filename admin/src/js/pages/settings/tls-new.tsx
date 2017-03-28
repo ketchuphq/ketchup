@@ -105,7 +105,7 @@ export default class TLSNewComponent {
           handler={() => ctrl.register()}>
           Enable TLS
         </Button>
-        {m(ModalComponent, ctrl.modal)}
+        <ModalComponent {...ctrl.modal}/>
       </div>
     </div>;
   }
