@@ -14,3 +14,4 @@ global.window = Object.assign(
 // uncomment for extra debugging
 // chai.config.includeStack = true;
 chai.use(chaiAsPromised);
+chai.use(require('chai-subset'));

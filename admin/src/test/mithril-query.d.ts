@@ -8,9 +8,11 @@ declare namespace MithrilQuery {
     <A, S>(vnode: Mithril.Vnode<A, S>): AssertionStatic<A, S>;
   }
 
+  type Vnode<A,S> = Mithril.Vnode<A, S> & { text: string }
+
   export interface AssertionStatic<A, S> {
     first(selector: string): Mithril.Vnode<A, S>;
-    find(selector: string): Mithril.Vnode<A, S>[];
+    find(selector: string): Vnode<A,S>[];
     has(selector: string): boolean;
     contains(str: string): boolean;
 
@@ -18,6 +20,7 @@ declare namespace MithrilQuery {
     click(selector: string): void;
     vnode: Mithril.Vnode<A, S>;
     log(selector: string): void;
+    rootNode: any
   }
 
 }
