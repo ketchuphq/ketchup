@@ -10,7 +10,7 @@ interface TextEditorAttrs {
 }
 
 export default class TextEditorComponent {
-  private readonly _attrs: TextEditorAttrs
+  private readonly _attrs: TextEditorAttrs;
   content: API.Content;
   element: HTMLElement;
   id: string;
@@ -39,7 +39,6 @@ export default class TextEditorComponent {
 
   static view(v: Mithril.Vnode<TextEditorAttrs, TextEditorComponent>) {
     let ctrl = v.state;
-    ctrl.content = v.attrs.content; // for some reason we lose the reference
     return <div id={ctrl.id} class={ctrl.klass}>
       <textarea
         onchange={(el: Event) => {
