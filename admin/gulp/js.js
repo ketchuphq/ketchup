@@ -5,6 +5,7 @@ var gutil = require('gutil');
 var tslint = require('gulp-tslint');
 var tsc = require('gulp-typescript');
 var mocha = require('gulp-mocha')
+var sourcemaps = require('gulp-sourcemaps');
 
 let webpackCache = {}
 let webpackConfig = require('../webpack.config')
@@ -58,15 +59,18 @@ gulp.task('js:test:compile', () => {
     }
   )
   return gulp.src('src/**/*.ts*')
+    .pipe(sourcemaps.init())
     .pipe(ts())
+    .pipe(sourcemaps.write())
     .pipe(gulp.dest('.test/'))
 })
 
 gulp.task('js:test:mocha', () => {
   process.env.NODE_PATH = '.test/js/';
   return gulp.src(['.test/test/chai.js', '.test/**/*.test.js'], { read: false })
-    .pipe(mocha())
-    .on('error', gutil.log)
+    .pipe(mocha({
+      compilers: ['js:source-map-support/register']
+    }))
 })
 
 gulp.task('js:test', ['js:test:compile', 'js:test:mocha'])

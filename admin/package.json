@@ -41,6 +41,7 @@
     "style-loader": "^0.13.2",
     "ts-loader": "^2.0.1",
     "tslint": "^4.5.0",
+    "source-map-support": "^0.4.14",
     "typescript": "^2.2.1",
     "webfontloader": "^1.6.27",
     "webpack": "^2.2.1",
