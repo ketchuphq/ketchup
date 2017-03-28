@@ -11,6 +11,7 @@ interface ThemePickerAttrs {
 }
 
 export default class ThemePickerComponent {
+  private readonly _attrs: ThemePickerAttrs;
   callback: ThemePickerCallback;
   themes: Theme[];
   ready: boolean;
