@@ -34,7 +34,11 @@ export class ModalComponent {
 interface ConfirmModalAttrs extends ModalAttrs {
   confirmText?: string;
   cancelText?: string;
+  confirmColor?: ModalButtonColor;
+  cancelColor?: ModalButtonColor;
 }
+
+type ModalButtonColor = '' | 'modal-button--green' | 'modal-button--red'
 
 export class ConfirmModalComponent {
   private static content: ConfirmModalAttrs;
@@ -73,13 +77,13 @@ export class ConfirmModalComponent {
         <div class='modal__title'>{content.title}</div>
         <div class='modal__content'>{content.content()}</div>
         <div class='modal__controls'>
-          <div class='modal-button modal-button--green' onclick={() => {
+          <div class={`modal-button ${content.confirmColor || ''}`} onclick={() => {
             ConfirmModalComponent.resolve();
             ConfirmModalComponent.reset();
           }}>
             {content.confirmText || 'Yes'}
           </div>
-          <div class='modal-button' onclick={() => {
+          <div class={`modal-button ${content.cancelColor || ''}`} onclick={() => {
             ConfirmModalComponent.reject();
             ConfirmModalComponent.reset();
           }}>

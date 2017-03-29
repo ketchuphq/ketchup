@@ -34,6 +34,8 @@ $modalPadding: 15px
       color: white
     &__content
       flex-grow: 1
+      p:first-child
+        margin-top: 0
     &__controls
       display: flex
       .modal-button
@@ -47,6 +49,10 @@ $modalPadding: 15px
         color: white
         &:hover
           background: $slate2
+        &--red
+          background: $red1
+          &:hover
+            background: $red2
         &--green
           background: $green
           &:hover

@@ -35,7 +35,7 @@ export default class PageSaveButtonComponent {
 
   static view({ attrs: { page, classes }, state }: Mithril.Vnode<PageSaveButtonAttrs, PageSaveButtonComponent>) {
     return <a
-      class={`button button--green ${classes}`}
+      class={`button button--green ${classes || ''}`}
       onclick={(e: Event) => { e.stopPropagation(); state.save(page); }}
     >
       Save

@@ -1,32 +1,18 @@
 import msx from 'lib/msx';
 
-export let hidePopover = () => {};
+interface PopoverAttrs {
+  visible: boolean;
+}
 
 export default class Popover {
-  visible: boolean;
+  private readonly _attrs: PopoverAttrs;
 
-  constructor() {
-    this.visible = false;
-    if (hidePopover != null) {
-      hidePopover();
+  static view({ attrs: {visible}, children }: Mithril.Vnode<PopoverAttrs, {}>) {
+    if (!visible) {
+      return;
     }
-    hidePopover = () => this.visible = false;
-  }
-
-  static oninit(v: Mithril.Vnode<{}, Popover>) {
-    v.state = new Popover();
-  };
-
-  static view(v: Mithril.Vnode<{}, Popover>) {
-    let ctrl = v.state;
-    let content = [
-      <a onclick={() => ctrl.visible = !ctrl.visible}>{v.children[0]}</a>
-    ];
-    if (ctrl.visible) {
-      content.push(
-        <div class='popover'>{v.children.slice(1)}</div>
-      );
-    }
-    return <div class='popover-outer'>{content}</div>;
+    return <div class='popover-outer'>
+      <div class='popover'>{children}</div>
+    </div>;
   }
 }

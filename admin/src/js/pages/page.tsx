@@ -6,7 +6,7 @@ import * as m from 'mithril';
 import * as API from 'lib/api';
 import Page from 'lib/page';
 import Theme from 'lib/theme';
-import { hidePopover, default as Popover } from 'components/popover';
+import Popover from 'components/popover';
 import { MustAuthController } from 'components/auth';
 import { ConfirmModalComponent } from 'components/modal';
 
@@ -18,7 +18,7 @@ import PageEditorsComponent from 'pages/page/editors';
 
 export default class PagePage extends MustAuthController {
   page: Page;
-  showControls: boolean;
+  showSettings: boolean;
   template: API.ThemeTemplate;
   _nextRoute: string;
   _clickStart: DOMTokenList; // keep track of click location to prevent firing on drag
@@ -28,8 +28,8 @@ export default class PagePage extends MustAuthController {
 
   constructor() {
     super();
-    this.showControls = false;
     this.dirty = false;
+    this.showSettings = false;
     let pageUUID = m.route.param('id');
     if (pageUUID) {
       Page.get(pageUUID)
@@ -42,6 +42,14 @@ export default class PagePage extends MustAuthController {
     } else {
       this.updatePage(new Page());
     }
+  }
+
+  toggleSettings() {
+    this.showSettings = !this.showSettings;
+  }
+
+  goToIndex() {
+    this._nextRoute = '/admin/pages';
   }
 
   updatePage(page: Page) {
@@ -100,8 +108,23 @@ export default class PagePage extends MustAuthController {
     this.page.contents = pageContents.concat(placeholderContents);
   }
 
-  renderSettings(show: boolean = false) {
-    return <div class={this.showControls || show ? 'controlset' : 'controlset hidden'}>
+  confirmLeave() {
+    ConfirmModalComponent.confirm({
+      title: 'You are about to leave this page',
+      content: () => <p>
+        You have unsaved changes. Are you sure
+        you want to leave this page?
+      </p>,
+      confirmText: 'Stay',
+      cancelText: 'Leave',
+      cancelColor: 'modal-button--red'
+    })
+      .then(() => { /* noop */ })
+      .catch(() => { this.goToIndex(); });
+  }
+
+  renderSettings() {
+    return <div class='controlset'>
       <div class='settings'>
         <div class='controls'>
           <div class='control'>
@@ -130,20 +153,18 @@ export default class PagePage extends MustAuthController {
   static view(v: Mithril.Vnode<{}, PagePage>) {
     let ctrl = v.state;
     if (!ctrl.page) {
-      return; // loading
+      return;
     }
 
     let controls = [
       <PageSaveButtonComponent page={ctrl.page} />,
-      <Popover>
-        <span class='typcn typcn-cog' />
-        <div>{ctrl.renderSettings(true)}</div>
-      </Popover>,
+      <span class='typcn typcn-cog' onclick={() => ctrl.toggleSettings()} />,
+      <Popover visible={ctrl.showSettings}>{ctrl.renderSettings()}</Popover>,
       <a class='typcn typcn-times'
         href='/admin/pages'
         onclick={(e: MouseEvent) => {
           e.preventDefault();
-          ctrl._nextRoute = '/admin/pages';
+          ctrl.confirmLeave();
         }}
       />
     ];
@@ -156,22 +177,19 @@ export default class PagePage extends MustAuthController {
     return <div class={pageMaxClasses}
       onclick={(e: any) => {
         let validClick = e.target.classList.contains('page-max') && ctrl._clickStart && ctrl._clickStart.contains('page-max');
-        ctrl.dirty = ctrl.dirty || !isEqual(ctrl.initialContent, ctrl.page.contents);
-        if (validClick) {
-          if (ctrl.dirty) {
-            ConfirmModalComponent.confirm({
-              title: 'You have unsaved changes',
-              content: () => 'do you want to save or close?',
-              confirmText: 'Save',
-              cancelText: 'Cancel'
-            })
-              .then(() => { console.log('woot'); })
-              .catch(() => { console.log('woops'); });
-            return;
-            // confirm
-          }
-          ctrl._nextRoute = '/admin/pages';
+        if (!validClick) {
+          return;
         }
+        if (ctrl.showSettings) {
+          ctrl.toggleSettings();
+          return;
+        }
+        ctrl.dirty = ctrl.dirty || !isEqual(ctrl.initialContent, ctrl.page.contents);
+        if (ctrl.dirty) {
+          ctrl.confirmLeave();
+          return;
+        }
+        ctrl.goToIndex();
       }}
       oncreate={(v: Mithril.VnodeDOM<any, any>) => {
         v.dom.addEventListener('mousedown', (ev: any) => {
@@ -194,7 +212,7 @@ export default class PagePage extends MustAuthController {
       <div class='page-max__controls'>{controls}</div>
       <div class='page-editor'
         oncreate={(v: Mithril.VnodeDOM<any, any>) => {
-          v.dom.addEventListener('click', () => hidePopover());
+          v.dom.addEventListener('click', () => ctrl.showSettings = false);
         }}
       >
         <div class='controls'>
