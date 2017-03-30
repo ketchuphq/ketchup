@@ -53,11 +53,23 @@ export default class SettingsPage extends MustAuthController {
     //   ])
     // ),
     return <div class='settings'>
-        <header>
-          <h1>Settings</h1>
-        </header>
-        <h2>TLS</h2>
-        {tlsSection}
+      <header>
+        <h1>Settings</h1>
+      </header>
+      <h2>TLS</h2>
+      {tlsSection}
+      <h2>Backup</h2>
+      <div class='table'>
+        <div class='tr tr--center'>
+          <label>Export your data as JSON</label>
+          <a
+            class='button button--green button--small'
+            href='/api/v1/download-backup'
+          >
+            Download backup
+          </a>
+        </div>
+      </div>
     </div>;
   }
 }

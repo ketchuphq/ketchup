@@ -79,6 +79,8 @@ func (m *Module) Init(c *service.Config) {
 
 			{"/api/v1/routes", methodPost, m.Auth.MustWithAuth(m.UpdateRoute)},
 			{"/api/v1/routes/:uuid", methodDelete, m.Auth.MustWithAuth(m.DeleteRoute)},
+
+			{"/api/v1/download-backup", methodGet, m.Auth.MustWithAuth(m.GetBackup)},
 			{"/api/v1/debug", methodGet, m.Auth.MustWithAuth(m.Debug)},
 			{"/api/v1/logout", methodGet, m.Auth.MustWithAuth(m.Logout)},
 		}
