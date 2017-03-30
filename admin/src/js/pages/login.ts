@@ -6,9 +6,9 @@ import { AuthController, User } from 'components/auth';
 let _: Mithril.Component<{}, LoginPage> = LoginPage;
 
 export default class LoginPage extends AuthController {
-  email: Mithril.Stream<string>;
-  password: Mithril.Stream<string>;
-  showReset: Mithril.Stream<boolean>;
+  email: string;
+  password: string;
+  showReset: boolean;
 
   constructor() {
     super();
@@ -18,15 +18,15 @@ export default class LoginPage extends AuthController {
           m.route.set('/admin');
         }
       });
-    this.email = stream('');
-    this.password = stream('');
-    this.showReset = stream(false);
+    this.email = '';
+    this.password = '';
+    this.showReset = false;
   }
 
   login() {
     let data = new FormData();
-    data.append('email', this.email());
-    data.append('password', this.password());
+    data.append('email', this.email);
+    data.append('password', this.password);
     m.request({
       method: 'POST',
       url: '/api/v1/login',
@@ -56,23 +56,23 @@ export default class LoginPage extends AuthController {
             m('div',
               m('input[type=text]', {
                 placeholder: 'email',
-                onchange: m.withAttr('value', ctrl.email)
+                onchange: m.withAttr('value', (val) => ctrl.email = val)
               }),
             ),
             m('div',
               m('input[type=password]', {
                 placeholder: 'password',
-                onchange: m.withAttr('value', ctrl.password)
+                onchange: m.withAttr('value', (val) => ctrl.password = val)
               })
             ),
             m('button.button.button--green', 'Log In'),
             m('.button.small', {
-              onclick: () => ctrl.showReset(true)
+              onclick: () => ctrl.showReset = true
             }, 'Forgot your password?')
           ]),
-        !ctrl.showReset() ? '' : m('.reset',
+        !ctrl.showReset ? '' : m('.reset',
           m('p', 'You can reset your password in the command-line using the following command:'),
-          m('pre', './ketchup users:password me@gmail.com')
+          m('pre', './ketchup users:password youremail@gmail.com')
         )
       )
     );
