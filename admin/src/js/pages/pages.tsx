@@ -3,15 +3,18 @@ import * as m from 'mithril';
 import * as API from 'lib/api';
 import Page from 'lib/page';
 import { MustAuthController } from 'components/auth';
+import { loading } from 'components/loading';
 
 let _: Mithril.Component<{}, PagesPage> = PagesPage;
 
 export default class PagesPage extends MustAuthController {
   pages: Page[];
   viewOption: API.ListPageRequest_ListPageFilter;
+  loading: boolean;
   constructor() {
     super();
     this.pages = [];
+    this.loading = true;
     this.viewOption = 'all';
     this.loading = true
     this.fetch(this.viewOption);
@@ -22,6 +25,7 @@ export default class PagesPage extends MustAuthController {
     return Page.list(val)
       .then((pages) => this.pages = pages)
       .then(() => {
+        this.loading = false;
         m.redraw();
       });
   }
@@ -56,6 +60,7 @@ export default class PagesPage extends MustAuthController {
         {tab('published')}
       </h2>
       <div class='table'>
+        {loading(ctrl.loading)}
         {ctrl.pages.map((page) => {
           let status = null;
           let klass = '';
