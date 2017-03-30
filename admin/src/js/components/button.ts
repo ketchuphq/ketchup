@@ -1,5 +1,4 @@
 import * as m from 'mithril';
-import * as stream from 'mithril/stream';
 
 let _: Mithril.Component<ButtonAttrs, Button> = Button;
 interface ButtonAttrs {
@@ -13,20 +12,20 @@ interface ButtonAttrs {
 
 export default class Button {
   private _attrs: ButtonAttrs;
-  loading: Mithril.Stream<boolean>;
+  loading: boolean;
   handler: () => void;
 
   constructor(readonly config: ButtonAttrs) {
-    this.loading = stream(false);
+    this.loading = false;
     this.handler = () => {
       if (!config.handler) {
         return;
       }
-      this.loading(true);
+      this.loading = true;
       m.redraw();
       config.handler()
-        .then(() => this.loading(false))
-        .catch(() => this.loading(false));
+        .then(() => this.loading = false)
+        .catch(() => this.loading = false);
     };
   }
 
@@ -45,7 +44,7 @@ export default class Button {
     }
 
     let loader = null;
-    if (ctrl.loading()) {
+    if (ctrl.loading) {
       c = { class: c.class + ' button--loading' };
       loader = m('.loader', [m('.loading0'), m('.loading1'), m('.loading2')]);
     }
