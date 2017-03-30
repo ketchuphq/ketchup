@@ -33,14 +33,10 @@ export default class PagePage extends MustAuthController {
     let pageUUID = m.route.param('id');
     if (pageUUID) {
       Page.get(pageUUID)
-        .then((page) => this.updatePage(page))
-        .then((page) => {
-          this.initialContent = cloneDeep(page.contents);
-          return page;
-        })
+        .then((page) => this.updatePage(page, true))
         .then((page) => page.getRoutes());
     } else {
-      this.updatePage(new Page());
+      this.updatePage(new Page(), true);
     }
   }
 
@@ -52,10 +48,15 @@ export default class PagePage extends MustAuthController {
     this._nextRoute = '/admin/pages';
   }
 
-  updatePage(page: Page) {
+  updatePage(page: Page, initial = false) {
     return this.updateThemeTemplate(page.theme, page.template)
-      .then(() => this.page = page)
-      .then(() => this.updateContent())
+      .then(() => {
+        if (!this.page) {
+          this.initialContent = cloneDeep(page.contents);
+          this.page = page;
+        }
+      })
+      .then(() => this.updateContent(initial))
       .then(() => m.redraw())
       .then(() => page);
   }
@@ -71,14 +72,14 @@ export default class PagePage extends MustAuthController {
     });
   }
 
-  updateContent() {
-    // todo: keep old content temporarily
+  updateContent(initial = false) {
+    // todo: keep old content temporarily for 'undo'
     let contentMap: { [key: string]: API.Content } = {};
     let placeholderContents: API.Content[] = [];
     let placeholderContentMap: { [key: string]: boolean } = {};
-
     (this.page.contents || []).forEach((c) => {
-      if (c.uuid || c.value) {
+      // on initial load copy all fields
+      if (c.uuid || c.value || initial) {
         contentMap[c.key] = c;
       }
     });
@@ -109,18 +110,27 @@ export default class PagePage extends MustAuthController {
   }
 
   confirmLeave() {
-    ConfirmModalComponent.confirm({
-      title: 'You are about to leave this page',
-      content: () => <p>
-        You have unsaved changes. Are you sure
+    if (this.showSettings) {
+      this.toggleSettings();
+      return;
+    }
+    this.dirty = this.dirty || !isEqual(this.initialContent, this.page.contents);
+    if (this.dirty) {
+      ConfirmModalComponent.confirm({
+        title: 'You are about to leave this page',
+        content: () => <p>
+          You have unsaved changes. Are you sure
         you want to leave this page?
       </p>,
-      confirmText: 'Stay',
-      cancelText: 'Leave',
-      cancelColor: 'modal-button--red'
-    })
-      .then(() => { /* noop */ })
-      .catch(() => { this.goToIndex(); });
+        confirmText: 'Stay',
+        cancelText: 'Leave',
+        cancelColor: 'modal-button--red'
+      })
+        .then(() => { /* noop */ })
+        .catch(() => { this.goToIndex(); });
+      return;
+    }
+    this.goToIndex();
   }
 
   renderSettings() {
@@ -180,16 +190,7 @@ export default class PagePage extends MustAuthController {
         if (!validClick) {
           return;
         }
-        if (ctrl.showSettings) {
-          ctrl.toggleSettings();
-          return;
-        }
-        ctrl.dirty = ctrl.dirty || !isEqual(ctrl.initialContent, ctrl.page.contents);
-        if (ctrl.dirty) {
-          ctrl.confirmLeave();
-          return;
-        }
-        ctrl.goToIndex();
+        ctrl.confirmLeave();
       }}
       oncreate={(v: Mithril.VnodeDOM<any, any>) => {
         v.dom.addEventListener('mousedown', (ev: any) => {
