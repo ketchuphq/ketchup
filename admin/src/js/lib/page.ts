@@ -36,7 +36,7 @@ export default class Page extends API.Page {
     this.title = config.title;
     this.theme = config.theme;
     this.template = config.template;
-    this.contents = config.contents || [defaultContent];
+    this.contents = config.contents || [API.Content.copy(defaultContent)];
     this.timestamps = config.timestamps;
     this.publishedAt = config.publishedAt;
     this.routes = [];
@@ -46,17 +46,6 @@ export default class Page extends API.Page {
     if (this.routes.length > 0) {
       return this.routes[0].path;
     }
-  }
-
-  updateContent(c: API.Content) {
-    for (var i = 0; i < this.contents.length; i++) {
-      var element = this.contents[i];
-      if (element.key == c.key) {
-        API.Content.copy(c, element);
-        return;
-      }
-    }
-    this.contents.push(API.Content.copy(c));
   }
 
   save(): Promise<API.Page> {
