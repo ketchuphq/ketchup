@@ -1,26 +1,26 @@
 import msx from 'lib/msx';
 import * as m from 'mithril';
 import * as API from 'lib/api';
-import * as stream from 'mithril/stream';
 import Page from 'lib/page';
 import { MustAuthController } from 'components/auth';
 
 let _: Mithril.Component<{}, PagesPage> = PagesPage;
 
 export default class PagesPage extends MustAuthController {
-  pages: Mithril.Stream<Page[]>;
-  viewOption: Mithril.Stream<API.ListPageRequest_ListPageFilter>;
+  pages: Page[];
+  viewOption: API.ListPageRequest_ListPageFilter;
   constructor() {
     super();
-    this.pages = stream([]);
-    this.viewOption = stream<API.ListPageRequest_ListPageFilter>('all');
-    this.fetch(this.viewOption());
+    this.pages = [];
+    this.viewOption = 'all';
+    this.loading = true
+    this.fetch(this.viewOption);
   }
 
   fetch(val: API.ListPageRequest_ListPageFilter) {
-    this.viewOption(val);
+    this.viewOption = val;
     return Page.list(val)
-      .then((pages) => this.pages(pages))
+      .then((pages) => this.pages = pages)
       .then(() => {
         m.redraw();
       });
@@ -34,7 +34,7 @@ export default class PagesPage extends MustAuthController {
     let ctrl = v.state;
     let tab = (v: API.ListPageRequest_ListPageFilter, desc?: string) => {
       let classes = 'tab-el';
-      if (ctrl.viewOption() == v) {
+      if (ctrl.viewOption == v) {
         classes += ' tab-selected';
       }
       return <span class={classes} onclick={() => ctrl.fetch(v)}>
@@ -56,7 +56,7 @@ export default class PagesPage extends MustAuthController {
         {tab('published')}
       </h2>
       <div class='table'>
-        {ctrl.pages().map((page) => {
+        {ctrl.pages.map((page) => {
           let status = null;
           let klass = '';
           if (page.isPublished) {
