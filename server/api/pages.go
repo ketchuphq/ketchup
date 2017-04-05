@@ -11,6 +11,7 @@ import (
 	"github.com/octavore/ketchup/db/bolt"
 	"github.com/octavore/ketchup/proto/ketchup/api"
 	"github.com/octavore/ketchup/proto/ketchup/models"
+	"github.com/octavore/ketchup/proto/structpb"
 	"github.com/octavore/ketchup/server/router"
 )
 
@@ -44,14 +45,35 @@ func (m *Module) GetPage(rw http.ResponseWriter, req *http.Request, par httprout
 }
 
 func (m *Module) GetRenderedPage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+	opts := &api.GetRenderedPageRequest{}
+	err := req.ParseForm()
+	if err != nil {
+		return err
+	}
+	err = m.decoder.Decode(opts, req.Form)
+	if err != nil {
+		return err
+	}
 	page, err := m.getPage(par, func(*models.Page) error { return nil })
 	if err != nil {
 		return err
 	}
-
 	contents, err := m.Content.CreateContentMap(page)
 	if err != nil {
 		return err
+	}
+
+	res := &api.GetRenderedPageResponse{
+		Data: &structpb.Struct{Fields: map[string]*structpb.Value{}},
+	}
+
+	for k, val := range contents {
+		switch v := val.(type) {
+		case string:
+			res.Data.Fields[k] = &structpb.Value{
+				Kind: &structpb.Value_StringValue{StringValue: v},
+			}
+		}
 	}
 
 	return m.Router.JSON(rw, http.StatusOK, contents)

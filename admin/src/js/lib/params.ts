@@ -1,4 +1,4 @@
-export let serialize = (obj: any): string => {
+export let serialize = <T>(obj: T): string => {
   let data: { [key: string]: any } = {};
   flatten(obj, data);
   return Object.keys(data)

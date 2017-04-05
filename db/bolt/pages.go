@@ -61,7 +61,7 @@ func (m *Module) UpdatePage(page *models.Page) error {
 // ListPages lists all the pages stored in the DB (unsorted), without contents
 func (m *Module) ListPages(opts *api.ListPageRequest) ([]*models.Page, error) {
 	lst := []*models.Page{}
-	filter := opts.GetOptions().GetPreset()
+	filter := opts.GetOptions().GetFilter()
 
 	err := m.Bolt.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(PAGE_BUCKET))

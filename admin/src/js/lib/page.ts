@@ -135,9 +135,9 @@ export default class Page extends API.Page {
   }
 
   static list(filter: API.ListPageRequest_ListPageFilter = 'all'): Promise<Page[]> {
-    let q = serialize({
-      options: { preset: filter }
-    } as API.ListPageRequest);
+    let q = serialize<API.ListPageRequest>({
+      options: { filter: filter }
+    });
     return m.request({
       method: 'GET',
       url: `/api/v1/pages?${q}`,

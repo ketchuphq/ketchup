@@ -293,10 +293,10 @@ export abstract class ListPageRequest {
 }
 
 export abstract class ListPageRequest_ListPageOptions {
-  preset?: ListPageRequest_ListPageFilter;
+  filter?: ListPageRequest_ListPageFilter;
   static copy(from: ListPageRequest_ListPageOptions, to?: ListPageRequest_ListPageOptions): ListPageRequest_ListPageOptions {
     to = to || {};
-    to.preset = from.preset;
+    to.filter = from.filter;
     return to;
   }
 }

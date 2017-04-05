@@ -3,6 +3,7 @@ syntax = "proto2";
 import "page.proto";
 import "route.proto";
 import "theme.proto";
+import "struct.proto";
 
 package ketchup.api;
 
@@ -33,6 +34,23 @@ message UpdatePageRoutesRequest {
     repeated ketchup.models.Route routes = 1;
 }
 
+message GetRenderedPageRequest {
+    enum RenderedPageFilter {
+        all = 1;
+        published = 2;
+        draft = 3;
+    }
+    message RenderedPageOptions {
+        optional RenderedPageFilter filter = 1;
+        // repeated string tags = 2;
+    }
+    optional RenderedPageOptions options = 1;
+}
+
+message GetRenderedPageResponse {
+    optional google.protobuf.Struct data = 1;
+}
+
 message ListPageRequest {
     enum ListPageFilter {
         all = 1;
@@ -40,7 +58,7 @@ message ListPageRequest {
         draft = 3;
     }
     message ListPageOptions {
-        optional ListPageFilter preset = 1;
+        optional ListPageFilter filter = 1;
         // repeated string tags = 2;
     }
     optional ListOptions list = 1;
