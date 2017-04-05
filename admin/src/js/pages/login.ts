@@ -1,5 +1,4 @@
 import * as m from 'mithril';
-import * as stream from 'mithril/stream';
 import * as Toaster from 'components/toaster';
 import { AuthController, User } from 'components/auth';
 
