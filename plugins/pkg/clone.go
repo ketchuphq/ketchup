@@ -178,3 +178,23 @@ func (m *Module) clone(dest, url string) error {
 		return err
 	})
 }
+
+// CheckForUpdates in the given repo at {data_dir}/{dir}/{packageName}
+func (m *Module) CheckForUpdates(packageName, dir string) (headRef, latestRef string, err error) {
+	packagePath := m.Config.DataPath(path.Join(dir, packageName), "")
+	repo, err := git.PlainOpen(packagePath)
+	if err != nil {
+		return
+	}
+	head, err := repo.Head()
+	if err != nil {
+		return
+	}
+	latest, err := repo.Reference("refs/remotes/origin/master", true)
+	if err != nil {
+		return
+	}
+	headRef = head.Hash().String()
+	latestRef = latest.Hash().String()
+	return
+}
