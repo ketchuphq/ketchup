@@ -44,7 +44,6 @@
     "tslint": "^5.0.0",
     "typescript": "^2.2.2",
     "webfontloader": "^1.6.27",
-    "webpack": "^2.3.3",
-    "webpack-stream": "^3.2.0"
+    "webpack": "^2.3.3"
   }
 }

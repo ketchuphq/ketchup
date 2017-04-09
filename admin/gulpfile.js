@@ -5,8 +5,5 @@ require('./gulp/js.js');
 require('./gulp/html.js');
 require('./gulp/bindata.js');
 
-gulp.task('default', ['css', 'js', 'html', 'bindata'])
-gulp.task('watch', [
-  'css', 'js', 'html', 'bindata',
-  'css:watch', 'js:watch', 'html:watch', 'bindata:watch'
-])
+gulp.task('default', ['bindata'])
+gulp.task('watch', ['bindata:watch'])

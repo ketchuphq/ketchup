@@ -1,5 +1,5 @@
-var gulp = require('gulp')
-var shell = require('gulp-shell')
+let gulp = require('gulp')
+let shell = require('gulp-shell')
 
 const buildPaths = [
   'build',
@@ -8,7 +8,7 @@ const buildPaths = [
   'build/css',
   'build/images'
 ]
-gulp.task('bindata', () =>
+let bindata = () =>
   gulp.src('build/*', { read: false })
     .pipe(shell([
       `go-bindata -pkg admin -prefix build ${buildPaths.join(' ')}`
@@ -17,8 +17,10 @@ gulp.task('bindata', () =>
           PATH: `${process.env.GOPATH}/bin`
         }
       }))
-)
 
-gulp.task('bindata:watch', () =>
-  gulp.watch('./build/**', ['bindata'])
-);
+gulp.task('bindata', ['css', 'js', 'html', 'images'], bindata)
+gulp.task('bindata:partial', ['css', 'js:internal', 'js:lint', 'js:webpack', 'html', 'images'], bindata)
+
+gulp.task('bindata:watch', ['bindata'], () =>
+  gulp.watch('./src/**', ['bindata:partial'])
+)

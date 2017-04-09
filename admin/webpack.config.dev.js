@@ -1,3 +1,4 @@
+let path = require('path');
 let webpack = require('webpack');
 module.exports = {
   entry: {
@@ -13,6 +14,7 @@ module.exports = {
   devtool: 'source-map',
   output: {
     filename: '[name].js',
+    path: path.resolve(__dirname, 'build/js/'),
     publicPath: '/admin/js/'
   },
   resolve: {
@@ -33,6 +35,5 @@ module.exports = {
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor'
     })
-  ],
-  cache: {}
+  ]
 }

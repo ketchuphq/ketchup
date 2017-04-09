@@ -1,3 +1,4 @@
+let path = require('path');
 let webpack = require('webpack');
 module.exports = {
   entry: {
@@ -12,6 +13,7 @@ module.exports = {
   },
   output: {
     filename: '[name].js',
+    path: path.resolve(__dirname, 'build/js/'),
     publicPath: '/admin/js/'
   },
   resolve: {
@@ -34,6 +36,5 @@ module.exports = {
     new webpack.optimize.UglifyJsPlugin({
       compress: { warnings: false }
     })
-  ],
-  cache: {}
+  ]
 }

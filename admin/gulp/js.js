@@ -1,18 +1,18 @@
-var gulp = require('gulp');
-var webpack = require('webpack');
-var gulpWebpack = require('webpack-stream');
-var gutil = require('gulp-util');
-var tslint = require('gulp-tslint');
-var tsc = require('gulp-typescript');
-var mocha = require('gulp-mocha');
-var sourcemaps = require('gulp-sourcemaps');
-var del = require('del');
+let gulp = require('gulp');
+let webpack = require('webpack');
+let gutil = require('gulp-util');
+let gulpTSLint = require('gulp-tslint');
+let tslint = require('tslint');
+let tsc = require('gulp-typescript');
+let mocha = require('gulp-mocha');
+let sourcemaps = require('gulp-sourcemaps');
+let del = require('del');
 
 let production = gutil.env.production
 let webpackProdConfig = require('../webpack.config')
 let webpackDevConfig = require('../webpack.config.dev')
-let webpackCache = {}
 let webpackConfig = production ? webpackProdConfig : webpackDevConfig
+let webpackCache = {}
 webpackConfig.cache = webpackCache
 
 gulp.task('js:clean', () => del(['build/js/*']));
@@ -24,36 +24,44 @@ gulp.task('js:internal', () =>
     .pipe(gulp.dest('./build/vendor/'))
 );
 
-gulp.task('js:webpack', () =>
-  gulp.src('src/app.ts')
-    .pipe(gulpWebpack(webpackConfig, webpack))
-    .on('error', function(err) { this.emit('end') })
-    .pipe(gulp.dest('build/js/'))
-)
+// webpack is instantiated outside the task for performance.
+let webpackCompiler = webpack(webpackConfig)
 
-gulp.task('js:lint', () =>
-  gulp.src(['src/js/**/*.ts', 'src/js/**/*.tsx'])
-    .pipe(tslint({
-      formatter: 'verbose'
+gulp.task('js:webpack', (cb) => {
+  webpackCompiler.run((err, stats) => {
+    if (err) {
+      throw new gutil.PluginError('webpack', err);
+    }
+    gutil.log('[webpack]\n' + stats.toString({
+      colors: true,
+      cachedAssets: false,
+      chunks: false,
     }))
-    .pipe(tslint.report({
-      emitError: false
-    }))
-);
+    cb()
+  })
+})
+
+gulp.task('js:lint', () => {
+  let program = tslint.Linter.createProgram('tsconfig.json')
+  return gulp.src(['src/js/**/*.ts', 'src/js/**/*.tsx'])
+    .pipe(gulpTSLint({ program, formatter: 'verbose' }))
+    .pipe(gulpTSLint.report({ emitError: false }))
+});
 
 gulp.task('js', ['js:clean', 'js:internal', 'js:lint', 'js:webpack'])
 
-gulp.task('js:watch', () =>
-  gulp.watch('src/js/**/*.ts*', ['js'])
+gulp.task('js:watch', ['js:internal'], () =>
+  gulp.watch('src/js/**/*.ts*', ['js:lint', 'js:webpack'])
 );
 
+let ts = tsc.createProject(
+  'tsconfig.json', {
+    module: 'commonjs',
+    outDir: '.test/'
+  }
+)
+
 gulp.task('js:test:compile', () => {
-  let ts = tsc.createProject(
-    'tsconfig.json', {
-      module: 'commonjs',
-      outDir: '.test/'
-    }
-  )
   return gulp.src('src/**/*.ts*')
     .pipe(sourcemaps.init())
     .pipe(ts())
