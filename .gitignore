@@ -2,6 +2,11 @@
 **/bower_components/
 **/build/
 
+vendor/github.com/
+vendor/golang.org/
+vendor/gopkg.in/
+vendor/srcd.works/
+
 *.db
 *.key
 bindata.go
