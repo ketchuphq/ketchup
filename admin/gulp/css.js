@@ -1,8 +1,12 @@
-var gulp = require('gulp');
-var sass = require('gulp-sass');
-var gutil = require('gutil');
-var sourcemaps = require('gulp-sourcemaps');
-var cleanCSS = require('gulp-clean-css');
+let gulp = require('gulp');
+let sass = require('gulp-sass');
+let gutil = require('gulp-util');
+let sourcemaps = require('gulp-sourcemaps');
+let cleanCSS = require('gulp-clean-css');
+let del = require('del');
+let production = gutil.env.production
+
+gulp.task('css:clean', () => del(['build/css/*']));
 
 gulp.task('css:internal', () =>
   gulp.src([
@@ -14,20 +18,27 @@ gulp.task('css:internal', () =>
 );
 
 
-gulp.task('css:sass', () =>
-  gulp.src('./src/css/app.sass')
+gulp.task('css:sass', () => {
+  if (production) {
+    return gulp.src('./src/css/app.sass')
+      .pipe(sass({ includePaths: ['./bower_components'] })
+        .on('error', sass.logError))
+      .pipe(cleanCSS({ debug: true }, function (details) {
+        let percent = details.stats.minifiedSize / details.stats.originalSize
+        gutil.log(`${details.name} compressed: ${(percent * 100).toFixed(2)}%`)
+      }))
+      .pipe(gulp.dest('./build/css'))
+  }
+
+  return gulp.src('./src/css/app.sass')
     .pipe(sourcemaps.init())
     .pipe(sass({ includePaths: ['./bower_components'] })
-      .on('error', sass.logError))
-    // .pipe(cleanCSS({ debug: true }, function (details) {
-    //   let percent = details.stats.minifiedSize / details.stats.originalSize
-    //   gutil.log(`${details.name} compressed: ${(percent * 100).toFixed(2)}%`)
-    // }))
+        .on('error', sass.logError))
     .pipe(sourcemaps.write())
     .pipe(gulp.dest('./build/css'))
-);
+});
 
-gulp.task('css', ['css:internal', 'css:sass'])
+gulp.task('css', ['css:clean', 'css:internal', 'css:sass'])
 
 gulp.task('css:watch', () =>
   gulp.watch([
