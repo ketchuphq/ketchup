@@ -1,5 +1,5 @@
 all:
-	make -C admin sources
+	make -C admin production
 
 include make/proto.mk
 
@@ -11,4 +11,4 @@ linux:
 	GOOS=linux GOARCH=amd64 go build .
 
 ship:
-	scp press ketchup1:p2
+	scp ketchup ketchup1:k2

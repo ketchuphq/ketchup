@@ -10,6 +10,7 @@ module.exports = {
     ],
     app: 'app.ts'
   },
+  devtool: 'source-map',
   output: {
     filename: '[name].js',
     publicPath: '/admin/js/'
@@ -20,6 +21,7 @@ module.exports = {
   },
   module: {
     rules: [
+      { test: /\.js$/, loader: 'source-map-loader', enforce: 'pre' },
       { test: /\.tsx?$/, loader: 'ts-loader' },
       { test: /\.css$/, loader: 'style-loader!css-loader' }
     ],
@@ -30,9 +32,6 @@ module.exports = {
   plugins: [
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor'
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: { warnings: false }
     })
   ],
   cache: {}

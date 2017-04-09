@@ -1,25 +1,21 @@
 var gulp = require('gulp');
 var webpack = require('webpack');
 var gulpWebpack = require('webpack-stream');
-var gutil = require('gutil');
+var gutil = require('gulp-util');
 var tslint = require('gulp-tslint');
 var tsc = require('gulp-typescript');
-var mocha = require('gulp-mocha')
+var mocha = require('gulp-mocha');
 var sourcemaps = require('gulp-sourcemaps');
+var del = require('del');
 
+let production = gutil.env.production
+let webpackProdConfig = require('../webpack.config')
+let webpackDevConfig = require('../webpack.config.dev')
 let webpackCache = {}
-let webpackConfig = require('../webpack.config')
-
+let webpackConfig = production ? webpackProdConfig : webpackDevConfig
 webpackConfig.cache = webpackCache
 
-let prod = false
-if (prod) {
-  webpackConfig.plugins = [
-    new webpack.optimize.UglifyJsPlugin({
-      compress: { warnings: false }
-    })
-  ]
-}
+gulp.task('js:clean', () => del(['build/js/*']));
 
 gulp.task('js:internal', () =>
   gulp.src([
@@ -45,7 +41,7 @@ gulp.task('js:lint', () =>
     }))
 );
 
-gulp.task('js', ['js:internal', 'js:lint', 'js:webpack'])
+gulp.task('js', ['js:clean', 'js:internal', 'js:lint', 'js:webpack'])
 
 gulp.task('js:watch', () =>
   gulp.watch('src/js/**/*.ts*', ['js'])
