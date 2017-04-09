@@ -11,6 +11,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	git "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
+	"gopkg.in/src-d/go-git.v4/storage/memory"
 
 	"github.com/octavore/ketchup/proto/ketchup/models"
 )
@@ -21,18 +22,13 @@ func (m *Module) Clone(packageName, packageURL, dir string) error {
 	return m.clone(packagePath, packageURL)
 }
 
-func (m *Module) prepareRepo(repo *git.Repository, url string) (*object.FileIter, error) {
-	err := repo.Clone(&git.CloneOptions{URL: url})
-	if err != nil {
-		return nil, err
-	}
-
+func getRepoMasterIterator(repo *git.Repository) (*object.FileIter, error) {
 	ref, err := repo.Reference("refs/remotes/origin/master", true)
 	if err != nil {
 		return nil, err
 	}
 
-	commit, err := repo.Commit(ref.Hash())
+	commit, err := repo.CommitObject(ref.Hash())
 	if err != nil {
 		return nil, err
 	}
@@ -50,10 +46,14 @@ type setDatar interface {
 	SetData(v *string)
 }
 
-// output stream of filename, data
+// CloneToTheme fetches the theme to memory returns the model and theme
 func (m *Module) CloneToTheme(url string) (*models.Theme, error) {
-	r := git.NewMemoryRepository()
-	iter, err := m.prepareRepo(r, url)
+	memStorage := memory.NewStorage()
+	r, err := git.Clone(memStorage, nil, &git.CloneOptions{URL: url})
+	if err != nil {
+		return nil, err
+	}
+	iter, err := getRepoMasterIterator(r)
 	if err != nil {
 		return nil, err
 	}
@@ -140,13 +140,15 @@ func (m *Module) CloneToTheme(url string) (*models.Theme, error) {
 	return theme, nil
 }
 
+// Clone the given url to the given dest
 // todo: support cloning into s3/github store?
 func (m *Module) clone(dest, url string) error {
-	r, err := git.NewFilesystemRepository(path.Join(dest, ".git"))
+	r, err := git.PlainClone(dest, false, &git.CloneOptions{URL: url})
 	if err != nil {
 		return err
 	}
-	iter, err := m.prepareRepo(r, url)
+
+	iter, err := getRepoMasterIterator(r)
 	if err != nil {
 		return err
 	}
@@ -158,7 +160,11 @@ func (m *Module) clone(dest, url string) error {
 		if err != nil {
 			return err
 		}
-		g, err := os.OpenFile(pth, os.O_CREATE|os.O_RDWR|os.O_TRUNC, f.Mode)
+		mode, err := f.Mode.ToOSFileMode()
+		if err != nil {
+			return err
+		}
+		g, err := os.OpenFile(pth, os.O_CREATE|os.O_RDWR|os.O_TRUNC, mode)
 		if err != nil {
 			return err
 		}
