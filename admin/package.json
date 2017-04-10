@@ -31,7 +31,7 @@
     "gutil": "^1.6.4",
     "highlight.js": "^9.10.0",
     "lodash-es": "^4.17.4",
-    "mithril": "^1.1.1",
+    "mithril": "1.0.1",
     "mithril-query": "^2.1.1",
     "mocha": "^3.2.0",
     "node-sass": "^4.5.2",
