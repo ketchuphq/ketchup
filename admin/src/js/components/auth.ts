@@ -35,6 +35,27 @@ class DummyStore {
 let cachedUser: User = null;
 let dummyStore = new DummyStore();
 
+export let getUser = (force = false): Promise<User> => {
+  if (cachedUser && !force) {
+    return new Promise<User>((resolve) => {
+      resolve(cachedUser);
+    });
+  }
+  return m.request({
+    method: 'GET',
+    url: '/api/v1/user',
+  }).then((res: User) => {
+    if (!res.uuid) {
+      throw new Error('not logged in');
+    }
+    cachedUser = res;
+    return res;
+  }).catch(() => {
+    cachedUser = null;
+    throw new Error('not logged in');
+  });
+}
+
 // AuthController is a super class for controllers which may require auth
 export class AuthController {
   user: User;
@@ -44,26 +65,11 @@ export class AuthController {
   constructor(user: User = null) {
     this.store = store.disabled ? dummyStore : store;
     this.user = user || cachedUser;
-    if (this.user) {
-      this._userPromise = new Promise<User>((resolve) => {
-        resolve(this.user);
+    this._userPromise = getUser()
+      .then((user) => {
+        this.user = user;
+        return user;
       });
-    } else {
-      this._userPromise = m.request({
-        method: 'GET',
-        url: '/api/v1/user',
-        background: false,
-      }).then((res: User) => {
-        if (!res.uuid) {
-          throw new Error('not logged in');
-        }
-        this.user = cachedUser = res;
-        return res;
-      }).catch(() => {
-        cachedUser = null;
-        return null;
-      });
-    }
   }
 
   logout() {
