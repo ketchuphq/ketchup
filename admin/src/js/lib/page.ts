@@ -19,6 +19,7 @@ const defaultPage: API.Page = {
   theme: 'none',
   template: 'html',
   contents: [defaultContent],
+  authors: [],
   timestamps: {
     createdAt: null,
     updatedAt: null
@@ -39,6 +40,7 @@ export default class Page extends API.Page {
     this.contents = config.contents || [API.Content.copy(defaultContent)];
     this.timestamps = config.timestamps;
     this.publishedAt = config.publishedAt;
+    this.authors = config.authors;
     this.routes = [];
   }
 

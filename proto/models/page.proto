@@ -16,6 +16,10 @@ message Timestamp {
     optional int64 updated_at = 2; // millis
 }
 
+message Author {
+    optional string uuid = 1;
+}
+
 message Page {
     optional string uuid = 1;
     optional string title = 2;
@@ -26,6 +30,7 @@ message Page {
     repeated Content contents = 10; // should this be a map?
     map<string, string> metadata = 11; // tags? for filtering
     repeated string tags = 12;
+    repeated Author authors = 13;
 }
 
 

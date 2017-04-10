@@ -36,7 +36,12 @@ export default class PagePage extends MustAuthController {
         .then((page) => this.updatePage(page, true))
         .then((page) => page.getRoutes());
     } else {
-      this.updatePage(new Page(), true);
+      this.updatePage(new Page(), true)
+        .then((page) => {
+          this._userPromise.then((user) => {
+            page.authors.push({ uuid: user.uuid });
+          })
+        })
     }
   }
 

@@ -36,6 +36,7 @@ func main() {
 		models.ContentMultiple{},
 		models.ContentText{},
 		models.ContentString{},
+		models.Author{},
 		packages.Package{},
 		packages.PackageRelease{},
 		packages.Registry{},

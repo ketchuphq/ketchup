@@ -10,6 +10,7 @@ export abstract class Page {
   contents?: Content[];
   metadata?: { [key: string]: string; };
   tags?: string[];
+  authors?: Author[];
   static copy(from: Page, to?: Page): Page {
     to = to || {};
     to.uuid = from.uuid;
@@ -23,6 +24,7 @@ export abstract class Page {
     to.contents = from.contents;
     to.metadata = from.metadata;
     to.tags = from.tags;
+    to.authors = from.authors;
     return to;
   }
 }
@@ -196,6 +198,15 @@ export abstract class ContentString {
     to = to || {};
     to.title = from.title;
     to.type = from.type;
+    return to;
+  }
+}
+
+export abstract class Author {
+  uuid?: string;
+  static copy(from: Author, to?: Author): Author {
+    to = to || {};
+    to.uuid = from.uuid;
     return to;
   }
 }

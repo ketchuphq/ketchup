@@ -37,6 +37,7 @@ It has these top-level messages:
 	Export
 	Metadata
 	Timestamp
+	Author
 	Page
 	Content
 	Route
