@@ -63,4 +63,21 @@ describe('renderEditor', function() {
       }
     }, EditorComponent);
   });
+
+  it('short:markdown -> ShortMarkdownEditor', function() {
+    let content: API.Content = {
+      key: 'akey',
+      value: '*hello world*',
+      short: {
+        title: 'thetitle',
+        type: 'markdown',
+      }
+    }
+    let out = mq(renderEditor(content, false));
+    let handler = out.find('input')[0].attrs.onchange;
+    assert.isFunction(handler);
+    let event = { target: { value: 'goodbye moon' }};
+    handler(event)
+    assert.equal(content.value, event.target.value)
+  });
 });
