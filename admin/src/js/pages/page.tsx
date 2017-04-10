@@ -181,7 +181,7 @@ export default class PagePage extends MustAuthController {
 
     let pageMaxClasses = 'page-max animate-fade-in';
     if (ctrl._nextRoute) {
-      pageMaxClasses = 'page-max animate-zoom-away';
+      pageMaxClasses = 'page-max animate-zoom-away animate-fill';
     }
 
     return <div class={pageMaxClasses}
