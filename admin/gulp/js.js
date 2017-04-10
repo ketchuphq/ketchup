@@ -69,7 +69,7 @@ gulp.task('js:test:compile', () => {
     .pipe(gulp.dest('.test/'))
 })
 
-gulp.task('js:test:mocha', () => {
+gulp.task('js:test:mocha', ['js:test:compile'], () => {
   process.env.NODE_PATH = '.test/js/';
   return gulp.src(['.test/test/chai.js', '.test/**/*.test.js'], { read: false })
     .pipe(mocha({
@@ -80,5 +80,5 @@ gulp.task('js:test:mocha', () => {
 gulp.task('js:test', ['js:test:compile', 'js:test:mocha'])
 
 gulp.task('js:test:watch', () =>
-  gulp.watch('src/js/**/*.ts*', ['js:test:compile', 'js:test:mocha'])
+  gulp.watch('src/js/**/*.ts*', ['js:test:mocha'])
 );
