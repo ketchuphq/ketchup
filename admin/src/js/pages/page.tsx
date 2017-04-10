@@ -51,7 +51,7 @@ export default class PagePage extends MustAuthController {
   updatePage(page: Page, initial = false) {
     return this.updateThemeTemplate(page.theme, page.template)
       .then(() => {
-        if (!this.page) {
+        if (!this.page || initial) {
           this.initialContent = cloneDeep(page.contents);
           this.page = page;
         }
@@ -152,7 +152,7 @@ export default class PagePage extends MustAuthController {
           />
         </div>
       </div>
-      <PageButtonsComponent page={this.page} />
+      <PageButtonsComponent page={this.page} onsave={(page: Page) => this.updatePage(page, true)} />
     </div>;
   }
 
@@ -167,7 +167,9 @@ export default class PagePage extends MustAuthController {
     }
 
     let controls = [
-      <PageSaveButtonComponent page={ctrl.page} />,
+      <PageSaveButtonComponent
+        page={ctrl.page}
+        onsave={(page: Page) => ctrl.updatePage(page, true)} />,
       <span class='typcn typcn-cog' onclick={() => ctrl.toggleSettings()} />,
       <Popover visible={ctrl.showSettings}>{ctrl.renderSettings()}</Popover>,
       <a class='typcn typcn-times'

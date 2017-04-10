@@ -5,11 +5,15 @@ import * as Toaster from 'components/toaster';
 
 interface PageSaveButtonAttrs {
   page: Page;
+  onsave: (page: Page) => void;
   classes?: string;
 }
 
 export default class PageSaveButtonComponent {
   private readonly _attrs: PageSaveButtonAttrs;
+
+  constructor(private onsave: (page: Page) => void) {
+  }
 
   save(page: Page) {
     page.save().then((p: API.Page) => {
@@ -19,6 +23,7 @@ export default class PageSaveButtonComponent {
     })
       .then(() => {
         Toaster.add('Page successfully saved');
+        this.onsave(page);
       })
       .catch((err: any) => {
         if (err.detail) {
@@ -30,7 +35,7 @@ export default class PageSaveButtonComponent {
   }
 
   static oninit(v: Mithril.Vnode<PageSaveButtonAttrs, PageSaveButtonComponent>) {
-    v.state = new PageSaveButtonComponent();
+    v.state = new PageSaveButtonComponent(v.attrs.onsave);
   }
 
   static view({ attrs: { page, classes }, state }: Mithril.Vnode<PageSaveButtonAttrs, PageSaveButtonComponent>) {
