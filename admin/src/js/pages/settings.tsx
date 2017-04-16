@@ -11,6 +11,7 @@ let _: Mithril.Component<{}, SettingsPage> = SettingsPage;
 // setup static upload
 export default class SettingsPage extends MustAuthController {
   settings: API.TLSSettingsReponse;
+  version: string;
 
   constructor() {
     super();
@@ -20,6 +21,13 @@ export default class SettingsPage extends MustAuthController {
       url: '/api/v1/settings/tls',
     }).then((settings: API.TLSSettingsReponse) => {
       this.settings = settings;
+      m.redraw();
+    });
+    m.request({
+      method: 'GET',
+      url: '/api/v1/settings/info',
+    }).then(({ version }) => {
+      this.version = version;
       m.redraw();
     });
   }
@@ -42,24 +50,16 @@ export default class SettingsPage extends MustAuthController {
     } else {
       tlsSection = m(TLSComponent, settings);
     }
-    // m('.table',
-    //   m('.tr', [
-    //     m('label', 'Ketchup Version'),
-    //     m('div', '0.1')
-    //   ]),
-    //   m('.tr', [
-    //     m('label', 'Default theme and template'),
-    //     m('input.large', { type: 'text' })
-    //   ])
-    // ),
     return <div class='settings'>
       <header>
         <h1>Settings</h1>
       </header>
-      <h2>TLS</h2>
-      {tlsSection}
-      <h2>Backup</h2>
+      <h2>Ketchup</h2>
       <div class='table'>
+        <div class='tr tr--center'>
+          <label>Version</label>
+          <div>{v.state.version}</div>
+        </div>
         <div class='tr tr--center'>
           <label>Export your data as JSON</label>
           <a
@@ -70,6 +70,8 @@ export default class SettingsPage extends MustAuthController {
           </a>
         </div>
       </div>
+      <h2>TLS</h2>
+      {tlsSection}
     </div>;
   }
 }

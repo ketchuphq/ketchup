@@ -19,6 +19,8 @@ import (
 	"github.com/octavore/ketchup/server/users"
 )
 
+var KetchupVersion = ""
+
 type Module struct {
 	Router    *router.Module
 	DB        *db.Module
@@ -30,6 +32,7 @@ type Module struct {
 	Logger    *logger.Module
 
 	decoder *schema.Decoder
+	version string
 }
 
 const (
@@ -62,6 +65,7 @@ func (m *Module) Init(c *service.Config) {
 			{"/api/v1/routes", methodGet, m.ListRoutes},
 
 			{"/api/v1/user", methodGet, m.Auth.MustWithAuth(m.GetUser)},
+			{"/api/v1/settings/info", methodGet, m.Auth.MustWithAuth(m.GetInfo)},
 			{"/api/v1/settings/tls", methodGet, m.Auth.MustWithAuth(m.GetTLS)},
 			{"/api/v1/settings/tls", methodPost, m.Auth.MustWithAuth(m.EnableTLS)},
 
