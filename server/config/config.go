@@ -7,6 +7,8 @@ import (
 	"github.com/octavore/nagax/config"
 )
 
+const defaultDataDir = "data"
+
 type Config struct {
 	DataDir string `json:"data_dir"` // themes, plugins
 }
@@ -18,7 +20,14 @@ type Module struct {
 
 func (m *Module) Init(c *service.Config) {
 	c.Setup = func() error {
-		return m.ReadConfig(&m.Config)
+		err := m.ReadConfig(&m.Config)
+		if err != nil {
+			return err
+		}
+		if m.Config.DataDir == "" {
+			m.Config.DataDir = defaultDataDir
+		}
+		return nil
 	}
 }
 
