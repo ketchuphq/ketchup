@@ -21,7 +21,7 @@ const (
 
 type ThemesConfig struct {
 	Themes struct {
-		Path        string `json:"dir"`
+		Path        string `json:"path"`
 		RegistryURL string `json:"registry_url"`
 	} `json:"themes"`
 }
