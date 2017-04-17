@@ -66,7 +66,7 @@ export default class PagePage extends MustAuthController {
       .then(() => page);
   }
 
-  updateThemeTemplate(theme: string, template: string) {
+  updateThemeTemplate(theme: string, template: string): Promise<void> {
     if (this.page) {
       this.page.theme = theme;
       this.page.template = template;
@@ -74,7 +74,9 @@ export default class PagePage extends MustAuthController {
     return Theme.get(theme).then((t) => {
       this.template = t.getTemplate(template);
       m.redraw();
-    });
+    })
+      // catch deleted theme
+      .catch(() => this.updateThemeTemplate('none', 'html'))
   }
 
   updateContent(initial = false) {
