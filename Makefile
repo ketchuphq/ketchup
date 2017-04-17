@@ -1,6 +1,6 @@
 # shell is set so new path is picked up
 SHELL := /bin/bash
-export PATH := $(GOPATH):$(PATH)
+export PATH := $(GOPATH)/bin:$(PATH)
 
 dev:
 	make -C admin
@@ -27,6 +27,13 @@ goreleaser.yml:
 		> goreleaser.yml
 
 include make/*.mk
+
+prepare-admin:
+	make -C admin prepare
+
+prepare-vendor:
+	go get -u github.com/kardianos/govendor
+	govendor sync
 
 goimports:
 	GO_DIRS=$$(find . -name "*.go" -exec dirname {} \; | sort -u); \
