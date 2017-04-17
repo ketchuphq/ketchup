@@ -17,7 +17,7 @@ var noneTemplate = `<html>
 var noneTheme = &models.Theme{
 	Name: proto.String("none"),
 	Templates: map[string]*models.ThemeTemplate{
-		"html": &models.ThemeTemplate{
+		"html": {
 			Name:   proto.String("html"),
 			Engine: proto.String(engines.EngineTypeHTML),
 			Data:   &noneTemplate,
@@ -32,7 +32,7 @@ var noneTheme = &models.Theme{
 				},
 			},
 		},
-		"markdown": &models.ThemeTemplate{
+		"markdown": {
 			Name:   proto.String("markdown"),
 			Engine: proto.String(engines.EngineTypeHTML),
 			Data:   &noneTemplate,

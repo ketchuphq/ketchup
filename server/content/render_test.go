@@ -54,7 +54,7 @@ func TestRenderTextContent(t *testing.T) {
 func TestCreateContentMap(t *testing.T) {
 	page := &models.Page{
 		Contents: []*models.Content{
-			&models.Content{
+			{
 				Key:   proto.String("k0"),
 				Value: proto.String("v0"),
 				Type: &models.Content_Short{
