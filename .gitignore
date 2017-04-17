@@ -1,6 +1,8 @@
 **/node_modules/
 **/bower_components/
 **/build/
+dist/
+goreleaser.yml
 
 vendor/github.com/
 vendor/golang.org/
@@ -12,3 +14,4 @@ vendor/srcd.works/
 bindata.go
 
 .test
+ketchup

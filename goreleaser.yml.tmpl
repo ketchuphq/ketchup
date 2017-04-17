@@ -1,0 +1,14 @@
+build:
+  main: main.go
+  binary: ketchup
+  flags: "-gcflags=-trimpath={GOPATH}/src -asmflags=-trimpath={GOPATH}/src"
+  goos:
+    - darwin
+    - linux
+  goarch:
+    - amd64
+
+archive:
+  format: tar.gz
+  files:
+    - LICENSE

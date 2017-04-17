@@ -11,6 +11,9 @@ import (
 	"github.com/octavore/ketchup/server/tls"
 )
 
+// set by goreleaser
+var version = "dev"
+
 type App struct {
 	Content *content.Module
 	API     *api.Module
@@ -25,6 +28,7 @@ type App struct {
 func (p *App) Init(c *service.Config) {}
 
 func main() {
+	api.KetchupVersion = version
 	service.EnvVarName = "KETCHUP_ENV"
 	service.Run(&App{})
 }
