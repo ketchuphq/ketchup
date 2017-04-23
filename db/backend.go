@@ -19,6 +19,9 @@ type Backend interface {
 	// GetUserByEmail TODO
 	GetUserByEmail(email string) (*models.User, error)
 
+	// GetUserByToken looks up a user by token, and returns nil, nil if no user.
+	GetUserByToken(token string) (*models.User, error)
+
 	// UpdateUser
 	UpdateUser(*models.User) error
 

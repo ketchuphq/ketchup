@@ -44,6 +44,30 @@ func (m *Module) GetUserByEmail(email string) (*models.User, error) {
 	return user, err
 }
 
+func (m *Module) GetUserByToken(token string) (*models.User, error) {
+	if token == "" {
+		return nil, nil
+	}
+	var user *models.User
+	err := m.Bolt.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(USER_BUCKET))
+		c := b.Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			u := &models.User{}
+			err := proto.Unmarshal(v, u)
+			if err != nil {
+				return err
+			}
+			if u.GetToken() == token {
+				user = u
+				return nil
+			}
+		}
+		return nil
+	})
+	return user, err
+}
+
 func (m *Module) UpdateUser(user *models.User) error {
 	if user.Uuid == nil {
 		user.Uuid = proto.String(uuid.NewV4().String())
