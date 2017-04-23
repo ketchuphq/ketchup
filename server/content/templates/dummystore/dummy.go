@@ -1,12 +1,6 @@
 package dummy
 
-import (
-	"io"
-
-	"github.com/golang/protobuf/jsonpb"
-
-	"github.com/octavore/ketchup/proto/ketchup/models"
-)
+import "github.com/octavore/ketchup/proto/ketchup/models"
 
 type DummyTemplateStore struct {
 	Themes map[string]*models.Theme
@@ -26,14 +20,9 @@ func (d *DummyTemplateStore) List() ([]*models.Theme, error) {
 	return themes, nil
 }
 
-func (d *DummyTemplateStore) Add(r io.Reader) (*models.Theme, error) {
-	theme := &models.Theme{}
-	err := jsonpb.Unmarshal(r, theme)
-	if err != nil {
-		return nil, err
-	}
+func (d *DummyTemplateStore) Add(theme *models.Theme) error {
 	d.Themes[theme.GetName()] = theme
-	return theme, nil
+	return nil
 }
 
 func (d *DummyTemplateStore) Get(themeName string) (*models.Theme, error) {

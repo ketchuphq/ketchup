@@ -40,7 +40,7 @@ func TestUser(t *testing.T) {
 		{"c@example.com", "defghi", false},
 	}
 	for _, tt := range tests {
-		user, err := app.GetUser(tt.email)
+		user, err := app.GetUserByEmail(tt.email)
 		if err != nil {
 			t.Fatal(err)
 		}

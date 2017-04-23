@@ -1,7 +1,7 @@
 package content
 
 import (
-	"bytes"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -109,7 +109,8 @@ func TestReloadNew(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = m.Templates.Stores[0].Add(bytes.NewBufferString(`{
+	theme := &models.Theme{}
+	json.Unmarshal([]byte(`{
     "name": "test-theme",
     "templates": {
       "markdown": {
@@ -119,7 +120,8 @@ func TestReloadNew(t *testing.T) {
         "placeholders": []
       }
     }
-  }`))
+  }`), theme)
+	err = m.Templates.Stores[0].Add(theme)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -3,6 +3,7 @@ package dummy
 import (
 	"io"
 
+	"github.com/octavore/ketchup/proto/ketchup/api"
 	"github.com/octavore/ketchup/proto/ketchup/models"
 )
 
@@ -33,6 +34,15 @@ func (d *DummyDB) GetUserByEmail(email string) (*models.User, error) {
 	return nil, nil
 }
 
+func (d *DummyDB) GetUserByToken(token string) (*models.User, error) {
+	for _, u := range d.Users {
+		if u.GetToken() == token {
+			return u, nil
+		}
+	}
+	return nil, nil
+}
+
 func (d *DummyDB) UpdateUser(u *models.User) error {
 	// todo: set uuid, timestamp?
 	d.Users[u.GetEmail()] = u
@@ -53,7 +63,7 @@ func (d *DummyDB) DeletePage(p *models.Page) error {
 	return nil
 }
 
-func (d *DummyDB) ListPages() ([]*models.Page, error) {
+func (d *DummyDB) ListPages(_ *api.ListPageRequest) ([]*models.Page, error) {
 	pages := []*models.Page{}
 	for _, p := range d.Pages {
 		pages = append(pages, p)

@@ -37,6 +37,7 @@ type Module struct {
 // Init implements service.Init
 func (m *Module) Init(c *service.Config) {
 	c.Setup = func() (err error) {
+		m.Backend.Register(m)
 		err = m.ConfigModule.ReadConfig(&m.config)
 		if err != nil {
 			return err
@@ -44,7 +45,6 @@ func (m *Module) Init(c *service.Config) {
 		if c.Env().IsTest() {
 			return
 		}
-		m.Backend.Register(m)
 		m.config.Bolt.Path = m.ConfigModule.DataPath(m.config.Bolt.Path, "default.db")
 		m.Bolt, err = bolt.Open(m.config.Bolt.Path, os.ModePerm, &bolt.Options{
 			Timeout: 5 * time.Second,
@@ -71,7 +71,10 @@ func (m *Module) Init(c *service.Config) {
 		if err != nil {
 			panic(err)
 		}
-		m.init()
+		err = m.init()
+		if err != nil {
+			panic(err)
+		}
 		return
 	}
 	c.Stop = func() {
