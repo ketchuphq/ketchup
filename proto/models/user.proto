@@ -6,4 +6,5 @@ message User {
     optional string uuid = 1;
     optional string email = 2;
     optional string hashed_password = 3;
+    optional string token = 4;
 }
