@@ -2,6 +2,8 @@
 SHELL := /bin/bash
 export PATH := $(GOPATH)/bin:$(PATH)
 
+GO_DIRS := $(shell find . -name "*.go" -exec dirname {} \; | grep -v vendor | sort -u)
+
 dev:
 	make -C admin
 	go build .
@@ -36,8 +38,10 @@ prepare-vendor:
 	govendor sync
 
 goimports:
-	GO_DIRS=$$(find . -name "*.go" -exec dirname {} \; | sort -u); \
-	  goimports -w -local github.com/octavore/ketchup $$GO_DIRS
+	@goimports -w -local github.com/octavore/ketchup $(GO_DIRS)
+
+test:
+	@go test $(GO_DIRS)
 
 .PHONY: admin goreleaser.yml
 
