@@ -1,7 +1,10 @@
 package users
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
+	"strings"
 
 	"github.com/howeyc/gopass"
 	"github.com/octavore/naga/service"
@@ -55,6 +58,38 @@ func registerSetPassword(m *Module) *service.Command {
 			if err != nil {
 				panic(err)
 			}
+		},
+	}
+}
+
+func registerGenerateToken(m *Module) *service.Command {
+	return &service.Command{
+		Keyword:    "users:token <email>",
+		Usage:      "Generate user API token.",
+		ShortUsage: "Generate user API token. Replaces any existing token.",
+		Run: func(ctx *service.CommandContext) {
+			ctx.RequireExactlyNArgs(1)
+			email := ctx.Args[0]
+			u, err := m.DB.GetUserByEmail(email)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+
+			b := make([]byte, 15)
+			_, err = rand.Read(b)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+
+			t := strings.ToLower(base64.StdEncoding.EncodeToString(b))
+			u.SetToken(&t)
+			err = m.DB.UpdateUser(u)
+			if err != nil {
+				panic(err)
+			}
+			fmt.Println("generated token:", t)
 		},
 	}
 }

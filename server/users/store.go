@@ -1,6 +1,8 @@
 package users
 
 import (
+	"github.com/octavore/nagax/logger"
+
 	"github.com/octavore/ketchup/db"
 	"github.com/octavore/ketchup/proto/ketchup/models"
 )
@@ -30,4 +32,21 @@ func (s *userStore) Get(email string) (id, hashedPassword string, err error) {
 		return "", "", err
 	}
 	return u.GetUuid(), u.GetHashedPassword(), nil
+}
+
+type tokenStore struct {
+	db.Backend
+	logger.Logger
+}
+
+func (t *tokenStore) Get(token string) *string {
+	user, err := t.GetUserByToken(token)
+	if err != nil {
+		t.Logger.Warningf("error fetching token: %v", err)
+		return nil
+	}
+	if user == nil {
+		return nil
+	}
+	return user.Uuid
 }

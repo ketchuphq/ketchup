@@ -25,6 +25,7 @@ func (m *Module) GetUser(rw http.ResponseWriter, req *http.Request, par httprout
 		return err
 	}
 	user.HashedPassword = nil
+	user.Token = nil
 	return router.Proto(rw, user)
 }
 

@@ -10,6 +10,7 @@ import (
 	"github.com/octavore/nagax/users"
 	"github.com/octavore/nagax/users/databaseauth"
 	"github.com/octavore/nagax/users/session"
+	"github.com/octavore/nagax/users/tokenauth"
 
 	"github.com/octavore/ketchup/db"
 	"github.com/octavore/ketchup/server/config"
@@ -19,12 +20,15 @@ import (
 // to enable user logins.
 type Module struct {
 	Auth     *users.Module
-	DBAuth   *databaseauth.Module // todo: make this pluggable?
 	Sessions *session.Module
 	Config   *config.Module
 	Router   *router.Module
 	DB       *db.Module
 	Logger   *logger.Module
+
+	// todo: make these pluggable?
+	DBAuth    *databaseauth.Module
+	TokenAuth *tokenauth.Module
 }
 
 // Handle is similar to httprouter.Handle, except it returns an error which can be
@@ -35,6 +39,7 @@ type Handle func(rw http.ResponseWriter, req *http.Request, par httprouter.Param
 func (m *Module) Init(c *service.Config) {
 	c.AddCommand(registerSetPassword(m))
 	c.AddCommand(registerUserAdd(m))
+	c.AddCommand(registerGenerateToken(m))
 
 	c.Setup = func() error {
 		m.DBAuth.Configure(
@@ -43,10 +48,15 @@ func (m *Module) Init(c *service.Config) {
 			databaseauth.WithErrorHandler(m.ErrorHandler),
 		)
 		m.Sessions.KeyFile = m.Config.DataPath("session.key", "session.key")
-		m.Auth.ErrorHandler = m.ErrorHandler
-		m.Auth.RegisterAuthenticator(m.Sessions)
 		// todo: allow to be set in a config file
 		m.Sessions.CookieDomain = ""
+		m.Auth.ErrorHandler = m.ErrorHandler
+		m.Auth.RegisterAuthenticator(m.Sessions)
+
+		m.TokenAuth.Configure(
+			tokenauth.WithTokenSource(&tokenStore{m.DB, m.Logger}),
+		)
+		m.Auth.RegisterAuthenticator(m.TokenAuth)
 		return nil
 	}
 }
