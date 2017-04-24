@@ -14,6 +14,8 @@ If you’re interested in _using_ Ketchup, please check out the documentation at
 
 If you want to download the latest release, visit the [Releases page](https://github.com/ketchuphq/ketchup/releases).
 
+If you'd like to see some screenshots, see [here](https://ketchuphq.com/docs/screenshots).
+
 This readme will focus on how to build and develop Ketchup.
 
 ## Development
