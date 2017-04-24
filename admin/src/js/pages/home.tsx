@@ -21,6 +21,11 @@ export default class HomePage extends MustAuthController {
       >
         Write a new post &rarr;
       </Button>
+      <p>
+        <a href='https://ketchuphq.com/docs'>
+          Learn more
+        </a> &#8599;
+      </p>
     </div>;
   }
 }
