@@ -5,7 +5,7 @@ import (
 
 	"github.com/octavore/naga/service"
 
-	"github.com/octavore/ketchup/util/errors"
+	"github.com/ketchuphq/ketchup/util/errors"
 )
 
 type Module struct {

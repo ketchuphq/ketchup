@@ -7,7 +7,7 @@ import (
 
 	"github.com/russross/blackfriday"
 
-	"github.com/octavore/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 )
 
 func (m *Module) render(w io.Writer, page *models.Page) error {

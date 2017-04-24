@@ -6,10 +6,10 @@ import (
 	"github.com/octavore/naga/service"
 	"github.com/octavore/nagax/logger"
 
-	"github.com/octavore/ketchup/plugins/pkg"
-	"github.com/octavore/ketchup/server/config"
-	"github.com/octavore/ketchup/server/content/templates/defaultstore"
-	"github.com/octavore/ketchup/server/content/templates/filestore"
+	"github.com/ketchuphq/ketchup/plugins/pkg"
+	"github.com/ketchuphq/ketchup/server/config"
+	"github.com/ketchuphq/ketchup/server/content/templates/defaultstore"
+	"github.com/ketchuphq/ketchup/server/content/templates/filestore"
 )
 
 const (

@@ -1,6 +1,6 @@
 package dummy
 
-import "github.com/octavore/ketchup/proto/ketchup/models"
+import "github.com/ketchuphq/ketchup/proto/ketchup/models"
 
 type DummyTemplateStore struct {
 	Themes map[string]*models.Theme

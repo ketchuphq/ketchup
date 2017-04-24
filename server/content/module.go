@@ -7,10 +7,10 @@ import (
 	"github.com/octavore/naga/service"
 	"github.com/octavore/nagax/logger"
 
-	"github.com/octavore/ketchup/db"
-	"github.com/octavore/ketchup/proto/ketchup/models"
-	"github.com/octavore/ketchup/server/content/templates"
-	"github.com/octavore/ketchup/server/router"
+	"github.com/ketchuphq/ketchup/db"
+	"github.com/ketchuphq/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/server/content/templates"
+	"github.com/ketchuphq/ketchup/server/router"
 )
 
 // Module server is responsible for serving published content

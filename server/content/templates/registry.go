@@ -1,6 +1,6 @@
 package templates
 
-import "github.com/octavore/ketchup/proto/ketchup/packages"
+import "github.com/ketchuphq/ketchup/proto/ketchup/packages"
 
 func (m *Module) Registry() (*packages.Registry, error) {
 	err := m.themeRegistry.Sync()

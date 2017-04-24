@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/octavore/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 )
 
 func TestSort(t *testing.T) {

@@ -7,9 +7,9 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 
-	"github.com/octavore/ketchup/proto/ketchup/api"
-	"github.com/octavore/ketchup/server/router"
-	"github.com/octavore/ketchup/util/errors"
+	"github.com/ketchuphq/ketchup/proto/ketchup/api"
+	"github.com/ketchuphq/ketchup/server/router"
+	"github.com/ketchuphq/ketchup/util/errors"
 )
 
 func (m *Module) ListThemes(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) error {

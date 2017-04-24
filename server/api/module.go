@@ -9,14 +9,14 @@ import (
 	"github.com/octavore/naga/service"
 	"github.com/octavore/nagax/logger"
 
-	"github.com/octavore/ketchup/db"
-	"github.com/octavore/ketchup/proto/ketchup/api"
-	"github.com/octavore/ketchup/server/config"
-	"github.com/octavore/ketchup/server/content"
-	"github.com/octavore/ketchup/server/content/templates"
-	"github.com/octavore/ketchup/server/router"
-	"github.com/octavore/ketchup/server/tls"
-	"github.com/octavore/ketchup/server/users"
+	"github.com/ketchuphq/ketchup/db"
+	"github.com/ketchuphq/ketchup/proto/ketchup/api"
+	"github.com/ketchuphq/ketchup/server/config"
+	"github.com/ketchuphq/ketchup/server/content"
+	"github.com/ketchuphq/ketchup/server/content/templates"
+	"github.com/ketchuphq/ketchup/server/router"
+	"github.com/ketchuphq/ketchup/server/tls"
+	"github.com/ketchuphq/ketchup/server/users"
 )
 
 var KetchupVersion = ""

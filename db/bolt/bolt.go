@@ -11,10 +11,10 @@ import (
 	"github.com/octavore/naga/service"
 	"github.com/octavore/nagax/logger"
 
-	"github.com/octavore/ketchup/db"
-	"github.com/octavore/ketchup/proto/ketchup/models"
-	"github.com/octavore/ketchup/server/config"
-	"github.com/octavore/ketchup/util/errors"
+	"github.com/ketchuphq/ketchup/db"
+	"github.com/ketchuphq/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/server/config"
+	"github.com/ketchuphq/ketchup/util/errors"
 )
 
 type BoltConfig struct {

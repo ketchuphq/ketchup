@@ -7,7 +7,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/octavore/naga/service"
 
-	"github.com/octavore/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 )
 
 func TestRoutes(t *testing.T) {

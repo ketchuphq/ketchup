@@ -15,8 +15,8 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 
-	"github.com/octavore/ketchup/proto/ketchup/models"
-	"github.com/octavore/ketchup/util/errors"
+	"github.com/ketchuphq/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/util/errors"
 )
 
 const (

@@ -1,6 +1,6 @@
 package templates
 
-import "github.com/octavore/ketchup/proto/ketchup/models"
+import "github.com/ketchuphq/ketchup/proto/ketchup/models"
 
 // ThemeStore is a interface to support multiple theme backends.
 type ThemeStore interface {

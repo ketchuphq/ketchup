@@ -4,7 +4,7 @@ import (
 	"errors"
 	"io"
 
-	"github.com/octavore/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 )
 
 // Engines contain maps extensions to template rendering engines

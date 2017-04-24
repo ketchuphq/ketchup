@@ -7,7 +7,7 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/octavore/naga/service"
 
-	"github.com/octavore/ketchup/proto/ketchup/models/export"
+	"github.com/ketchuphq/ketchup/proto/ketchup/models/export"
 )
 
 var marshaler = &jsonpb.Marshaler{

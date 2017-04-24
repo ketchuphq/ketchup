@@ -7,7 +7,7 @@ PROTO_FILES=$(shell find . -name "*.proto")
 INCL_PROTO_DIR=$(shell find . -name "*.proto" -exec dirname {} \; | sort -u | sed -e 's/^/-I/')
 INCL_WKT=-I $$GOPATH/src/github.com/golang/protobuf/ptypes/struct
 
-PROTO_PREFIX=import_prefix_proto=github.com/octavore/ketchup/proto/
+PROTO_PREFIX=import_prefix_proto=github.com/ketchuphq/ketchup/proto/
 
 protos:
 	@mkdir -p proto

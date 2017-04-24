@@ -58,8 +58,8 @@ package api
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import ketchup_models "github.com/octavore/ketchup/proto/ketchup/models"
-import structpb "github.com/octavore/ketchup/proto/structpb"
+import ketchup_models "github.com/ketchuphq/ketchup/proto/ketchup/models"
+import structpb "github.com/ketchuphq/ketchup/proto/structpb"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal

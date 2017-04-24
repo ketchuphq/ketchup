@@ -1,9 +1,9 @@
 package templates
 
 import (
-	"github.com/octavore/ketchup/proto/ketchup/models"
-	"github.com/octavore/ketchup/proto/ketchup/packages"
-	"github.com/octavore/ketchup/util/errors"
+	"github.com/ketchuphq/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/proto/ketchup/packages"
+	"github.com/ketchuphq/ketchup/util/errors"
 )
 
 func (m *Module) getTheme(name string) (ThemeStore, *models.Theme, error) {

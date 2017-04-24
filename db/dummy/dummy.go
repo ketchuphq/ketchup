@@ -3,8 +3,8 @@ package dummy
 import (
 	"io"
 
-	"github.com/octavore/ketchup/proto/ketchup/api"
-	"github.com/octavore/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/proto/ketchup/api"
+	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 )
 
 type DummyDB struct {

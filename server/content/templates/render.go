@@ -3,8 +3,8 @@ package templates
 import (
 	"io"
 
-	"github.com/octavore/ketchup/proto/ketchup/models"
-	"github.com/octavore/ketchup/server/content/engines"
+	"github.com/ketchuphq/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/server/content/engines"
 )
 
 // Render a page using the theme and template specified therein.

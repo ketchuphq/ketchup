@@ -5,8 +5,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	"github.com/octavore/ketchup/proto/ketchup/models"
-	"github.com/octavore/ketchup/server/content/engines"
+	"github.com/ketchuphq/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/server/content/engines"
 )
 
 var noneTemplate = `<html>

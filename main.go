@@ -3,12 +3,12 @@ package main
 import (
 	"github.com/octavore/naga/service"
 
-	"github.com/octavore/ketchup/admin"
-	"github.com/octavore/ketchup/db/bolt"
-	"github.com/octavore/ketchup/server/api"
-	"github.com/octavore/ketchup/server/backup"
-	"github.com/octavore/ketchup/server/content"
-	"github.com/octavore/ketchup/server/tls"
+	"github.com/ketchuphq/ketchup/admin"
+	"github.com/ketchuphq/ketchup/db/bolt"
+	"github.com/ketchuphq/ketchup/server/api"
+	"github.com/ketchuphq/ketchup/server/backup"
+	"github.com/ketchuphq/ketchup/server/content"
+	"github.com/ketchuphq/ketchup/server/tls"
 )
 
 // set by goreleaser

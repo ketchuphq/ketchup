@@ -11,9 +11,9 @@ import (
 	router_api "github.com/octavore/nagax/proto/nagax/router/api"
 	"github.com/octavore/pbts"
 
-	"github.com/octavore/ketchup/proto/ketchup/api"
-	"github.com/octavore/ketchup/proto/ketchup/models"
-	"github.com/octavore/ketchup/proto/ketchup/packages"
+	"github.com/ketchuphq/ketchup/proto/ketchup/api"
+	"github.com/ketchuphq/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/proto/ketchup/packages"
 )
 
 func main() {

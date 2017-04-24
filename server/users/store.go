@@ -3,8 +3,8 @@ package users
 import (
 	"github.com/octavore/nagax/logger"
 
-	"github.com/octavore/ketchup/db"
-	"github.com/octavore/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/db"
+	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 )
 
 type userStore struct{ db.Backend }

@@ -14,9 +14,9 @@ import (
 	"github.com/octavore/nagax/logger"
 	"github.com/octavore/nagax/router"
 
-	"github.com/octavore/ketchup/proto/ketchup/api"
-	"github.com/octavore/ketchup/server/router/middleware/gzip"
-	logger2 "github.com/octavore/ketchup/server/router/middleware/logger"
+	"github.com/ketchuphq/ketchup/proto/ketchup/api"
+	"github.com/ketchuphq/ketchup/server/router/middleware/gzip"
+	logger2 "github.com/ketchuphq/ketchup/server/router/middleware/logger"
 )
 
 var ErrNotFound = fmt.Errorf("not found")

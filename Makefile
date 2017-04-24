@@ -38,7 +38,7 @@ prepare-vendor:
 	govendor sync
 
 goimports:
-	@goimports -w -local github.com/octavore/ketchup $(GO_DIRS)
+	@goimports -w -local github.com/ketchuphq/ketchup $(GO_DIRS)
 
 test:
 	@go test $(GO_DIRS)

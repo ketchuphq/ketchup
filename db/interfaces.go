@@ -3,7 +3,7 @@ package db
 import (
 	"github.com/golang/protobuf/proto"
 
-	"github.com/octavore/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 )
 
 type AddressableProto interface {
