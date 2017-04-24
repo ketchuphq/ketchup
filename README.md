@@ -10,7 +10,7 @@
 
 ## Usage
 
-If you’re interested in _using_ Ketchup, please check out the documentation at [ketchuphq.com/docs](https://ketchuphq.com/docs).
+If you’re interested in _using_ Ketchup, please check out the documentation at [ketchuphq.com/docs](https://ketchuphq.com/docs) (which is itself built with Ketchup &mdash; dogfood!).
 
 This readme will focus on how to build and develop Ketchup.
 
