@@ -12,6 +12,8 @@
 
 If you’re interested in _using_ Ketchup, please check out the documentation at [ketchuphq.com/docs](https://ketchuphq.com/docs) (which is itself built with Ketchup &mdash; dogfood!).
 
+If you want to download the latest release, visit the [Releases page](https://github.com/ketchuphq/ketchup/releases).
+
 This readme will focus on how to build and develop Ketchup.
 
 ## Development
