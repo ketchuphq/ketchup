@@ -9,6 +9,7 @@ func New(log func(format string, args ...interface{})) func(rw http.ResponseWrit
 	return func(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 		t := time.Now()
 		next(rw, req)
-		log("[%s] %q %v", req.Method, req.URL.Path, time.Now().Sub(t))
+		ua := req.Header.Get("User-Agent")
+		log("[%s] %q %v %s", req.Method, req.URL.Path, time.Now().Sub(t), ua)
 	}
 }
