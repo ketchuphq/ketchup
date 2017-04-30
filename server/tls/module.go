@@ -1,6 +1,7 @@
 package tls
 
 import (
+	"crypto/x509"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -79,6 +80,15 @@ Required params: domain to provision a cert for; contact email for Let's Encrypt
 				m.Logger.Error(errors.Wrap(err))
 			}
 		}()
+
+		go func() {
+			for range time.Tick(2 * time.Hour) {
+				err := m.renewExpiredCerts()
+				if err != nil {
+					m.Logger.Error(err)
+				}
+			}
+		}()
 	}
 }
 
@@ -86,7 +96,32 @@ func (m *Module) tlsDirPath(file string) string {
 	return path.Join(m.Config.Config.DataDir, tlsDir, file)
 }
 
-// func (m *Module) Renew(r *Registration) error {}
+func (m *Module) renewExpiredCerts() error {
+	tlsConfig, err := m.loadTLSConfig()
+	if err != nil {
+		return err
+	}
+	for _, cert := range tlsConfig.Certificates {
+		x509Cert, err := x509.ParseCertificate(cert.Certificate[0])
+		if err != nil {
+			m.Logger.Error(err)
+			continue
+		}
+		if x509Cert.NotAfter.Before(now()) {
+			domain := x509Cert.Subject.CommonName
+			m.Logger.Infof("expired cert: renewing cert for %s", domain)
+			r, err := m.GetRegistration(domain, false)
+			if err != nil {
+				return err
+			}
+			err = m.obtainCert(r)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
 
 func (m *Module) ObtainCert(email, domain string) error {
 	r, err := m.GetRegistration(domain, true)
