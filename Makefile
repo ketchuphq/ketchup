@@ -2,7 +2,7 @@
 SHELL := /bin/bash
 export PATH := $(GOPATH)/bin:$(PATH)
 
-GO_DIRS := $(shell find . -name "*.go" -exec dirname {} \; | grep -v vendor | sort -u)
+GO_DIRS := $(shell find . -name "*.go" -exec dirname {} \; | grep -v vendor | grep -v proto | sort -u)
 
 dev:
 	make -C admin
