@@ -2,7 +2,6 @@ package router
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"path"
 
@@ -19,7 +18,13 @@ import (
 	logger2 "github.com/ketchuphq/ketchup/server/router/middleware/logger"
 )
 
-var ErrNotFound = fmt.Errorf("not found")
+var (
+	ErrNotFound = fmt.Errorf("not found")
+	JSON        = &jsonpb.Marshaler{
+		EnumsAsInts: false,
+		Indent:      "  ",
+	}
+)
 
 type Module struct {
 	*router.Module
@@ -57,7 +62,7 @@ func Proto(rw http.ResponseWriter, pb proto.Message) error {
 
 func (m *Module) InternalError(rw http.ResponseWriter, err error) {
 	if err == ErrNotFound {
-		NotFound(rw)
+		m.NotFound(rw)
 		return
 	}
 
@@ -67,7 +72,7 @@ func (m *Module) InternalError(rw http.ResponseWriter, err error) {
 		f := path.Base(s.File)
 		m.Logger.Errorf("[%s/%s:%d] %v", s.Package, f, s.LineNumber, e.Error())
 	default:
-		m.Logger.Error(e)
+		m.Logger.Errorf("router: internal error %v", e)
 	}
 	rw.WriteHeader(http.StatusInternalServerError)
 	err = Proto(rw, &api.Error{
@@ -75,22 +80,17 @@ func (m *Module) InternalError(rw http.ResponseWriter, err error) {
 		Detail: proto.String("Internal server error."),
 	})
 	if err != nil {
-		log.Println("router: ", err)
+		m.Logger.Errorf("router: %v", err)
 	}
 }
 
-func NotFound(rw http.ResponseWriter) {
+func (m *Module) NotFound(rw http.ResponseWriter) {
 	rw.WriteHeader(http.StatusNotFound)
 	err := Proto(rw, &api.Error{
 		Code:   api.ErrorCode_NOT_FOUND.Enum(),
 		Detail: proto.String("Not found."),
 	})
 	if err != nil {
-		log.Println("router: ", err)
+		m.Logger.Errorf("router: not found error %v", err)
 	}
-}
-
-var JSON = &jsonpb.Marshaler{
-	EnumsAsInts: false,
-	Indent:      "  ",
 }
