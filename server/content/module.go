@@ -66,7 +66,7 @@ func (m *Module) servePage(pageUUID string) httprouter.Handle {
 	return func(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 		page, err := m.DB.GetPage(pageUUID)
 		if page.PublishedAt == nil {
-			router.NotFound(rw)
+			m.Router.NotFound(rw)
 			return
 		}
 		if err == nil {

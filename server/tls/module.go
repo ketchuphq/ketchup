@@ -204,7 +204,7 @@ func (m *Module) obtainCert(r *Registration) error {
 
 func (m *Module) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	if m.challenge == nil {
-		router.NotFound(rw)
+		m.Router.NotFound(rw)
 		return
 	}
 	// The handler validates the HOST header and request type.
