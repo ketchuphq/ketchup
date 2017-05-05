@@ -48,7 +48,7 @@ func (x *Package_Type) UnmarshalJSON(data []byte) error {
 	*x = Package_Type(value)
 	return nil
 }
-func (Package_Type) EnumDescriptor() ([]byte, []int) { return fileDescriptor8, []int{1, 0} }
+func (Package_Type) EnumDescriptor() ([]byte, []int) { return fileDescriptor9, []int{1, 0} }
 
 type PackageRelease struct {
 	KetchupMin       *string `protobuf:"bytes,1,opt,name=ketchup_min,json=ketchupMin" json:"ketchup_min,omitempty"`
@@ -59,7 +59,7 @@ type PackageRelease struct {
 func (m *PackageRelease) Reset()                    { *m = PackageRelease{} }
 func (m *PackageRelease) String() string            { return proto.CompactTextString(m) }
 func (*PackageRelease) ProtoMessage()               {}
-func (*PackageRelease) Descriptor() ([]byte, []int) { return fileDescriptor8, []int{0} }
+func (*PackageRelease) Descriptor() ([]byte, []int) { return fileDescriptor9, []int{0} }
 
 func (m *PackageRelease) GetKetchupMin() string {
 	if m != nil && m.KetchupMin != nil {
@@ -90,7 +90,7 @@ type Package struct {
 func (m *Package) Reset()                    { *m = Package{} }
 func (m *Package) String() string            { return proto.CompactTextString(m) }
 func (*Package) ProtoMessage()               {}
-func (*Package) Descriptor() ([]byte, []int) { return fileDescriptor8, []int{1} }
+func (*Package) Descriptor() ([]byte, []int) { return fileDescriptor9, []int{1} }
 
 func (m *Package) GetName() string {
 	if m != nil && m.Name != nil {
@@ -158,7 +158,7 @@ type Registry struct {
 func (m *Registry) Reset()                    { *m = Registry{} }
 func (m *Registry) String() string            { return proto.CompactTextString(m) }
 func (*Registry) ProtoMessage()               {}
-func (*Registry) Descriptor() ([]byte, []int) { return fileDescriptor8, []int{2} }
+func (*Registry) Descriptor() ([]byte, []int) { return fileDescriptor9, []int{2} }
 
 func (m *Registry) GetRegistryVersion() string {
 	if m != nil && m.RegistryVersion != nil {
@@ -228,9 +228,9 @@ func (m *Registry) SetPackages(v []*Package) {
 	m.Packages = v
 }
 
-func init() { proto.RegisterFile("packages.proto", fileDescriptor8) }
+func init() { proto.RegisterFile("packages.proto", fileDescriptor9) }
 
-var fileDescriptor8 = []byte{
+var fileDescriptor9 = []byte{
 	// 329 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x50, 0x3d, 0x6f, 0xab, 0x40,
 	0x10, 0x7c, 0x60, 0x6c, 0xe3, 0xe5, 0xc9, 0x0f, 0x6d, 0xf1, 0x72, 0x69, 0x92, 0x13, 0x15, 0x49,

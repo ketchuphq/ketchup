@@ -27,7 +27,7 @@ type Theme struct {
 func (m *Theme) Reset()                    { *m = Theme{} }
 func (m *Theme) String() string            { return proto.CompactTextString(m) }
 func (*Theme) ProtoMessage()               {}
-func (*Theme) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{0} }
+func (*Theme) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{0} }
 
 func (m *Theme) GetUuid() string {
 	if m != nil && m.Uuid != nil {
@@ -73,7 +73,7 @@ type ThemeTemplate struct {
 func (m *ThemeTemplate) Reset()                    { *m = ThemeTemplate{} }
 func (m *ThemeTemplate) String() string            { return proto.CompactTextString(m) }
 func (*ThemeTemplate) ProtoMessage()               {}
-func (*ThemeTemplate) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{1} }
+func (*ThemeTemplate) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{1} }
 
 const Default_ThemeTemplate_Engine string = "html"
 const Default_ThemeTemplate_HideContent bool = false
@@ -147,7 +147,7 @@ type ThemePlaceholder struct {
 func (m *ThemePlaceholder) Reset()                    { *m = ThemePlaceholder{} }
 func (m *ThemePlaceholder) String() string            { return proto.CompactTextString(m) }
 func (*ThemePlaceholder) ProtoMessage()               {}
-func (*ThemePlaceholder) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{2} }
+func (*ThemePlaceholder) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{2} }
 
 type IsThemePlaceholder_Type interface {
 	IsThemePlaceholder_Type()
@@ -306,7 +306,7 @@ type ThemeAsset struct {
 func (m *ThemeAsset) Reset()                    { *m = ThemeAsset{} }
 func (m *ThemeAsset) String() string            { return proto.CompactTextString(m) }
 func (*ThemeAsset) ProtoMessage()               {}
-func (*ThemeAsset) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{3} }
+func (*ThemeAsset) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{3} }
 
 func (m *ThemeAsset) GetUuid() string {
 	if m != nil && m.Uuid != nil {
@@ -410,9 +410,9 @@ func (m *ThemeAsset) SetData(v *string) {
 	m.Data = v
 }
 
-func init() { proto.RegisterFile("theme.proto", fileDescriptor6) }
+func init() { proto.RegisterFile("theme.proto", fileDescriptor7) }
 
-var fileDescriptor6 = []byte{
+var fileDescriptor7 = []byte{
 	// 442 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x92, 0x51, 0x8b, 0xd3, 0x40,
 	0x10, 0xc7, 0x9b, 0x36, 0x29, 0x77, 0x93, 0xeb, 0x71, 0x2c, 0x3e, 0x2c, 0x51, 0x31, 0x16, 0xc1,

@@ -24,7 +24,7 @@ type User struct {
 func (m *User) Reset()                    { *m = User{} }
 func (m *User) String() string            { return proto.CompactTextString(m) }
 func (*User) ProtoMessage()               {}
-func (*User) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{0} }
+func (*User) Descriptor() ([]byte, []int) { return fileDescriptor8, []int{0} }
 
 func (m *User) GetUuid() string {
 	if m != nil && m.Uuid != nil {
@@ -73,9 +73,9 @@ func (m *User) SetToken(v *string) {
 	m.Token = v
 }
 
-func init() { proto.RegisterFile("user.proto", fileDescriptor7) }
+func init() { proto.RegisterFile("user.proto", fileDescriptor8) }
 
-var fileDescriptor7 = []byte{
+var fileDescriptor8 = []byte{
 	// 133 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2a, 0x2d, 0x4e, 0x2d,
 	0xd2, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0xcb, 0x4e, 0x2d, 0x49, 0xce, 0x28, 0x2d, 0xd0,

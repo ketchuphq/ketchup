@@ -34,7 +34,7 @@ var NullValue_value = map[string]int32{
 func (x NullValue) String() string {
 	return proto.EnumName(NullValue_name, int32(x))
 }
-func (NullValue) EnumDescriptor() ([]byte, []int) { return fileDescriptor9, []int{0} }
+func (NullValue) EnumDescriptor() ([]byte, []int) { return fileDescriptor10, []int{0} }
 func (NullValue) XXX_WellKnownType() string       { return "NullValue" }
 
 // `Struct` represents a structured data value, consisting of fields
@@ -53,7 +53,7 @@ type Struct struct {
 func (m *Struct) Reset()                    { *m = Struct{} }
 func (m *Struct) String() string            { return proto.CompactTextString(m) }
 func (*Struct) ProtoMessage()               {}
-func (*Struct) Descriptor() ([]byte, []int) { return fileDescriptor9, []int{0} }
+func (*Struct) Descriptor() ([]byte, []int) { return fileDescriptor10, []int{0} }
 func (*Struct) XXX_WellKnownType() string   { return "Struct" }
 
 func (m *Struct) GetFields() map[string]*Value {
@@ -85,7 +85,7 @@ type Value struct {
 func (m *Value) Reset()                    { *m = Value{} }
 func (m *Value) String() string            { return proto.CompactTextString(m) }
 func (*Value) ProtoMessage()               {}
-func (*Value) Descriptor() ([]byte, []int) { return fileDescriptor9, []int{1} }
+func (*Value) Descriptor() ([]byte, []int) { return fileDescriptor10, []int{1} }
 func (*Value) XXX_WellKnownType() string   { return "Value" }
 
 type IsValue_Kind interface {
@@ -313,7 +313,7 @@ type ListValue struct {
 func (m *ListValue) Reset()                    { *m = ListValue{} }
 func (m *ListValue) String() string            { return proto.CompactTextString(m) }
 func (*ListValue) ProtoMessage()               {}
-func (*ListValue) Descriptor() ([]byte, []int) { return fileDescriptor9, []int{2} }
+func (*ListValue) Descriptor() ([]byte, []int) { return fileDescriptor10, []int{2} }
 func (*ListValue) XXX_WellKnownType() string   { return "ListValue" }
 
 func (m *ListValue) GetValues() []*Value {
@@ -337,9 +337,9 @@ func (m *ListValue) SetValues(v []*Value) {
 	m.Values = v
 }
 
-func init() { proto.RegisterFile("struct.proto", fileDescriptor9) }
+func init() { proto.RegisterFile("struct.proto", fileDescriptor10) }
 
-var fileDescriptor9 = []byte{
+var fileDescriptor10 = []byte{
 	// 409 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x91, 0xc1, 0x6b, 0xd4, 0x40,
 	0x14, 0xc6, 0x77, 0x92, 0x6e, 0x30, 0x2f, 0xa5, 0x96, 0x11, 0x74, 0xa9, 0xa0, 0x61, 0x7b, 0x09,

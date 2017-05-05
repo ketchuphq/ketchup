@@ -23,7 +23,7 @@ type Export struct {
 func (m *Export) Reset()                    { *m = Export{} }
 func (m *Export) String() string            { return proto.CompactTextString(m) }
 func (*Export) ProtoMessage()               {}
-func (*Export) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{0} }
+func (*Export) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{0} }
 
 func (m *Export) GetPages() []*ketchup_models.Page {
 	if m != nil {
@@ -50,9 +50,9 @@ func (m *Export) SetRoutes(v []*ketchup_models.Route) {
 	m.Routes = v
 }
 
-func init() { proto.RegisterFile("export/export.proto", fileDescriptor2) }
+func init() { proto.RegisterFile("export/export.proto", fileDescriptor3) }
 
-var fileDescriptor2 = []byte{
+var fileDescriptor3 = []byte{
 	// 128 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x4e, 0xad, 0x28, 0xc8,
 	0x2f, 0x2a, 0xd1, 0x87, 0x50, 0x7a, 0x05, 0x45, 0xf9, 0x25, 0xf9, 0x42, 0xa2, 0xd9, 0xa9, 0x25,

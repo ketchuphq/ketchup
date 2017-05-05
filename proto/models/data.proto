@@ -1,0 +1,19 @@
+syntax = "proto2";
+
+package ketchup.models;
+
+import "content.proto";
+import "page.proto";
+
+message Data {
+    optional string uuid = 1;
+    optional string key = 2;
+    optional string value = 3;
+    optional Timestamp timestamps = 5;
+
+    oneof type {
+        ContentString short = 11;
+        ContentText text = 12;
+        ContentMultiple multiple = 13;
+    }
+}

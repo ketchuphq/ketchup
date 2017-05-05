@@ -4,6 +4,7 @@ import "page.proto";
 import "route.proto";
 import "theme.proto";
 import "struct.proto";
+import "data.proto";
 
 package ketchup.api;
 
@@ -75,6 +76,10 @@ message ListRouteResponse {
 
 message ListThemeResponse {
     repeated ketchup.models.Theme themes = 1;
+}
+
+message ListDataResponse {
+    repeated ketchup.models.Data data = 1;
 }
 
 message TLSSettingsReponse {

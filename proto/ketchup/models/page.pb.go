@@ -22,7 +22,7 @@ type Timestamp struct {
 func (m *Timestamp) Reset()                    { *m = Timestamp{} }
 func (m *Timestamp) String() string            { return proto.CompactTextString(m) }
 func (*Timestamp) ProtoMessage()               {}
-func (*Timestamp) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{0} }
+func (*Timestamp) Descriptor() ([]byte, []int) { return fileDescriptor5, []int{0} }
 
 func (m *Timestamp) GetCreatedAt() int64 {
 	if m != nil && m.CreatedAt != nil {
@@ -46,7 +46,7 @@ type Author struct {
 func (m *Author) Reset()                    { *m = Author{} }
 func (m *Author) String() string            { return proto.CompactTextString(m) }
 func (*Author) ProtoMessage()               {}
-func (*Author) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{1} }
+func (*Author) Descriptor() ([]byte, []int) { return fileDescriptor5, []int{1} }
 
 func (m *Author) GetUuid() string {
 	if m != nil && m.Uuid != nil {
@@ -72,7 +72,7 @@ type Page struct {
 func (m *Page) Reset()                    { *m = Page{} }
 func (m *Page) String() string            { return proto.CompactTextString(m) }
 func (*Page) ProtoMessage()               {}
-func (*Page) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{2} }
+func (*Page) Descriptor() ([]byte, []int) { return fileDescriptor5, []int{2} }
 
 func (m *Page) GetUuid() string {
 	if m != nil && m.Uuid != nil {
@@ -161,7 +161,7 @@ type Content struct {
 func (m *Content) Reset()                    { *m = Content{} }
 func (m *Content) String() string            { return proto.CompactTextString(m) }
 func (*Content) ProtoMessage()               {}
-func (*Content) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{3} }
+func (*Content) Descriptor() ([]byte, []int) { return fileDescriptor5, []int{3} }
 
 type IsContent_Type interface {
 	IsContent_Type()
@@ -404,9 +404,9 @@ func (m *Content) SetTimestamps(v *Timestamp) {
 	m.Timestamps = v
 }
 
-func init() { proto.RegisterFile("page.proto", fileDescriptor4) }
+func init() { proto.RegisterFile("page.proto", fileDescriptor5) }
 
-var fileDescriptor4 = []byte{
+var fileDescriptor5 = []byte{
 	// 432 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x51, 0x4b, 0x8b, 0x13, 0x41,
 	0x10, 0x4e, 0x32, 0x93, 0x6c, 0x52, 0x93, 0x88, 0x34, 0xa2, 0x6d, 0x74, 0x31, 0xce, 0x29, 0xa7,
