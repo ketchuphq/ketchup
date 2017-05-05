@@ -121,22 +121,24 @@ func (m *Module) Get(bucket, key string, pb proto.Message) error {
 	})
 }
 
-func (m *Module) Update(bucket string, pb db.AddressableProto) error {
-	// set timestamp
-	if tsp, ok := pb.(db.TimestampedProto); ok {
-		ts := tsp.GetTimestamps()
-		if ts == nil {
-			ts = &models.Timestamp{}
-		}
-		// convert time to millis
-		nowMillis := time.Now().UnixNano() / 1e6
-		if ts.GetCreatedAt() == 0 {
-			ts.CreatedAt = proto.Int64(nowMillis)
-		}
-		ts.UpdatedAt = proto.Int64(nowMillis)
-		tsp.SetTimestamps(ts)
+func (m *Module) updateTimestampedProto(tsp db.TimestampedProto) {
+	ts := tsp.GetTimestamps()
+	if ts == nil {
+		ts = &models.Timestamp{}
 	}
+	// convert time to millis
+	nowMillis := time.Now().UnixNano() / 1e6
+	if ts.GetCreatedAt() == 0 {
+		ts.CreatedAt = proto.Int64(nowMillis)
+	}
+	ts.UpdatedAt = proto.Int64(nowMillis)
+	tsp.SetTimestamps(ts)
+}
 
+func (m *Module) Update(bucket string, pb db.AddressableProto) error {
+	if tsp, ok := pb.(db.TimestampedProto); ok {
+		m.updateTimestampedProto(tsp)
+	}
 	data, err := proto.Marshal(pb)
 	if err != nil {
 		return errors.Wrap(err)
