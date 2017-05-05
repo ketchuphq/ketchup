@@ -61,8 +61,10 @@ func (m *Module) Init(c *service.Config) {
 			{"/api/v1/pages/:uuid", methodGet, m.GetPage},
 			{"/api/v1/pages/:uuid/contents", methodGet, m.GetRenderedPage},
 			{"/api/v1/pages/:uuid/routes", methodGet, m.ListRoutesByPage},
+			{"/api/v1/data/:key", methodGet, m.GetData},
 			{"/api/v1/pages", methodGet, m.ListPages},
 			{"/api/v1/routes", methodGet, m.ListRoutes},
+			{"/api/v1/data", methodGet, m.Auth.MustWithAuth(m.ListData)},
 
 			{"/api/v1/user", methodGet, m.Auth.MustWithAuth(m.GetUser)},
 			{"/api/v1/settings/info", methodGet, m.Auth.MustWithAuth(m.GetInfo)},
@@ -83,6 +85,8 @@ func (m *Module) Init(c *service.Config) {
 
 			{"/api/v1/routes", methodPost, m.Auth.MustWithAuth(m.UpdateRoute)},
 			{"/api/v1/routes/:uuid", methodDelete, m.Auth.MustWithAuth(m.DeleteRoute)},
+
+			{"/api/v1/data", methodPost, m.Auth.MustWithAuth(m.UpdateData)},
 
 			{"/api/v1/download-backup", methodGet, m.Auth.MustWithAuth(m.GetBackup)},
 			{"/api/v1/debug", methodGet, m.Auth.MustWithAuth(m.Debug)},
