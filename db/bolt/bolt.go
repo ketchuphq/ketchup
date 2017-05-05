@@ -99,7 +99,7 @@ func (e ErrNoKey) Error() string {
 
 func (m *Module) init() error {
 	return m.Bolt.Update(func(tx *bolt.Tx) error {
-		buckets := []string{PAGE_BUCKET, ROUTE_BUCKET, USER_BUCKET}
+		buckets := []string{PAGE_BUCKET, ROUTE_BUCKET, USER_BUCKET, DATA_BUCKET}
 		for _, bucket := range buckets {
 			_, err := tx.CreateBucketIfNotExists([]byte(bucket))
 			if err != nil {
