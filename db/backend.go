@@ -52,5 +52,13 @@ type Backend interface {
 	// ListRoutes returns all existing routes. May be unsorted.
 	ListRoutes() ([]*models.Route, error)
 
+	GetData(key string) (*models.Data, error)
+
+	UpdateData(*models.Data) error
+
+	DeleteData(*models.Data) error
+
+	ListData() ([]*models.Data, error)
+
 	Debug(w io.Writer) error // print debug info
 }

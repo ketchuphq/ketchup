@@ -3,6 +3,7 @@ package dummy
 import (
 	"io"
 
+	"github.com/ketchuphq/ketchup/db"
 	"github.com/ketchuphq/ketchup/proto/ketchup/api"
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 )
@@ -11,13 +12,17 @@ type DummyDB struct {
 	Users  map[string]*models.User
 	Pages  map[string]*models.Page
 	Routes map[string]*models.Route
+	Data   map[string]*models.Data
 }
+
+var _ db.Backend = &DummyDB{}
 
 func New() *DummyDB {
 	return &DummyDB{
 		Users:  map[string]*models.User{},
 		Pages:  map[string]*models.Page{},
 		Routes: map[string]*models.Route{},
+		Data:   map[string]*models.Data{},
 	}
 }
 
@@ -95,4 +100,26 @@ func (d *DummyDB) ListRoutes() ([]*models.Route, error) {
 
 func (d *DummyDB) Debug(w io.Writer) error {
 	return nil
+}
+
+func (d *DummyDB) GetData(key string) (*models.Data, error) {
+	return d.Data[key], nil
+}
+
+func (d *DummyDB) UpdateData(data *models.Data) error {
+	d.Data[data.GetKey()] = data
+	return nil
+}
+
+func (d *DummyDB) DeleteData(data *models.Data) error {
+	delete(d.Data, data.GetKey())
+	return nil
+}
+
+func (d *DummyDB) ListData() ([]*models.Data, error) {
+	data := []*models.Data{}
+	for _, d := range d.Data {
+		data = append(data, d)
+	}
+	return data, nil
 }
