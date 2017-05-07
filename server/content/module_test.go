@@ -116,7 +116,7 @@ func TestReloadNew(t *testing.T) {
       "markdown": {
         "name": "markdown",
         "engine": "html",
-        "data": "<html>{{.content}}</html>",
+        "data": "<html>{{.Page.Content}}</html>",
         "placeholders": []
       }
     }

@@ -11,7 +11,7 @@ import (
 
 var noneTemplate = `<html>
 	<style>#c{max-width:600px;margin:0 auto;font-family:helvetica, sans-serif;}</style>
-	<div id='c'>{{.content}}</div>
+	<div id='c'>{{.Page.Content}}</div>
 </html>`
 
 var noneTheme = &models.Theme{

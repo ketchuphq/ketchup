@@ -7,12 +7,13 @@ import (
 	"github.com/golang/protobuf/proto"
 
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/server/content/context"
 )
 
 func TestRenderTemplate(t *testing.T) {
 	type args struct {
 		template *models.ThemeTemplate
-		contents map[string]interface{}
+		contents *context.EngineContext
 	}
 	tests := []struct {
 		name           string
@@ -25,11 +26,14 @@ func TestRenderTemplate(t *testing.T) {
 			args{
 				&models.ThemeTemplate{
 					Engine: proto.String("html"),
-					Data:   proto.String("<h1>hello {{.world}}</h1>"),
+					Data:   proto.String(`<h1>hello {{.Page.Data "world"}}</h1>`),
 				},
-				map[string]interface{}{
-					"world": "earth",
-				},
+				context.NewContext(
+					nil, nil, nil,
+					map[string]interface{}{
+						"world": "earth",
+					},
+				),
 			},
 			"<h1>hello earth</h1>",
 			false,
