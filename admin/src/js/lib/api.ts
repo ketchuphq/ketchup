@@ -211,6 +211,38 @@ export abstract class Author {
   }
 }
 
+export abstract class Data {
+  uuid?: string;
+  key?: string;
+  value?: string;
+  timestamps?: Timestamp;
+  // skipped field: type
+  
+  // oneof types:
+  multiple?: ContentMultiple;
+  short?: ContentString;
+  text?: ContentText;
+  static copy(from: Data, to?: Data): Data {
+    to = to || {};
+    to.uuid = from.uuid;
+    to.key = from.key;
+    to.value = from.value;
+    if ('timestamps' in from) {
+      to.timestamps = Timestamp.copy(from.timestamps || {}, to.timestamps || {});
+    }
+    if ('multiple' in from) {
+      to.multiple = ContentMultiple.copy(from.multiple || {}, to.multiple || {});
+    }
+    if ('short' in from) {
+      to.short = ContentString.copy(from.short || {}, to.short || {});
+    }
+    if ('text' in from) {
+      to.text = ContentText.copy(from.text || {}, to.text || {});
+    }
+    return to;
+  }
+}
+
 export abstract class Package {
   name?: string;
   author?: string[];
@@ -324,6 +356,24 @@ export abstract class ListPageResponse {
 export abstract class ListOptions {
   static copy(_: ListOptions, to?: ListOptions): ListOptions {
     to = to || {};
+    return to;
+  }
+}
+
+export abstract class ListDataResponse {
+  data?: Data[];
+  static copy(from: ListDataResponse, to?: ListDataResponse): ListDataResponse {
+    to = to || {};
+    to.data = from.data;
+    return to;
+  }
+}
+
+export abstract class UpdateDataRequest {
+  data?: Data[];
+  static copy(from: UpdateDataRequest, to?: UpdateDataRequest): UpdateDataRequest {
+    to = to || {};
+    to.data = from.data;
     return to;
   }
 }

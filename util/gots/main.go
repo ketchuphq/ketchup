@@ -37,6 +37,7 @@ func main() {
 		models.ContentText{},
 		models.ContentString{},
 		models.Author{},
+		models.Data{},
 		packages.Package{},
 		packages.PackageRelease{},
 		packages.Registry{},
@@ -47,6 +48,8 @@ func main() {
 		api.ListPageRequest_ListPageOptions{},
 		api.ListPageResponse{},
 		api.ListOptions{},
+		api.ListDataResponse{},
+		api.UpdateDataRequest{},
 
 		router_api.Error{},
 		router_api.ErrorResponse{},
