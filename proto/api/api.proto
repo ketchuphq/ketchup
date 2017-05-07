@@ -78,6 +78,10 @@ message ListThemeResponse {
     repeated ketchup.models.Theme themes = 1;
 }
 
+message UpdateDataRequest {
+    repeated ketchup.models.Data data = 1;
+}
+
 message ListDataResponse {
     repeated ketchup.models.Data data = 1;
 }

@@ -12,7 +12,7 @@ const DATA_BUCKET = "data"
 
 // UpdateData updates (or creates if necessary) an existing data.
 // Requires key to be set.
-func (m *Module) UpdateData(data *models.Data) error {
+func (m *Module) updateData(tx *bolt.Tx, data *models.Data) error {
 	if data.GetKey() == "" {
 		return errors.New("bolt: cannot update data without key")
 	}
@@ -22,9 +22,25 @@ func (m *Module) UpdateData(data *models.Data) error {
 	if err != nil {
 		return errors.Wrap(err)
 	}
+	b := tx.Bucket([]byte(DATA_BUCKET))
+	return errors.Wrap(b.Put(key, dataBytes))
+}
+
+func (m *Module) UpdateData(data *models.Data) error {
 	return m.Bolt.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(DATA_BUCKET))
-		return errors.Wrap(b.Put(key, dataBytes))
+		return m.updateData(tx, data)
+	})
+}
+
+func (m *Module) UpdateDataBatch(data []*models.Data) error {
+	return m.Bolt.Update(func(tx *bolt.Tx) error {
+		for _, d := range data {
+			err := m.updateData(tx, d)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
 	})
 }
 

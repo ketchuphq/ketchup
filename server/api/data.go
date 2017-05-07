@@ -10,6 +10,7 @@ import (
 	"github.com/ketchuphq/ketchup/proto/ketchup/api"
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 	"github.com/ketchuphq/ketchup/server/router"
+	"github.com/ketchuphq/ketchup/util/errors"
 )
 
 func (m *Module) ListData(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
@@ -41,14 +42,20 @@ func (m *Module) GetData(rw http.ResponseWriter, req *http.Request, par httprout
 }
 
 func (m *Module) UpdateData(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
-	data := &models.Data{}
-	err := jsonpb.Unmarshal(req.Body, data)
+	rpb := &api.UpdateDataRequest{}
+	err := jsonpb.Unmarshal(req.Body, rpb)
 	if err != nil {
-		return err
+		return errors.Wrap(err)
 	}
-	err = m.DB.UpdateData(data)
-	if err != nil {
-		return err
+
+	for _, data := range rpb.Data {
+		if data.Type == nil {
+			data.Type = &models.Data_Short{
+				Short: &models.ContentString{
+					Type: models.ContentTextType_text.Enum(),
+				},
+			}
+		}
 	}
-	return router.Proto(rw, data)
+	return m.DB.UpdateDataBatch(rpb.Data)
 }

@@ -52,8 +52,10 @@ func TestSetData(t *testing.T) {
 	rw := httptest.NewRecorder()
 	req := httptest.NewRequest("POST", "/api/v1/data",
 		bytes.NewBufferString(`{
-			"key": "new-key",
-			"value": "1"
+			"data": [{
+				"key": "new-key",
+				"value": "1"
+			}]
 		}`))
 
 	err := te.module.UpdateData(rw, req, httprouter.Params{})
@@ -61,17 +63,15 @@ func TestSetData(t *testing.T) {
 		t.Fail()
 	}
 	assert.Equal(t, http.StatusOK, rw.Code)
-	assert.JSONEq(t, `{
-		"key": "new-key",
-		"value": "1"
-	}`, rw.Body.String())
 
 	// update data
 	rw = httptest.NewRecorder()
 	req = httptest.NewRequest("POST", "/api/v1/data",
 		bytes.NewBufferString(`{
-			"key": "new-key",
-			"value": "2"
+			"data": [{
+				"key": "new-key",
+				"value": "2"
+			}]
 		}`))
 	err = te.module.UpdateData(rw, req, httprouter.Params{})
 	if !assert.NoError(t, err) {
@@ -81,5 +81,10 @@ func TestSetData(t *testing.T) {
 	assert.Equal(t, &models.Data{
 		Key:   proto.String("new-key"),
 		Value: proto.String("2"),
+		Type: &models.Data_Short{
+			Short: &models.ContentString{
+				Type: models.ContentTextType_text.Enum(),
+			},
+		},
 	}, te.db.Data["new-key"])
 }

@@ -56,6 +56,8 @@ type Backend interface {
 
 	UpdateData(*models.Data) error
 
+	UpdateDataBatch([]*models.Data) error
+
 	DeleteData(*models.Data) error
 
 	ListData() ([]*models.Data, error)

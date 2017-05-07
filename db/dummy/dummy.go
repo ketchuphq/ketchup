@@ -111,6 +111,13 @@ func (d *DummyDB) UpdateData(data *models.Data) error {
 	return nil
 }
 
+func (d *DummyDB) UpdateDataBatch(data []*models.Data) error {
+	for _, datum := range data {
+		d.Data[datum.GetKey()] = datum
+	}
+	return nil
+}
+
 func (d *DummyDB) DeleteData(data *models.Data) error {
 	delete(d.Data, data.GetKey())
 	return nil
