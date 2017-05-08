@@ -4,7 +4,7 @@ import isEqual from 'lodash-es/isEqual';
 import msx from 'lib/msx';
 import * as m from 'mithril';
 import * as API from 'lib/api';
-import Page from 'lib/page';
+import { defaultContent, default as Page} from 'lib/page';
 import Theme from 'lib/theme';
 import Popover from 'components/popover';
 import { MustAuthController } from 'components/auth';
@@ -84,12 +84,15 @@ export default class PagePage extends MustAuthController {
     let contentMap: { [key: string]: API.Content } = {};
     let placeholderContents: API.Content[] = [];
     let placeholderContentMap: { [key: string]: boolean } = {};
+    // cache existing content
     (this.page.contents || []).forEach((c) => {
       // on initial load copy all fields
       if (c.uuid || c.value || initial) {
         contentMap[c.key] = c;
       }
     });
+
+    // load placeholders from templates
     (this.template.placeholders || []).forEach((p) => {
       if (contentMap[p.key]) {
         Object.keys(p).forEach((k: keyof API.ThemePlaceholder) => {
@@ -104,6 +107,7 @@ export default class PagePage extends MustAuthController {
       placeholderContentMap[p.key] = true;
     });
 
+    // load placeholders from existing page contents
     let pageContents: API.Content[] = [];
     (this.page.contents || []).forEach((c) => {
       if (c.key == 'content' && this.template.hideContent) {
@@ -113,6 +117,12 @@ export default class PagePage extends MustAuthController {
         pageContents.push(c);
       }
     });
+
+    // add default content editor
+    if (!contentMap['content'] && !placeholderContentMap['content'] && !this.template.hideContent) {
+      placeholderContents.push(API.Content.copy(defaultContent, {}))
+    }
+
     this.page.contents = pageContents.concat(placeholderContents);
   }
 
