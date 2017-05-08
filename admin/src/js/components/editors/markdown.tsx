@@ -1,8 +1,6 @@
 import msx from 'lib/msx';
 import * as API from 'lib/api';
 
-let _: Mithril.Component<CodeMirrorAttrs, CodeMirrorComponent> = CodeMirrorComponent;
-
 interface CodeMirrorAttrs {
   readonly content: API.Content;
   readonly short?: boolean;
@@ -74,3 +72,5 @@ export default class CodeMirrorComponent {
     </div>;
   }
 }
+
+let _: Mithril.Component<CodeMirrorAttrs, CodeMirrorComponent> = CodeMirrorComponent;

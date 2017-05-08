@@ -5,8 +5,6 @@ import Page from 'lib/page';
 import { MustAuthController } from 'components/auth';
 import { loading } from 'components/loading';
 
-let _: Mithril.Component<{}, PagesPage> = PagesPage;
-
 export default class PagesPage extends MustAuthController {
   pages: Page[];
   viewOption: API.ListPageRequest_ListPageFilter;
@@ -84,3 +82,5 @@ export default class PagesPage extends MustAuthController {
     </div>;
   }
 }
+
+let _: Mithril.Component<{}, PagesPage> = PagesPage;

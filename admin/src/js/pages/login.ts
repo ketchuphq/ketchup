@@ -2,8 +2,6 @@ import * as m from 'mithril';
 import * as Toaster from 'components/toaster';
 import { AuthController, User } from 'components/auth';
 
-let _: Mithril.Component<{}, LoginPage> = LoginPage;
-
 export default class LoginPage extends AuthController {
   email: string;
   password: string;
@@ -77,3 +75,5 @@ export default class LoginPage extends AuthController {
     );
   }
 }
+
+let _: Mithril.Component<{}, LoginPage> = LoginPage;

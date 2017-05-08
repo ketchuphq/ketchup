@@ -1,7 +1,6 @@
 import msx from 'lib/msx';
 import * as API from 'lib/api';
 
-let _: Mithril.Component<QuillAttrs, QuillComponent> = QuillComponent;
 interface QuillAttrs {
   readonly elementId?: string;
   readonly content: API.Content;
@@ -84,3 +83,5 @@ export default class QuillComponent {
     </div>;
   }
 };
+
+let _: Mithril.Component<QuillAttrs, QuillComponent> = QuillComponent;

@@ -4,8 +4,6 @@ import * as API from 'lib/api';
 import Theme from 'lib/theme';
 import { MustAuthController } from 'components/auth';
 
-let _: Mithril.Component<{}, TemplatePage> = TemplatePage;
-
 export default class TemplatePage extends MustAuthController {
   template: API.ThemeTemplate;
 
@@ -92,3 +90,5 @@ export default class TemplatePage extends MustAuthController {
     </div>;
   }
 }
+
+let _: Mithril.Component<{}, TemplatePage> = TemplatePage;

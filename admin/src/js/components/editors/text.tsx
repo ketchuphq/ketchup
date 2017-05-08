@@ -1,8 +1,6 @@
 import msx from 'lib/msx';
 import * as API from 'lib/api';
 
-let _: Mithril.Component<TextEditorAttrs, TextEditorComponent> = TextEditorComponent;
-
 interface TextEditorAttrs {
   elementId?: string;
   readonly content: API.Content;
@@ -51,3 +49,5 @@ export default class TextEditorComponent {
     </div>;
   }
 }
+
+let _: Mithril.Component<TextEditorAttrs, TextEditorComponent> = TextEditorComponent;

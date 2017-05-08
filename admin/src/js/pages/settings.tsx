@@ -5,8 +5,6 @@ import { MustAuthController } from 'components/auth';
 import TLSNewComponent from 'pages/settings/tls-new';
 import TLSComponent from 'pages/settings/tls';
 
-let _: Mithril.Component<{}, SettingsPage> = SettingsPage;
-
 // add redirect
 // setup static upload
 export default class SettingsPage extends MustAuthController {
@@ -75,3 +73,5 @@ export default class SettingsPage extends MustAuthController {
     </div>;
   }
 }
+
+let _: Mithril.Component<{}, SettingsPage> = SettingsPage;

@@ -1,6 +1,5 @@
 import * as m from 'mithril';
 
-let _: Mithril.Component<ButtonAttrs, Button> = Button;
 interface ButtonAttrs {
   handler?: () => Promise<any>;
   onclick?: () => any;
@@ -54,3 +53,5 @@ export default class Button {
     ]);
   }
 }
+
+let _: Mithril.Component<ButtonAttrs, Button> = Button;

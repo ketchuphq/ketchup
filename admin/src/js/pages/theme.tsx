@@ -3,8 +3,6 @@ import * as m from 'mithril';
 import Theme from 'lib/theme';
 import { MustAuthController } from 'components/auth';
 
-let _: Mithril.Component<{}, ThemePage> = ThemePage;
-
 export default class ThemePage extends MustAuthController {
   theme: Theme;
 
@@ -70,3 +68,5 @@ export default class ThemePage extends MustAuthController {
     </div>;
   }
 }
+
+let _: Mithril.Component<{}, ThemePage> = ThemePage;

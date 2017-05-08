@@ -6,9 +6,6 @@ import Button from 'components/button';
 let store = require('store/dist/store.modern') as StoreJSStatic;
 
 
-
-let _: Mithril.Component<{}, NavigationComponent> = NavigationComponent;
-
 export default class NavigationComponent extends AuthController {
   collapsed: boolean;
   constructor() {
@@ -72,13 +69,14 @@ export default class NavigationComponent extends AuthController {
         <Button
           class='button--green button--center'
           href='/admin/compose'
-          >
+        >
           <span class='typcn typcn-edit' />
           <span class='nav-link__text'>Compose</span>
         </Button>
       </div>
       {ctrl.link('/admin/pages', 'Pages', { icon: 'document-text' })}
       {ctrl.link('/admin/themes', 'Theme', { icon: 'brush' })}
+      {ctrl.link('/admin/data', 'Data', { icon: 'brush' })}
       {ctrl.link('/admin/settings', 'Settings', { icon: 'spanner-outline' })}
       {ctrl.link('/admin/logout', 'Logout', { onclick: () => ctrl.logout(), icon: 'weather-night' })}
       <a class='nav-link nav-link--toggle' onclick={() => ctrl.toggle()}>
@@ -87,3 +85,5 @@ export default class NavigationComponent extends AuthController {
     </div>;
   }
 }
+
+let _: Mithril.Component<{}, NavigationComponent> = NavigationComponent;
