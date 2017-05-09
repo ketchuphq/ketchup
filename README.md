@@ -1,4 +1,4 @@
-# Ketchup
+# Ketchup [![CircleCI](https://circleci.com/gh/ketchuphq/ketchup.svg?style=svg)](https://circleci.com/gh/ketchuphq/ketchup)
 
 [Ketchup](https://ketchuphq.com) is a CMS that aims to be...
 

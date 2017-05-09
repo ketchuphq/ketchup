@@ -14,5 +14,4 @@ vendor/srcd.works/
 bindata.go
 
 .test
-ketchup
 config.json

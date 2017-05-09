@@ -15,6 +15,12 @@
 			"revisionTime": "2016-04-07T14:34:38Z"
 		},
 		{
+			"checksumSHA1": "dvabztWVQX8f6oMLRyv4dLH+TGY=",
+			"path": "github.com/davecgh/go-spew/spew",
+			"revision": "346938d642f2ec3594ed81d874461961cd0faa76",
+			"revisionTime": "2016-10-29T20:57:26Z"
+		},
+		{
 			"checksumSHA1": "z6/ZTyMf8EVqZKHU/MNCim8yTbg=",
 			"path": "github.com/eknkc/amber",
 			"revision": "a69a021e158c3b06700cc881c05d0923f627b578",
@@ -153,6 +159,12 @@
 			"revisionTime": "2017-04-05T06:03:46Z"
 		},
 		{
+			"checksumSHA1": "LuFv4/jlrmFNnDb/5SCSEPAM9vU=",
+			"path": "github.com/pmezard/go-difflib/difflib",
+			"revision": "792786c7400a136282c1664665ae0a8db921c6c2",
+			"revisionTime": "2016-01-10T10:55:54Z"
+		},
+		{
 			"checksumSHA1": "c7jHQZk5ZEsFR9EXsWJXkszPBZA=",
 			"path": "github.com/russross/blackfriday",
 			"revision": "5f33e7b7878355cd2b7e6b8eefc48a5472c69f70",
@@ -211,6 +223,12 @@
 			"path": "github.com/src-d/gcfg/types",
 			"revision": "f187355171c936ac84a82793659ebb4936bc1c23",
 			"revisionTime": "2016-10-26T10:01:55Z"
+		},
+		{
+			"checksumSHA1": "JXUVA1jky8ZX8w09p2t5KLs97Nc=",
+			"path": "github.com/stretchr/testify/assert",
+			"revision": "4d4bfba8f1d1027c4fdbe371823030df51419987",
+			"revisionTime": "2017-01-30T11:31:45Z"
 		},
 		{
 			"checksumSHA1": "zILgYmb0lP823zfEm2UQWQBvhX4=",
@@ -301,6 +319,12 @@
 			"path": "golang.org/x/net/publicsuffix",
 			"revision": "61557ac0112b576429a0df080e1c2cef5dfbb642",
 			"revisionTime": "2017-01-26T11:54:58Z"
+		},
+		{
+			"checksumSHA1": "ArDa4bMPKzhiS1I7iioemBwZ6tE=",
+			"path": "golang.org/x/sys/unix",
+			"revision": "f3918c30c5c2cb527c0b071a27c35120a6c0719a",
+			"revisionTime": "2017-04-05T16:58:12Z"
 		},
 		{
 			"checksumSHA1": "LKz+OTCQIjRCae1xBcDR7Pa+DU0=",
@@ -567,5 +591,5 @@
 			"revisionTime": "2016-12-15T10:38:17Z"
 		}
 	],
-	"rootPath": "github.com/octavore/ketchup"
+	"rootPath": "github.com/ketchuphq/ketchup"
 }
