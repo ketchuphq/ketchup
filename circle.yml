@@ -1,0 +1,13 @@
+machine:
+  environment:
+    CIRCLE_BUILD_DIR: ${GOPATH%%:*}/src/github.com/ketchuphq/${CIRCLE_PROJECT_REPONAME}
+
+dependencies:
+  override:
+    - mkdir -p ${GOPATH%%:*}/src/github.com/ketchuphq
+    - ln -nsf ${HOME}/${CIRCLE_PROJECT_REPONAME} ${CIRCLE_BUILD_DIR}
+    - cd ${CIRCLE_BUILD_DIR}; make prepare-vendor
+
+test:
+  override:
+    - cd ${CIRCLE_BUILD_DIR}; make test
