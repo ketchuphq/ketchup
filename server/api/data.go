@@ -41,6 +41,14 @@ func (m *Module) GetData(rw http.ResponseWriter, req *http.Request, par httprout
 	return router.Proto(rw, data)
 }
 
+func (m *Module) DeleteData(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+	key := par.ByName("key")
+	if key == "" {
+		return router.ErrNotFound
+	}
+	return m.DB.DeleteData(&models.Data{Key: &key})
+}
+
 func (m *Module) UpdateData(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	rpb := &api.UpdateDataRequest{}
 	err := jsonpb.Unmarshal(req.Body, rpb)

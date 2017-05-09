@@ -88,3 +88,22 @@ func TestSetData(t *testing.T) {
 		},
 	}, te.db.Data["new-key"])
 }
+
+func TestDeleteData(t *testing.T) {
+	te := setup()
+	te.db.Data["test-key"] = &models.Data{
+		Key:   proto.String("test-key"),
+		Value: proto.String("test-value"),
+	}
+
+	rw := httptest.NewRecorder()
+	req := httptest.NewRequest("DELETE", "/api/v1/data/test-key", nil)
+	err := te.module.DeleteData(rw, req, []httprouter.Param{
+		{Key: "key", Value: "test-key"},
+	})
+
+	if assert.NoError(t, err) {
+		assert.Equal(t, http.StatusOK, rw.Code)
+		assert.Nil(t, te.db.Data["test-key"])
+	}
+}
