@@ -10,6 +10,7 @@ import ThemePage from 'pages/theme';
 import ThemesPage from 'pages/themes';
 import TemplatePage from 'pages/template';
 import SettingsPage from 'pages/settings';
+import DataPage from 'pages/data';
 import InstallThemePage from 'pages/install-theme';
 
 import * as WebFont from 'webfontloader';
@@ -26,7 +27,8 @@ export let routes: Mithril.RouteDefs = {
   '/admin/themes/:name/templates/:template': Layout(TemplatePage),
   '/admin/themes-install': Layout(InstallThemePage),
   '/admin/login': LoginPage,
-  '/admin/settings': Layout(SettingsPage)
+  '/admin/settings': Layout(SettingsPage),
+  '/admin/data': Layout(DataPage)
 };
 
 document.addEventListener('DOMContentLoaded', () => {

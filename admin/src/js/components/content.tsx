@@ -60,7 +60,7 @@ let editors: ContentEditor[] = [
   ShortTextEditor,
 ];
 
-export function renderEditor(c: API.Content, hideLabel: boolean): Mithril.Vnode<any, any> {
+export function renderEditor(c: API.Content | API.Data, hideLabel: boolean): Mithril.Vnode<any, any> {
   for (var i = 0; i < editors.length; i++) {
     let editor = editors[i];
     if (editor.shouldRender(c)) {

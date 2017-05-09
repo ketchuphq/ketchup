@@ -76,7 +76,7 @@ export default class NavigationComponent extends AuthController {
       </div>
       {ctrl.link('/admin/pages', 'Pages', { icon: 'document-text' })}
       {ctrl.link('/admin/themes', 'Theme', { icon: 'brush' })}
-      {ctrl.link('/admin/data', 'Data', { icon: 'brush' })}
+      {ctrl.link('/admin/data', 'Data', { icon: 'th-small' })}
       {ctrl.link('/admin/settings', 'Settings', { icon: 'spanner-outline' })}
       {ctrl.link('/admin/logout', 'Logout', { onclick: () => ctrl.logout(), icon: 'weather-night' })}
       <a class='nav-link nav-link--toggle' onclick={() => ctrl.toggle()}>
