@@ -11,4 +11,4 @@ dependencies:
 
 test:
   override:
-    - cd ${CIRCLE_BUILD_DIR}; make test
+    - cd ${CIRCLE_BUILD_DIR}; make circle-cover

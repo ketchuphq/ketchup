@@ -43,5 +43,18 @@ goimports:
 test:
 	@go test $(GO_DIRS)
 
+cover:
+	@go get -u github.com/go-playground/overalls
+	overalls -project github.com/ketchuphq/ketchup
+	@find . -name 'profile.coverprofile' | xargs rm
+
+circle-cover: cover
+	@go get -u github.com/mattn/goveralls
+	@goveralls \
+		-coverprofile=overalls.coverprofile \
+		-service=circle-ci \
+		-repotoken=$$COVERALLS_TOKEN
+
+
 .PHONY: admin goreleaser.yml
 
