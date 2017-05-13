@@ -3,6 +3,12 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "7Ncpz6uCsQgFIrDCADflnyXqmYI=",
+			"path": "github.com/Masterminds/semver",
+			"revision": "abff1900528dbdaf6f3f5aa92c398be1eaf2a9f7",
+			"revisionTime": "2017-05-02T10:47:25Z"
+		},
+		{
 			"checksumSHA1": "A2pdu2nM6tWBy87r+/NXsV6qFFY=",
 			"path": "github.com/Masterminds/sprig",
 			"revision": "f5b0ed4a680a0943228155eaf6a77a96ead1bc77",
@@ -13,6 +19,12 @@
 			"path": "github.com/NYTimes/gziphandler",
 			"revision": "6710af535839f57c687b62c4c23d649f9545d885",
 			"revisionTime": "2017-01-04T15:57:01Z"
+		},
+		{
+			"checksumSHA1": "oLdNE7TyNIKK+ZYVPvEwhLmVb98=",
+			"path": "github.com/aokoli/goutils",
+			"revision": "e57d01ace047c1a43e6a49ecf3ecc50ed2be81d1",
+			"revisionTime": "2017-05-02T14:47:50Z"
 		},
 		{
 			"checksumSHA1": "H57oqpzRpxtzb0xoPbhWYEy9KSA=",
@@ -67,6 +79,18 @@
 			"path": "github.com/howeyc/gopass",
 			"revision": "f5387c492211eb133053880d23dfae62aa14123d",
 			"revisionTime": "2016-10-03T13:09:00Z"
+		},
+		{
+			"checksumSHA1": "0MZ+LgAY36oK73IE9297Vf4NTXU=",
+			"path": "github.com/huandu/xstrings",
+			"revision": "3959339b333561bf62a38b424fd41517c2c90f40",
+			"revisionTime": "2015-11-30T12:51:19Z"
+		},
+		{
+			"checksumSHA1": "VBXGouqOkPe3OkeJnyUBkx3aZXA=",
+			"path": "github.com/imdario/mergo",
+			"revision": "d806ba8c21777d504a2090a2ca4913c750dd3a33",
+			"revisionTime": "2017-03-26T20:45:27Z"
 		},
 		{
 			"checksumSHA1": "0aax/qOmVxrexQc7w9+P99GH7zs=",
@@ -301,6 +325,12 @@
 			"path": "golang.org/x/crypto/pbkdf2",
 			"revision": "f6b343c37ca80bfa8ea539da67a0b621f84fab1d",
 			"revisionTime": "2016-12-21T04:54:10Z"
+		},
+		{
+			"checksumSHA1": "E8pDMGySfy5Mw+jzXOkOxo35bww=",
+			"path": "golang.org/x/crypto/scrypt",
+			"revision": "122d919ec1efcfb58483215da23f815853e24b81",
+			"revisionTime": "2017-05-08T12:54:44Z"
 		},
 		{
 			"checksumSHA1": "RnJfaFwKpC0h06J2MZ8UZX2eohc=",
