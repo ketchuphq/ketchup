@@ -2,7 +2,8 @@
   "rules": {
     "quotemark": [
       true,
-      "single"
+      "single",
+      "jsx-single"
     ],
     "semicolon": [
       "always"
