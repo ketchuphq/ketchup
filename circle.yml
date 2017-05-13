@@ -1,9 +1,11 @@
 machine:
   environment:
+    GOPATH: ${GOPATH%%:*}
     CIRCLE_BUILD_DIR: ${GOPATH%%:*}/src/github.com/ketchuphq/${CIRCLE_PROJECT_REPONAME}
 
 dependencies:
   override:
+    - echo CIRCLE_BUILD_DIR ${CIRCLE_BUILD_DIR}; echo GOPATH ${GOPATH}
     - mkdir -p ${GOPATH%%:*}/src/github.com/ketchuphq
     - ln -nsf ${HOME}/${CIRCLE_PROJECT_REPONAME} ${CIRCLE_BUILD_DIR}
     - cp ${CIRCLE_BUILD_DIR}/admin/bindata.go.circle ${CIRCLE_BUILD_DIR}/admin/bindata.go
