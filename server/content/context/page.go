@@ -1,5 +1,7 @@
 package context
 
+import "time"
+
 // PageContext wraps page related data
 type PageContext struct {
 	*EngineContext
@@ -18,4 +20,16 @@ func (p *PageContext) Title() string {
 // Content is shorthand for accessing page content.
 func (p *PageContext) Content() interface{} {
 	return p.Data("content")
+}
+
+// CreatedAt is shorthand for accessing page created at time
+func (p *PageContext) CreatedAt() time.Time {
+	createdMillis := p.page.GetTimestamps().GetCreatedAt()
+	return time.Unix(createdMillis/1000, 0)
+}
+
+// UpdatedAt is shorthand for accessing page updated at time
+func (p *PageContext) UpdatedAt() time.Time {
+	updatedMillis := p.page.GetTimestamps().GetUpdatedAt()
+	return time.Unix(updatedMillis/1000, 0)
 }
