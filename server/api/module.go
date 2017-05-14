@@ -19,8 +19,6 @@ import (
 	"github.com/ketchuphq/ketchup/server/users"
 )
 
-var KetchupVersion = ""
-
 type Module struct {
 	Router    *router.Module
 	DB        *db.Module

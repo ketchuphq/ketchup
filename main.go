@@ -9,6 +9,7 @@ import (
 	"github.com/ketchuphq/ketchup/server/backup"
 	"github.com/ketchuphq/ketchup/server/content"
 	"github.com/ketchuphq/ketchup/server/tls"
+	ketchup_version "github.com/ketchuphq/ketchup/server/version"
 )
 
 // set by goreleaser
@@ -28,7 +29,7 @@ type App struct {
 func (p *App) Init(c *service.Config) {}
 
 func main() {
-	api.KetchupVersion = version
+	ketchup_version.Set(version)
 	service.EnvVarName = "KETCHUP_ENV"
 	service.Run(&App{})
 }
