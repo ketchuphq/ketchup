@@ -33,3 +33,10 @@ func (s *sortPages) Less(i, j int) bool {
 	}
 	return a > b
 }
+
+func SortRoutesByPath(data []*models.Route) []*models.Route {
+	sort.Slice(data, func(i, j int) bool {
+		return data[i].GetPath() < data[j].GetPath()
+	})
+	return data
+}

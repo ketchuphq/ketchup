@@ -1,14 +1,14 @@
 package api
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strings"
 
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/julienschmidt/httprouter"
 
+	"github.com/ketchuphq/ketchup/db"
 	"github.com/ketchuphq/ketchup/proto/ketchup/api"
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 	"github.com/ketchuphq/ketchup/server/router"
@@ -19,19 +19,20 @@ var (
 	re1 = regexp.MustCompile(`[^a-zA-Z0-9\/]`)
 	re2 = regexp.MustCompile(`^-+`)
 	re3 = regexp.MustCompile(`-+$`)
-	re4 = regexp.MustCompile(`\/\/+`)
+	re4 = regexp.MustCompile(`-*\/\/*-*\/*`)
 )
 
 func formatRoute(r *models.Route) *models.Route {
 	if r.Path == nil {
 		return r
 	}
-	p := "/" + strings.Trim(r.GetPath(), "/")
-	p = strings.ToLower(p)
+	p := strings.ToLower(r.GetPath())
 	p = re1.ReplaceAllString(p, "-")
 	p = re2.ReplaceAllString(p, "")
 	p = re3.ReplaceAllString(p, "")
 	p = re4.ReplaceAllString(p, "/")
+
+	p = "/" + strings.Trim(p, "/")
 	r.Path = &p
 	return r
 }
@@ -43,7 +44,7 @@ func (m *Module) ListRoutes(rw http.ResponseWriter, req *http.Request, par httpr
 		return err
 	}
 	return router.Proto(rw, &api.ListRouteResponse{
-		Routes: routes,
+		Routes: db.SortRoutesByPath(routes),
 	})
 }
 
@@ -61,7 +62,7 @@ func (m *Module) ListRoutesByPage(rw http.ResponseWriter, req *http.Request, par
 		}
 	}
 	return router.Proto(rw, &api.ListRouteResponse{
-		Routes: filteredRoutes,
+		Routes: db.SortRoutesByPath(filteredRoutes),
 	})
 }
 
@@ -69,11 +70,7 @@ func (m *Module) ListRoutesByPage(rw http.ResponseWriter, req *http.Request, par
 // reloaded after the route is saved.
 func (m *Module) UpdateRoute(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	route := &models.Route{}
-	b, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		return errors.Wrap(err)
-	}
-	err = json.Unmarshal(b, route)
+	err := jsonpb.Unmarshal(req.Body, route)
 	if err != nil {
 		return errors.Wrap(err)
 	}
@@ -88,6 +85,7 @@ func (m *Module) UpdateRoute(rw http.ResponseWriter, req *http.Request, par http
 	return router.Proto(rw, route)
 }
 
+// DeleteRoute deletes the given route.
 func (m *Module) DeleteRoute(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	routeUUID := par.ByName("uuid")
 	r, err := m.DB.GetRoute(routeUUID)
@@ -97,36 +95,39 @@ func (m *Module) DeleteRoute(rw http.ResponseWriter, req *http.Request, par http
 	return m.DB.DeleteRoute(r)
 }
 
-// UpdateRoutesByPage takes a list of routes and
-// /api/v1/pages/:uuid/routes
+// UpdateRoutesByPage takes a list of routes and sets it for the given page, deleting
+// any existing routes that aren't in the new list.
 func (m *Module) UpdateRoutesByPage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	pageUUID := par.ByName("uuid")
 	pb := &api.UpdatePageRoutesRequest{}
-	b, err := ioutil.ReadAll(req.Body)
+	err := jsonpb.Unmarshal(req.Body, pb)
 	if err != nil {
 		return errors.Wrap(err)
 	}
-	err = json.Unmarshal(b, pb)
+
+	oldRoutes, err := m.DB.ListRoutes()
 	if err != nil {
-		return errors.Wrap(err)
+		return err
 	}
 
 	// newList contains a map of uuid to routes for routes to add.
 	newList := map[string]*models.Route{}
 	for _, route := range pb.GetRoutes() {
 		route.Target = &models.Route_PageUuid{PageUuid: pageUUID}
-		// bug: need to handle multiple routes with no uuid
-		newList[route.GetUuid()] = route
-	}
 
-	routes, err := m.DB.ListRoutes()
-	if err != nil {
-		return err
+		// if no uuid, then just save the route
+		if route.GetUuid() == "" {
+			err = m.DB.UpdateRoute(formatRoute(route))
+			if err != nil {
+				return err
+			}
+		} else {
+			newList[route.GetUuid()] = route
+		}
 	}
 
 	// loop over all routes
-	filteredRoutes := []*models.Route{}
-	for _, route := range routes {
+	for _, route := range oldRoutes {
 		if route.GetPageUuid() == pageUUID {
 			if newList[route.GetUuid()] == nil {
 				// if we're not adding this existing route, then delete it
@@ -146,12 +147,5 @@ func (m *Module) UpdateRoutesByPage(rw http.ResponseWriter, req *http.Request, p
 		}
 	}
 
-	err = m.Content.ReloadRouter()
-	if err != nil {
-		return err
-	}
-
-	return router.Proto(rw, &api.ListRouteResponse{
-		Routes: filteredRoutes,
-	})
+	return m.Content.ReloadRouter()
 }
