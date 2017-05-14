@@ -7,14 +7,13 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/xenolf/lego/acme"
-
-	"regexp"
 )
 
 var now = time.Now

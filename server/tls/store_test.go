@@ -6,37 +6,7 @@ import (
 	"path"
 	"reflect"
 	"testing"
-	"time"
-
-	"github.com/ketchuphq/ketchup/server/config"
 )
-
-const testDomain = "example.com"
-const testTime = "2017-01-01T00:51:26Z"
-const testPath = testDomain + "-2017-01-01-v000.json"
-
-func testNow() time.Time {
-	t, _ := time.Parse(time.RFC3339, testTime)
-	return t
-}
-
-func setup(t *testing.T) (*Module, string) {
-	dir, err := ioutil.TempDir("", "")
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = os.Mkdir(path.Join(dir, tlsDir), os.ModePerm)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return &Module{
-		Config: &config.Module{
-			Config: config.Config{
-				DataDir: dir,
-			},
-		},
-	}, dir
-}
 
 func TestGetAll(t *testing.T) {
 	m, dir := setup(t)
@@ -98,7 +68,6 @@ func TestCurrentTLSPath(t *testing.T) {
 func TestNextTLSPath(t *testing.T) {
 	e1 := "example.com-2017-01-01-v000.json"
 	e2 := "example.com-2017-01-01-v001.json"
-	now = testNow
 	m, _ := setup(t)
 	s, err := m.getNextRegistrationPath(testDomain)
 	if err != nil {
