@@ -21,8 +21,8 @@ import (
 )
 
 const (
-	defaultCAURL        = "https://acme-v01.api.letsencrypt.org/directory"
-	defaultStagingCAURL = "https://acme-staging.api.letsencrypt.org/directory"
+	defaultCAURL               = "https://acme-v01.api.letsencrypt.org/directory"
+	defaultStagingCAURL        = "https://acme-staging.api.letsencrypt.org/directory"
 	challengeBasePath          = "/.well-known/acme-challenge/"
 	tlsDir                     = "tls"
 	defaultRenewWithinInterval = time.Hour * 24 * 14 // renew if cert expires within two weeks
@@ -175,12 +175,11 @@ func (m *Module) obtainCert(r *Registration) error {
 
 	// Initialize the Client
 	r.Domain = domain.Host
-	c, err := acme.NewClient(defaultCAURL, r, "")
+	c, err := newAcmeClient(r, m)
 	if err != nil {
 		return errors.Wrap(err)
 	}
 
-	c.SetChallengeProvider(acme.HTTP01, m)
 	registration, err := c.Register()
 	if err != nil {
 		return errors.Wrap(err)
@@ -204,7 +203,7 @@ func (m *Module) obtainCert(r *Registration) error {
 		return errors.Wrap(LetsEncryptError{fmt.Errorf(strings.Join(lst, "; "))})
 	}
 
-	m.saveCert(cert)
+	err = m.saveCert(cert)
 	return errors.Wrap(err)
 }
 
@@ -233,7 +232,6 @@ func (m *Module) Present(domain, token, keyAuth string) error {
 	}
 	m.challenge = &acmeChallenge{domain: domain, token: token, keyAuth: keyAuth}
 	return nil
-
 }
 
 // CleanUp implements the acme.ChallengeProvider.CleanUp
