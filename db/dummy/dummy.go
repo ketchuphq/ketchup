@@ -2,7 +2,9 @@ package dummy
 
 import (
 	"io"
+	"strconv"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/ketchuphq/ketchup/db"
 	"github.com/ketchuphq/ketchup/proto/ketchup/api"
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
@@ -13,6 +15,8 @@ type DummyDB struct {
 	Pages  map[string]*models.Page
 	Routes map[string]*models.Route
 	Data   map[string]*models.Data
+
+	counter int
 }
 
 var _ db.Backend = &DummyDB{}
@@ -59,6 +63,10 @@ func (d *DummyDB) GetPage(uuid string) (*models.Page, error) {
 }
 
 func (d *DummyDB) UpdatePage(p *models.Page) error {
+	if p.GetUuid() == "" {
+		p.Uuid = proto.String(strconv.Itoa(d.counter))
+		d.counter++
+	}
 	d.Pages[p.GetUuid()] = p
 	return nil
 }
@@ -81,7 +89,11 @@ func (d *DummyDB) GetRoute(uuid string) (*models.Route, error) {
 }
 
 func (d *DummyDB) UpdateRoute(r *models.Route) error {
-	d.Routes[r.GetUuid()] = r
+	if r.GetUuid() == "" {
+		r.Uuid = proto.String(strconv.Itoa(d.counter))
+		d.counter++
+	}
+	d.Routes[r.GetUuid()] = proto.Clone(r).(*models.Route)
 	return nil
 }
 
