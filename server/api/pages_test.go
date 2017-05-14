@@ -15,6 +15,7 @@ import (
 
 func TestGetPage(t *testing.T) {
 	te := setup()
+	defer te.stop()
 	te.db.Pages["page123"] = &models.Page{
 		Uuid: proto.String("page123"),
 	}
@@ -35,6 +36,7 @@ func TestGetPage(t *testing.T) {
 
 func TestGetRenderedPage(t *testing.T) {
 	te := setup()
+	defer te.stop()
 	te.db.Pages["page123"] = &models.Page{
 		Uuid: proto.String("page123"),
 	}
@@ -55,7 +57,7 @@ func TestGetRenderedPage(t *testing.T) {
 
 func TestListPages(t *testing.T) {
 	te := setup()
-
+	defer te.stop()
 	te.db.Pages["page456"] = &models.Page{
 		Uuid: proto.String("page456"),
 		Timestamps: &models.Timestamp{
@@ -93,6 +95,7 @@ func TestListPages(t *testing.T) {
 
 func TestUpdatePage(t *testing.T) {
 	te := setup()
+	defer te.stop()
 	rw := httptest.NewRecorder()
 	req := httptest.NewRequest("POST", "/api/v1/pages/",
 		bytes.NewBufferString(`{
@@ -133,6 +136,7 @@ func TestUpdatePage(t *testing.T) {
 
 func TestPublishPage(t *testing.T) {
 	te := setup()
+	defer te.stop()
 	te.db.Pages["page123"] = &models.Page{
 		Uuid: proto.String("page123"),
 	}
@@ -151,6 +155,7 @@ func TestPublishPage(t *testing.T) {
 
 func TestUnpublishPage(t *testing.T) {
 	te := setup()
+	defer te.stop()
 	te.db.Pages["page123"] = &models.Page{
 		Uuid:        proto.String("page123"),
 		PublishedAt: proto.Int64(1494650000),
@@ -170,6 +175,7 @@ func TestUnpublishPage(t *testing.T) {
 
 func TestDeletePage(t *testing.T) {
 	te := setup()
+	defer te.stop()
 	te.db.Pages["page123"] = &models.Page{
 		Uuid: proto.String("page123"),
 	}
