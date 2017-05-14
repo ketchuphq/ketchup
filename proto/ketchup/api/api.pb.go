@@ -50,7 +50,7 @@ It has these top-level messages:
 	ThemePlaceholder
 	ThemeAsset
 	User
-	PackageRelease
+	PackageAuthor
 	Package
 	Registry
 	Struct

@@ -244,47 +244,51 @@ export abstract class Data {
 }
 
 export abstract class Package {
-  name?: string;
-  author?: string[];
   type?: Package_Type;
+  name?: string;
+  authors?: PackageAuthor[];
   description?: string;
-  readme?: string;
+  homepage?: string;
+  tags?: string[];
+  readmeUrl?: string;
   vcsUrl?: string;
-  releases?: PackageRelease;
-  labels?: string[];
+  screenshotUrls?: string[];
+  ketchupVersion?: string;
   static copy(from: Package, to?: Package): Package {
     to = to || {};
-    to.name = from.name;
-    to.author = from.author;
     to.type = from.type;
+    to.name = from.name;
+    to.authors = from.authors;
     to.description = from.description;
-    to.readme = from.readme;
+    to.homepage = from.homepage;
+    to.tags = from.tags;
+    to.readmeUrl = from.readmeUrl;
     to.vcsUrl = from.vcsUrl;
-    if ('releases' in from) {
-      to.releases = PackageRelease.copy(from.releases || {}, to.releases || {});
-    }
-    to.labels = from.labels;
+    to.screenshotUrls = from.screenshotUrls;
+    to.ketchupVersion = from.ketchupVersion;
     return to;
   }
 }
 
-export abstract class PackageRelease {
-  ketchupMin?: string;
-  tags?: boolean;
-  static copy(from: PackageRelease, to?: PackageRelease): PackageRelease {
+export abstract class PackageAuthor {
+  name?: string;
+  email?: string;
+  static copy(from: PackageAuthor, to?: PackageAuthor): PackageAuthor {
     to = to || {};
-    to.ketchupMin = from.ketchupMin;
-    to.tags = from.tags;
+    to.name = from.name;
+    to.email = from.email;
     return to;
   }
 }
 
 export abstract class Registry {
   registryVersion?: string;
+  ketchupMin?: string;
   packages?: Package[];
   static copy(from: Registry, to?: Registry): Registry {
     to = to || {};
     to.registryVersion = from.registryVersion;
+    to.ketchupMin = from.ketchupMin;
     to.packages = from.packages;
     return to;
   }

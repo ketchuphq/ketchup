@@ -39,7 +39,7 @@ func main() {
 		models.Author{},
 		models.Data{},
 		packages.Package{},
-		packages.PackageRelease{},
+		packages.PackageAuthor{},
 		packages.Registry{},
 
 		api.TLSSettingsReponse{},
