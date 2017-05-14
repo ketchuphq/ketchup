@@ -23,8 +23,9 @@ import (
 const (
 	defaultCAURL        = "https://acme-v01.api.letsencrypt.org/directory"
 	defaultStagingCAURL = "https://acme-staging.api.letsencrypt.org/directory"
-	challengeBasePath   = "/.well-known/acme-challenge/"
-	tlsDir              = "tls"
+	challengeBasePath          = "/.well-known/acme-challenge/"
+	tlsDir                     = "tls"
+	defaultRenewWithinInterval = time.Hour * 24 * 14 // renew if cert expires within two weeks
 )
 
 type acmeChallenge struct {
@@ -39,7 +40,8 @@ type Module struct {
 	challenge *acmeChallenge
 	keystore  *keystore.KeyStore
 
-	serverStarted bool
+	serverStarted       bool
+	renewWithinInterval time.Duration
 }
 
 func (m *Module) Init(c *service.Config) {
@@ -63,6 +65,7 @@ Required params: domain to provision a cert for; contact email for Let's Encrypt
 		},
 	})
 	c.Setup = func() error {
+		m.renewWithinInterval = defaultRenewWithinInterval
 		m.keystore = &keystore.KeyStore{Dir: m.Config.Config.DataDir}
 
 		dir := path.Join(m.Config.Config.DataDir, tlsDir)
@@ -107,7 +110,10 @@ func (m *Module) renewExpiredCerts() error {
 			m.Logger.Error(err)
 			continue
 		}
-		if x509Cert.NotAfter.Before(now()) {
+
+		expiration := x509Cert.NotAfter
+		nowPlusDelta := now().Add(m.renewWithinInterval)
+		if nowPlusDelta.After(expiration) {
 			domain := x509Cert.Subject.CommonName
 			m.Logger.Infof("expired cert: renewing cert for %s", domain)
 			r, err := m.GetRegistration(domain, false)
