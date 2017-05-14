@@ -111,70 +111,70 @@
 			"revisionTime": "2017-01-03T08:13:33Z"
 		},
 		{
-			"checksumSHA1": "6IQIEdv6QHOLstGWORHT1XpwBmA=",
+			"checksumSHA1": "QYiG8gdTErH6/y8T9IluYHV3RXU=",
 			"path": "github.com/octavore/nagax/config",
-			"revision": "b9ffaad4cdf9df1c0e8261ab316651201181aae2",
-			"revisionTime": "2017-04-23T21:46:54Z"
+			"revision": "1ebcb397805302738a5aa88768ba072949451b04",
+			"revisionTime": "2017-05-14T05:45:23Z"
 		},
 		{
-			"checksumSHA1": "gJWzbGSqvAMuzPA8G/NJx+P5o6I=",
+			"checksumSHA1": "y8F29tbOOg4ONGxSNj8izRh7jqc=",
 			"path": "github.com/octavore/nagax/keystore",
-			"revision": "b9ffaad4cdf9df1c0e8261ab316651201181aae2",
-			"revisionTime": "2017-04-23T21:46:54Z"
+			"revision": "1ebcb397805302738a5aa88768ba072949451b04",
+			"revisionTime": "2017-05-14T05:45:23Z"
 		},
 		{
-			"checksumSHA1": "kUimpblkZlarDO1TfN/MJeIknbA=",
+			"checksumSHA1": "PKWLv22VdLiBXs6yt2bo/6ox2Dk=",
 			"path": "github.com/octavore/nagax/logger",
-			"revision": "b9ffaad4cdf9df1c0e8261ab316651201181aae2",
-			"revisionTime": "2017-04-23T21:46:54Z"
+			"revision": "1ebcb397805302738a5aa88768ba072949451b04",
+			"revisionTime": "2017-05-14T05:45:23Z"
 		},
 		{
 			"checksumSHA1": "0FahT7naLEACNpJEP2+T0I9qbsU=",
 			"path": "github.com/octavore/nagax/proto/nagax/router/api",
-			"revision": "b9ffaad4cdf9df1c0e8261ab316651201181aae2",
-			"revisionTime": "2017-04-23T21:46:54Z"
+			"revision": "1ebcb397805302738a5aa88768ba072949451b04",
+			"revisionTime": "2017-05-14T05:45:23Z"
 		},
 		{
 			"checksumSHA1": "Li6dJ7jRSQpMn7dLZromW1S1aYM=",
 			"path": "github.com/octavore/nagax/router",
-			"revision": "b9ffaad4cdf9df1c0e8261ab316651201181aae2",
-			"revisionTime": "2017-04-23T21:46:54Z"
+			"revision": "1ebcb397805302738a5aa88768ba072949451b04",
+			"revisionTime": "2017-05-14T05:45:23Z"
 		},
 		{
 			"checksumSHA1": "/IybVAi0xCYEj0fhRf539CYGp7k=",
 			"path": "github.com/octavore/nagax/router/middleware",
-			"revision": "b9ffaad4cdf9df1c0e8261ab316651201181aae2",
-			"revisionTime": "2017-04-23T21:46:54Z"
+			"revision": "1ebcb397805302738a5aa88768ba072949451b04",
+			"revisionTime": "2017-05-14T05:45:23Z"
 		},
 		{
-			"checksumSHA1": "yyF6Iz0I3uTv4yWVjBbnJ1VFFu4=",
+			"checksumSHA1": "xUvkBy1gF8Zrhrm6bEnb073h0ZQ=",
 			"path": "github.com/octavore/nagax/users",
-			"revision": "b9ffaad4cdf9df1c0e8261ab316651201181aae2",
-			"revisionTime": "2017-04-23T21:46:54Z"
+			"revision": "1ebcb397805302738a5aa88768ba072949451b04",
+			"revisionTime": "2017-05-14T05:45:23Z"
 		},
 		{
-			"checksumSHA1": "5J3Gzr7EguuG87eTpYglLrC43oI=",
+			"checksumSHA1": "5icxjpQqnLau8U+sZGh6Ot2pZcU=",
 			"path": "github.com/octavore/nagax/users/databaseauth",
-			"revision": "b9ffaad4cdf9df1c0e8261ab316651201181aae2",
-			"revisionTime": "2017-04-23T21:46:54Z"
+			"revision": "1ebcb397805302738a5aa88768ba072949451b04",
+			"revisionTime": "2017-05-14T05:45:23Z"
 		},
 		{
-			"checksumSHA1": "s88olWi9Mj3ZfaQS/7gPfxEWaus=",
+			"checksumSHA1": "gJ5wGdyj3mOC/ti4QzHfec9qJhk=",
 			"path": "github.com/octavore/nagax/users/session",
-			"revision": "b9ffaad4cdf9df1c0e8261ab316651201181aae2",
-			"revisionTime": "2017-04-23T21:46:54Z"
+			"revision": "1ebcb397805302738a5aa88768ba072949451b04",
+			"revisionTime": "2017-05-14T05:45:23Z"
 		},
 		{
 			"checksumSHA1": "cbMFGfrXASpo/HXRcYGerC/vdVg=",
 			"path": "github.com/octavore/nagax/users/tokenauth",
-			"revision": "b9ffaad4cdf9df1c0e8261ab316651201181aae2",
-			"revisionTime": "2017-04-23T21:46:54Z"
+			"revision": "1ebcb397805302738a5aa88768ba072949451b04",
+			"revisionTime": "2017-05-14T05:45:23Z"
 		},
 		{
 			"checksumSHA1": "sQyhJKT3F3BNtASNMCslSAYqmkI=",
 			"path": "github.com/octavore/nagax/util/token",
-			"revision": "b9ffaad4cdf9df1c0e8261ab316651201181aae2",
-			"revisionTime": "2017-04-23T21:46:54Z"
+			"revision": "1ebcb397805302738a5aa88768ba072949451b04",
+			"revisionTime": "2017-05-14T05:45:23Z"
 		},
 		{
 			"checksumSHA1": "1R1x14YgUOFMbpS6aLg7IVF2Tds=",
