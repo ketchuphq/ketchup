@@ -6,6 +6,7 @@ import (
 	"github.com/golang/protobuf/proto"
 
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/proto/ketchup/packages"
 	"github.com/ketchuphq/ketchup/server/content/engines"
 )
 
@@ -58,6 +59,10 @@ func (d *DefaultStore) List() ([]*models.Theme, error) {
 }
 
 func (d *DefaultStore) Add(*models.Theme) error {
+	return errors.New("templates: cannot add to default store")
+}
+
+func (d *DefaultStore) AddPackage(p *packages.Package) error {
 	return errors.New("templates: cannot add to default store")
 }
 

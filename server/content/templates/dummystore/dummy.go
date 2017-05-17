@@ -1,6 +1,9 @@
 package dummy
 
-import "github.com/ketchuphq/ketchup/proto/ketchup/models"
+import (
+	"github.com/ketchuphq/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/proto/ketchup/packages"
+)
 
 type DummyTemplateStore struct {
 	Themes map[string]*models.Theme
@@ -23,6 +26,10 @@ func (d *DummyTemplateStore) List() ([]*models.Theme, error) {
 func (d *DummyTemplateStore) Add(theme *models.Theme) error {
 	d.Themes[theme.GetName()] = theme
 	return nil
+}
+
+func (d *DummyTemplateStore) AddPackage(p *packages.Package) error {
+	panic("not implemented")
 }
 
 func (d *DummyTemplateStore) Get(themeName string) (*models.Theme, error) {

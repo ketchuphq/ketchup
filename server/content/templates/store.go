@@ -1,6 +1,9 @@
 package templates
 
-import "github.com/ketchuphq/ketchup/proto/ketchup/models"
+import (
+	"github.com/ketchuphq/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/proto/ketchup/packages"
+)
 
 // ThemeStore is a interface to support multiple theme backends.
 type ThemeStore interface {
@@ -9,6 +12,8 @@ type ThemeStore interface {
 
 	// Add a theme from a theme file
 	Add(*models.Theme) error
+
+	AddPackage(*packages.Package) error
 
 	// Get a theme by name from the store
 	Get(string) (*models.Theme, error)
