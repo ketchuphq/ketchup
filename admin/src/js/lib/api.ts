@@ -244,7 +244,7 @@ export abstract class Data {
 }
 
 export abstract class Package {
-  type?: Package_Type;
+  type?: PackageType;
   name?: string;
   authors?: PackageAuthor[];
   description?: string;
@@ -283,12 +283,12 @@ export abstract class PackageAuthor {
 
 export abstract class Registry {
   registryVersion?: string;
-  ketchupMin?: string;
+  registryType?: string;
   packages?: Package[];
   static copy(from: Registry, to?: Registry): Registry {
     to = to || {};
     to.registryVersion = from.registryVersion;
-    to.ketchupMin = from.ketchupMin;
+    to.registryType = from.registryType;
     to.packages = from.packages;
     return to;
   }
@@ -409,4 +409,4 @@ export abstract class ErrorResponse {
 export type ContentMultiple_DropdownType = 'dropdown' | 'radio' | 'unknown';
 export type ContentTextType = 'html' | 'markdown' | 'text';
 export type ListPageRequest_ListPageFilter = 'all' | 'draft' | 'published';
-export type Package_Type = 'plugin' | 'theme' | 'unknown';
+export type PackageType = 'plugin' | 'theme' | 'unknown';

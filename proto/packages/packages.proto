@@ -8,52 +8,29 @@ message PackageAuthor {
   // twitter, github, etc.
 }
 
+enum PackageType {
+  unknown = 0;
+  theme = 1;
+  plugin = 2;
+}
+
 message Package {
-  enum Type {
-    unknown = 0;
-    theme = 1;
-    plugin = 2;
-  }
-  optional Type type = 1;
+  optional PackageType type = 1;
   optional string name = 2;
   repeated PackageAuthor authors = 3;
-  optional string description = 4; // short description
-  optional string homepage = 5; // support github, bitbucket
+  optional string description = 4;
+  optional string homepage = 5;
   repeated string tags = 6;
 
-  optional string readme_url = 7; // raw readme url, markdown; screenshots? otherwise pull from theme.json?
+  optional string readme_url = 7;
   optional string vcs_url = 8; // support github, bitbucket
   repeated string screenshot_urls = 9;
   optional string ketchup_version = 10; // minimum required ketchup version
-
-  // optional bool use_vcs_release_tags = 8 [default=true];
-  // optional bool vcs_release_tag_format = SEMVER;
-
-  // optional PackageRelease current_release = 10;
-  // specific semver and release range
-  // repeated PackageRelease releases = 11;
-
-  // issues
-  // donate
-  // buy
-  // previous_names
-  // allow multiple release versions pulled automatically from git
 }
 
-// message PackageRelease {
-  // optional string ketchup_version = 1;
-  // optional string tag = 2; // "{prefix}{semantic_version}"
-  // optional string tag_prefix = 3;
-  // dependencies
-  // release_version for self hosting
-  // optional string version
-  // optional string archive_url zip containing the package
-  // optional string released_at
-// }
 
 message Registry {
   optional string registry_version = 1;
-  optional string ketchup_min = 2; // ?
+  optional string registry_type = 2;
   repeated Package packages = 10;
-  // optional string include = other registry files?
 }
