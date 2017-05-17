@@ -1,10 +1,7 @@
 package filestore
 
 import (
-	"archive/tar"
 	"bytes"
-	"compress/gzip"
-	"io"
 	"io/ioutil"
 	"os"
 	"path"
@@ -15,7 +12,9 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 
+	"github.com/ketchuphq/ketchup/plugins/pkg"
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/proto/ketchup/packages"
 	"github.com/ketchuphq/ketchup/util/errors"
 )
 
@@ -53,7 +52,7 @@ func New(baseDir string, updateInterval time.Duration, log func(args ...interfac
 	return f, nil
 }
 
-func (f *FileStore) readConfig(themeConfigPath string) (*models.Theme, error) {
+func readConfig(themeConfigPath string) (*models.Theme, error) {
 	_, err := os.Stat(themeConfigPath)
 	if os.IsNotExist(err) {
 		return nil, nil
@@ -87,7 +86,7 @@ func (f *FileStore) updateThemeDirMap() error {
 			continue
 		}
 		themeConfigPath := path.Join(f.baseDir, fi.Name(), configFileName)
-		c, err := f.readConfig(themeConfigPath)
+		c, err := readConfig(themeConfigPath)
 		if err != nil {
 			return nil
 		}
@@ -151,42 +150,6 @@ func (f *FileStore) GetAsset(theme *models.Theme, assetName string) (*models.The
 	return t, nil
 }
 
-func (f *FileStore) loadTheme(t *models.Theme) error {
-	// get templates (todo: supported subdirs)
-	glob := path.Join(f.baseDir, t.GetName(), fileStoreTemplateDir, "*")
-	paths, err := filepath.Glob(glob)
-	if err != nil {
-		return err
-	}
-	for _, p := range paths {
-		q := path.Base(p)
-		if strings.HasPrefix(q, ".") {
-			continue
-		}
-		e := strings.TrimLeft(path.Ext(p), ".")
-		if t.Templates[q] == nil {
-			t.Templates[q] = &models.ThemeTemplate{}
-		}
-		t.Templates[q].Name = &q
-		t.Templates[q].Engine = &e
-	}
-
-	// get assets (todo: supported subdirs)
-	glob = path.Join(f.baseDir, t.GetName(), fileStoreAssetsDir, "*")
-	paths, err = filepath.Glob(glob)
-	if err != nil {
-		return err
-	}
-	for _, p := range paths {
-		q := path.Base(p)
-		if strings.HasPrefix(q, ".") {
-			continue
-		}
-		t.Assets[q] = &models.ThemeAsset{Name: &q}
-	}
-	return nil
-}
-
 // Get a theme from the file store
 func (f *FileStore) Get(themeName string) (*models.Theme, error) {
 	themeDir := themeName
@@ -194,7 +157,7 @@ func (f *FileStore) Get(themeName string) (*models.Theme, error) {
 		themeDir = altDir
 	}
 	themeConfigPath := path.Join(f.baseDir, themeDir, configFileName)
-	t, err := f.readConfig(themeConfigPath)
+	t, err := readConfig(themeConfigPath)
 	if err != nil || t == nil {
 		return nil, nil
 	}
@@ -271,16 +234,17 @@ type themeFile interface {
 	GetData() string
 }
 
+// themeIterator iterates over theme files stored in a models.Theme struct
 func themeIterator(theme *models.Theme, iterFn func(fn string, el themeFile) error) error {
 	for fn, tmpl := range theme.Templates {
-		err := iterFn(fn, tmpl)
+		err := iterFn(path.Join(fileStoreTemplateDir, fn), tmpl)
 		if err != nil {
 			return errors.Wrap(err)
 		}
 	}
 
 	for fn, asset := range theme.Assets {
-		err := iterFn(fn, asset)
+		err := iterFn(path.Join(fileStoreAssetsDir, fn), asset)
 		if err != nil {
 			return errors.Wrap(err)
 		}
@@ -296,10 +260,15 @@ var jpb = &jsonpb.Marshaler{
 }
 
 // Add a theme from a theme file.
+func (f *FileStore) AddPackage(p *packages.Package) error {
+	themeDir := path.Join(f.baseDir, p.GetName())
+	return pkg.CloneToDir(themeDir, p.GetVcsUrl())
+}
+
 func (f *FileStore) Add(theme *models.Theme) error {
 	theme = proto.Clone(theme).(*models.Theme)
 	templateDir := path.Join(f.baseDir, theme.GetName())
-	perm := os.FileMode(0700)
+	perm := os.FileMode(0600)
 
 	err := themeIterator(theme, func(fn string, el themeFile) error {
 		p := path.Clean(path.Join(templateDir, fn))
@@ -307,7 +276,7 @@ func (f *FileStore) Add(theme *models.Theme) error {
 			return nil
 		}
 
-		err := os.MkdirAll(path.Dir(p), perm)
+		err := os.MkdirAll(path.Dir(p), os.ModePerm)
 		if err != nil {
 			return errors.Wrap(err)
 		}
@@ -321,7 +290,7 @@ func (f *FileStore) Add(theme *models.Theme) error {
 	})
 
 	if err != nil {
-		return nil
+		return err
 	}
 
 	fw, err := os.Create(path.Join(templateDir, configFileName))
@@ -329,49 +298,4 @@ func (f *FileStore) Add(theme *models.Theme) error {
 		return err
 	}
 	return jpb.Marshal(fw, theme)
-}
-
-// extract tar.gz from reader into dir
-func (f *FileStore) extract(r io.Reader, dir string) (string, error) {
-	templateDir := path.Join(f.baseDir, dir)
-	gr, err := gzip.NewReader(r)
-	if err != nil {
-		return "", err
-	}
-	defer gr.Close()
-
-	tr := tar.NewReader(gr)
-	for {
-		hdr, err := tr.Next()
-		if err == io.EOF {
-			break
-		}
-
-		// ignore links
-		if hdr.Mode == tar.TypeSymlink {
-			continue
-		}
-
-		p := path.Clean(path.Join(templateDir, hdr.Name))
-		if strings.HasPrefix(p, "..") {
-			// no relative paths
-			continue
-		}
-		err = os.MkdirAll(path.Dir(p), os.FileMode(0700))
-		if err != nil {
-			return "", err
-		}
-
-		f, err := os.Create(p)
-		if err != nil {
-			return "", err
-		}
-
-		defer f.Close()
-		_, err = io.Copy(f, tr)
-		if err != nil {
-			return "", err
-		}
-	}
-	return templateDir, nil
 }
