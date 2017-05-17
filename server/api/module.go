@@ -73,7 +73,7 @@ func (m *Module) Init(c *service.Config) {
 			{"/api/v1/themes/:name", methodGet, m.Auth.MustWithAuth(m.GetTheme)},
 			{"/api/v1/themes/:name/templates/:template", methodGet, m.Auth.MustWithAuth(m.GetTemplate)},
 			{"/api/v1/theme-registry", methodGet, m.Auth.MustWithAuth(m.ThemeRegistry)},
-			{"/api/v1/theme-install", methodGet, m.Auth.MustWithAuth(m.InstallTheme)},
+			{"/api/v1/theme-install", methodPost, m.Auth.MustWithAuth(m.InstallTheme)},
 
 			{"/api/v1/pages", methodPost, m.Auth.MustWithAuth(m.UpdatePage)},
 			{"/api/v1/pages/:uuid", methodDelete, m.Auth.MustWithAuth(m.DeletePage)},
