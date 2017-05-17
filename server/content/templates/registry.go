@@ -13,3 +13,9 @@ func (m *Module) Registry() (*packages.Registry, error) {
 func (m *Module) SearchRegistry(themeName string) (*packages.Package, error) {
 	return m.themeRegistry.Search(themeName)
 }
+
+// InstallThemeFromPackage to the default store from a remote git.
+// todo: check for existing package
+func (m *Module) InstallThemeFromPackage(p *packages.Package) error {
+	return m.themeStore.AddPackage(p)
+}

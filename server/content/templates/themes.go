@@ -2,7 +2,6 @@ package templates
 
 import (
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
-	"github.com/ketchuphq/ketchup/proto/ketchup/packages"
 	"github.com/ketchuphq/ketchup/util/errors"
 )
 
@@ -62,15 +61,4 @@ func (m *Module) GetAsset(name string) (*models.ThemeAsset, error) {
 		}
 	}
 	return nil, nil
-}
-
-func (m *Module) InstallThemeFromPackage(pkg *packages.Package) error {
-	if pkg.GetType() != packages.Package_theme {
-		return errors.New("%s is not a theme", pkg.GetName())
-	}
-	theme, err := m.Pkg.CloneToTheme(pkg.GetVcsUrl())
-	if err != nil {
-		return err
-	}
-	return m.internalStore.Add(theme)
 }
