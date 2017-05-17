@@ -34,6 +34,7 @@ type Module struct {
 	Pkg          *pkg.Module
 
 	themeRegistry *pkg.Registry
+	themeStore    ThemeStore
 	internalStore *filestore.FileStore
 	Stores        []ThemeStore
 
@@ -49,7 +50,7 @@ func (m *Module) Init(c *service.Config) {
 		}
 
 		m.config.Themes.Path = m.ConfigModule.DataPath(m.config.Themes.Path, themeDir)
-		themeStore, err := filestore.New(m.config.Themes.Path, time.Second*10, m.Logger.Error)
+		m.themeStore, err = filestore.New(m.config.Themes.Path, time.Second*10, m.Logger.Error)
 		if err != nil {
 			return err
 		}
@@ -65,7 +66,7 @@ func (m *Module) Init(c *service.Config) {
 
 		m.Stores = []ThemeStore{
 			&defaultstore.DefaultStore{},
-			themeStore,
+			m.themeStore,
 			m.internalStore,
 		}
 		registryURL := defaultRegistryURL
