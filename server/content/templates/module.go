@@ -33,10 +33,11 @@ type Module struct {
 	Logger       *logger.Module
 	Pkg          *pkg.Module
 
-	themeRegistry *pkg.Registry
-	themeStore    ThemeStore
-	internalStore *filestore.FileStore
-	Stores        []ThemeStore
+	themeRegistry    *pkg.Registry
+	themeRegistryURL string
+	themeStore       ThemeStore
+	internalStore    *filestore.FileStore
+	Stores           []ThemeStore
 
 	config ThemesConfig
 }
@@ -73,6 +74,7 @@ func (m *Module) Init(c *service.Config) {
 		if c.Env().IsDevelopment() {
 			registryURL = devRegistryURL
 		}
+		m.themeRegistryURL = registryURL
 		m.themeRegistry = m.Pkg.Registry(registryURL)
 		err = m.themeRegistry.Sync()
 		if err != nil {
@@ -80,4 +82,9 @@ func (m *Module) Init(c *service.Config) {
 		}
 		return nil
 	}
+}
+
+// GetRegistryURL returns the configured registry URL
+func (m *Module) GetRegistryURL() string {
+	return m.themeRegistryURL
 }
