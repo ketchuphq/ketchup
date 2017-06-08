@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/golang/protobuf/proto"
+
 	"github.com/ketchuphq/ketchup/db"
 	"github.com/ketchuphq/ketchup/proto/ketchup/api"
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
