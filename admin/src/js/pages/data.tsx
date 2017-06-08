@@ -1,6 +1,4 @@
 import msx from 'lib/msx';
-import * as m from 'mithril';
-import * as API from 'lib/api';
 import Data from 'lib/data';
 import { MustAuthController } from 'components/auth';
 import { loading } from 'components/loading';
