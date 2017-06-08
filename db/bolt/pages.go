@@ -28,16 +28,22 @@ func (m *Module) DeletePage(page *models.Page) error {
 	if err != nil {
 		return err
 	}
-	routes, err := m.ListRoutes()
+	if page.GetUuid() == "" {
+		return nil
+	}
+
+	routes, err := m.ListRoutes(&api.ListRouteRequest{
+		Options: &api.ListRouteRequest_ListRouteOptions{
+			PageUuid: page.Uuid,
+		},
+	})
 	if err != nil {
 		return err
 	}
 	for _, route := range routes {
-		if route.GetPageUuid() == page.GetUuid() {
-			err := m.DeleteRoute(route)
-			if err != nil {
-				return err
-			}
+		err := m.DeleteRoute(route)
+		if err != nil {
+			return err
 		}
 	}
 	return nil

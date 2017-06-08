@@ -50,7 +50,7 @@ type Backend interface {
 	DeleteRoute(*models.Route) error
 
 	// ListRoutes returns all existing routes. May be unsorted.
-	ListRoutes() ([]*models.Route, error)
+	ListRoutes(*api.ListRouteRequest) ([]*models.Route, error)
 
 	GetData(key string) (*models.Data, error)
 

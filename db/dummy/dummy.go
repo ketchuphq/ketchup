@@ -102,9 +102,13 @@ func (d *DummyDB) DeleteRoute(r *models.Route) error {
 	return nil
 }
 
-func (d *DummyDB) ListRoutes() ([]*models.Route, error) {
+func (d *DummyDB) ListRoutes(req *api.ListRouteRequest) ([]*models.Route, error) {
 	routes := []*models.Route{}
 	for _, r := range d.Routes {
+		uuid := req.GetOptions().GetPageUuid()
+		if uuid != "" && uuid != r.GetPageUuid() {
+			continue
+		}
 		routes = append(routes, r)
 	}
 	return routes, nil

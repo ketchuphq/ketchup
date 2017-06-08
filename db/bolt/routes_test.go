@@ -35,7 +35,7 @@ func TestRoutes(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	routes, err := app.ListRoutes()
+	routes, err := app.ListRoutes(nil)
 	if err != nil {
 		t.Fatal(err)
 	}

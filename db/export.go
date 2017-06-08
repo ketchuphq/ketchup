@@ -88,7 +88,7 @@ func (m *Module) Export() (*export.Export, error) {
 		export.Pages = append(export.Pages, page)
 	}
 
-	routes, err := m.ListRoutes()
+	routes, err := m.ListRoutes(nil)
 	if err != nil {
 		return nil, err
 	}
