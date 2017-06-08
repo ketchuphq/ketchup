@@ -3,6 +3,7 @@ package engines
 import (
 	"html/template"
 	"io"
+	"time"
 
 	"github.com/Masterminds/sprig"
 
@@ -23,6 +24,10 @@ func init() {
 	fm := sprig.GenericFuncMap()
 	for _, k := range sprigWhitelist {
 		funcMap[k] = fm[k]
+	}
+
+	funcMap["dateParseMillis"] = func(millis int64) time.Time {
+		return time.Unix(millis/1000, 0)
 	}
 }
 
