@@ -10,6 +10,7 @@ import TLSComponent from 'pages/settings/tls';
 export default class SettingsPage extends MustAuthController {
   settings: API.TLSSettingsReponse;
   version: string;
+  registryURL: string;
 
   constructor() {
     super();
@@ -24,8 +25,9 @@ export default class SettingsPage extends MustAuthController {
     m.request({
       method: 'GET',
       url: '/api/v1/settings/info',
-    }).then(({ version }) => {
+    }).then(({ version, registry_url }) => {
       this.version = version;
+      this.registryURL = registry_url;
       m.redraw();
     });
   }
@@ -57,6 +59,10 @@ export default class SettingsPage extends MustAuthController {
         <div class='tr tr--center'>
           <label>Version</label>
           <div>{v.state.version}</div>
+        </div>
+        <div class='tr tr--center'>
+          <label>Theme Registry</label>
+          <div>{v.state.registryURL}</div>
         </div>
         <div class='tr tr--center'>
           <label>Export your data as JSON</label>
