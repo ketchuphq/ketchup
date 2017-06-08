@@ -93,12 +93,14 @@ export abstract class Timestamp {
 export abstract class Theme {
   uuid?: string;
   name?: string;
+  description?: string;
   templates?: { [key: string]: ThemeTemplate; };
   assets?: { [key: string]: ThemeAsset; };
   static copy(from: Theme, to?: Theme): Theme {
     to = to || {};
     to.uuid = from.uuid;
     to.name = from.name;
+    to.description = from.description;
     to.templates = from.templates;
     to.assets = from.assets;
     return to;
