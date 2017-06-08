@@ -70,6 +70,14 @@ message ListPageResponse {
     repeated ketchup.models.Page pages = 1;
 }
 
+message ListRouteRequest {
+    message ListRouteOptions {
+        optional string page_uuid = 1;
+    }
+    optional ListOptions list = 1;
+    optional ListRouteOptions options = 2;
+}
+
 message ListRouteResponse {
     repeated ketchup.models.Route routes = 1;
 }
