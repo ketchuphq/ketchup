@@ -71,7 +71,6 @@ func (m *Module) InstallTheme(rw http.ResponseWriter, req *http.Request, par htt
 	}
 
 	// search the registry for the theme package
-	// install the package
 	p, err := m.Templates.SearchRegistry(r.GetName())
 	if err != nil {
 		return errors.New("error searching registry: %s", err)
@@ -83,5 +82,32 @@ func (m *Module) InstallTheme(rw http.ResponseWriter, req *http.Request, par htt
 
 	m.Logger.Infof("cloning package %s from %s", p.GetName(), p.GetVcsUrl())
 
+	// install the package
 	return m.Templates.InstallThemeFromPackage(p)
+}
+
+func (m *Module) CheckThemeForUpdate(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+	name := par.ByName("name")
+	_, oldRef, currentRef, err := m.Templates.CheckThemeForUpdate(name)
+	if err != nil {
+		return errors.Wrap(err)
+	}
+
+	return m.Router.JSON(rw, http.StatusOK, &api.CheckThemeForUpdateResponse{
+		OldRef:     &oldRef,
+		CurrentRef: &currentRef,
+	})
+}
+
+func (m *Module) UpdateTheme(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+	themeName := par.ByName("name")
+	r := &api.UpdateThemeRequest{}
+	err := jsonpb.Unmarshal(req.Body, r)
+	if err != nil {
+		return errors.Wrap(err)
+	}
+	if r.GetName() != "" && r.GetName() != themeName {
+		return errors.New("theme name mismatch")
+	}
+	return m.Templates.UpdateTheme(r.GetName(), r.GetRef())
 }

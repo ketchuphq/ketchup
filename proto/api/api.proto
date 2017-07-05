@@ -108,8 +108,18 @@ message EnableTLSRequest {
     optional bool agreed = 3;
 }
 
+message CheckThemeForUpdateResponse {
+    optional string old_ref = 1;
+    optional string current_ref = 2;
+}
+
 message InstallThemeRequest {
     optional string name = 1;
     optional string vcs_url = 2;
     optional string registry_url = 3;
+}
+
+message UpdateThemeRequest {
+    optional string name = 1; // extracted from URL
+    optional string ref = 2;
 }
