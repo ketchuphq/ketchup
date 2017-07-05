@@ -6,6 +6,7 @@ import (
 	"path"
 
 	git "gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 
 	"github.com/ketchuphq/ketchup/proto/ketchup/packages"
@@ -79,22 +80,65 @@ func CloneToDir(dest, url string) error {
 	})
 }
 
-// CheckForUpdates in the given repo at {data_dir}/{dataSubdir}/{packageName}
-func (m *Module) CheckForUpdates(packageName, dataSubdir string) (headRef, latestRef string, err error) {
-	packagePath := m.Config.DataPath(path.Join(dataSubdir, packageName), "")
-	repo, err := git.PlainOpen(packagePath)
+// Fetch does a git fetch to the given ref
+func FetchDir(dir, ref string) error {
+	r, err := git.PlainOpen(dir)
 	if err != nil {
-		return "", "", errors.Wrap(err)
+		return errors.Wrap(err)
 	}
-	head, err := repo.Head()
+
+	// ensure worktree is clean
+	wt, err := r.Worktree()
 	if err != nil {
-		return "", "", errors.Wrap(err)
+		return errors.Wrap(err)
 	}
-	latest, err := repo.Reference("refs/remotes/origin/master", true)
+	// todo: need support for gitignore
+	status, err := wt.Status()
 	if err != nil {
-		return "", "", errors.Wrap(err)
+		return errors.Wrap(err)
 	}
-	headRef = head.Hash().String()
-	latestRef = latest.Hash().String()
-	return
+	if !status.IsClean() {
+		return errors.New("%s is not clean; refusing to update. %s", dir)
+	}
+
+	// fetch
+	err = r.Fetch(&git.FetchOptions{RemoteName: "origin"})
+	if err != nil && err != git.NoErrAlreadyUpToDate {
+		return errors.Wrap(err)
+	}
+
+	// get current head
+	head, err := r.Head()
+	if err != nil {
+		return errors.Wrap(err)
+	}
+	headHash := head.Hash().String
+
+	// get commit for the desired ref
+	remoteHash := plumbing.NewHash(ref)
+	// check that head is an ancestor of remoteRef
+	remoteCommit, err := r.CommitObject(remoteHash)
+	if err != nil {
+		return errors.Wrap(err)
+	}
+	iter := remoteCommit.Parents()
+	found := false
+	for {
+		commit, err := iter.Next()
+		if err == io.EOF {
+			break
+		}
+		if commit.Hash.String() == headHash() {
+			found = true
+			break
+		}
+	}
+	if !found {
+		return errors.New("%s is not a descendant of the current head", ref)
+	}
+
+	err = wt.Checkout(&git.CheckoutOptions{
+		Hash: remoteCommit.Hash,
+	})
+	return errors.Wrap(err)
 }
