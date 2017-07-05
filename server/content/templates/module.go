@@ -35,7 +35,7 @@ type Module struct {
 
 	themeRegistry    *pkg.Registry
 	themeRegistryURL string
-	themeStore       ThemeStore
+	themeStore       *filestore.FileStore
 	internalStore    *filestore.FileStore
 	Stores           []ThemeStore
 
