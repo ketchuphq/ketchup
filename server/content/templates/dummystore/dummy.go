@@ -32,8 +32,8 @@ func (d *DummyTemplateStore) AddPackage(p *packages.Package) error {
 	panic("not implemented")
 }
 
-func (d *DummyTemplateStore) Get(themeName string) (*models.Theme, error) {
-	return d.Themes[themeName], nil
+func (d *DummyTemplateStore) Get(themeName string) (*models.Theme, string, error) {
+	return d.Themes[themeName], "", nil
 }
 
 func (d *DummyTemplateStore) GetTemplate(t *models.Theme, template string) (*models.ThemeTemplate, error) {

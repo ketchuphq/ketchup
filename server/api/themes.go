@@ -21,7 +21,7 @@ func (m *Module) ListThemes(rw http.ResponseWriter, req *http.Request, _ httprou
 
 func (m *Module) GetTheme(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	name := par.ByName("name")
-	theme, err := m.Templates.GetTheme(name)
+	theme, _, err := m.Templates.GetTheme(name)
 	if err != nil {
 		return err
 	}

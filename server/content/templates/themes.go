@@ -5,28 +5,34 @@ import (
 	"github.com/ketchuphq/ketchup/util/errors"
 )
 
-func (m *Module) getTheme(name string) (ThemeStore, *models.Theme, error) {
+// getTheme checks all stores for the theme with the given name.
+// returns:
+// - theme store the theme was found in
+// - theme object
+// - ref of the theme
+// - (error)
+func (m *Module) getTheme(name string) (ThemeStore, *models.Theme, string, error) {
 	for i := len(m.Stores) - 1; i > -1; i-- {
 		store := m.Stores[i]
-		theme, err := store.Get(name)
+		theme, ref, err := store.Get(name)
 		if err != nil {
-			return nil, nil, errors.Wrap(err)
+			return nil, nil, "", errors.Wrap(err)
 		}
 		if theme != nil {
 			theme.Name = &name
-			return store, theme, nil
+			return store, theme, ref, nil
 		}
 	}
-	return nil, nil, nil
+	return nil, nil, "", nil
 }
 
-// GetTheme returns a theme with all related assets populated.
-func (m *Module) GetTheme(name string) (*models.Theme, error) {
-	_, theme, err := m.getTheme(name)
+// GetTheme returns an installed theme with all related assets populated.
+func (m *Module) GetTheme(name string) (*models.Theme, string, error) {
+	_, theme, ref, err := m.getTheme(name)
 	if err != nil {
-		return nil, errors.Wrap(err)
+		return nil, "", errors.Wrap(err)
 	}
-	return theme, nil
+	return theme, ref, nil
 }
 
 // ListThemes returns a list of all known themes.

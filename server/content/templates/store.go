@@ -15,8 +15,8 @@ type ThemeStore interface {
 
 	AddPackage(*packages.Package) error
 
-	// Get a theme by name from the store
-	Get(string) (*models.Theme, error)
+	// Get a theme by name from the store and the current ref
+	Get(string) (*models.Theme, string, error)
 
 	// Get a template for the given theme from the store
 	GetTemplate(t *models.Theme, template string) (*models.ThemeTemplate, error)

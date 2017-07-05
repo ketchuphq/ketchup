@@ -66,11 +66,11 @@ func (d *DefaultStore) AddPackage(p *packages.Package) error {
 	return errors.New("templates: cannot add to default store")
 }
 
-func (d *DefaultStore) Get(themeName string) (*models.Theme, error) {
+func (d *DefaultStore) Get(themeName string) (*models.Theme, string, error) {
 	if themeName == "" || themeName == noneTheme.GetName() {
-		return noneTheme, nil
+		return noneTheme, "", nil
 	}
-	return nil, nil
+	return nil, "", nil
 }
 
 func (d *DefaultStore) GetTemplate(t *models.Theme, template string) (*models.ThemeTemplate, error) {
