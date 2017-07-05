@@ -24,6 +24,13 @@ const (
 	fileStoreAssetsDir   = "assets"
 )
 
+var jpb = &jsonpb.Marshaler{
+	EnumsAsInts:  false,
+	EmitDefaults: false,
+	Indent:       "  ",
+	OrigName:     false,
+}
+
 // FileStore stores and loads templates on the filesystem
 type FileStore struct {
 	baseDir     string
@@ -50,29 +57,6 @@ func New(baseDir string, updateInterval time.Duration, log func(args ...interfac
 		}
 	}()
 	return f, nil
-}
-
-func readConfig(themeConfigPath string) (*models.Theme, error) {
-	_, err := os.Stat(themeConfigPath)
-	if os.IsNotExist(err) {
-		return nil, nil
-	}
-	if err != nil {
-		return nil, errors.Wrap(err)
-	}
-	b, err := ioutil.ReadFile(themeConfigPath)
-	if err != nil {
-		return nil, errors.Wrap(err)
-	}
-	t := &models.Theme{
-		Templates: map[string]*models.ThemeTemplate{},
-		Assets:    map[string]*models.ThemeAsset{},
-	}
-	err = jsonpb.Unmarshal(bytes.NewBuffer(b), t)
-	if err != nil {
-		return nil, errors.Wrap(err)
-	}
-	return t, nil
 }
 
 func (f *FileStore) updateThemeDirMap() error {
@@ -151,22 +135,23 @@ func (f *FileStore) GetAsset(theme *models.Theme, assetName string) (*models.The
 }
 
 // Get a theme from the file store
-func (f *FileStore) Get(themeName string) (*models.Theme, error) {
+func (f *FileStore) Get(themeName string) (*models.Theme, string, error) {
 	themeDir := themeName
 	if altDir := f.themeDirMap[themeName]; altDir != "" {
 		themeDir = altDir
 	}
+
 	themeConfigPath := path.Join(f.baseDir, themeDir, configFileName)
 	t, err := readConfig(themeConfigPath)
 	if err != nil || t == nil {
-		return nil, nil
+		return nil, "", nil
 	}
 
 	// get templates (todo: supported subdirs)
 	glob := path.Join(f.baseDir, themeDir, fileStoreTemplateDir, "*")
 	paths, err := filepath.Glob(glob)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	for _, p := range paths {
 		q := path.Base(p)
@@ -185,7 +170,7 @@ func (f *FileStore) Get(themeName string) (*models.Theme, error) {
 	glob = path.Join(f.baseDir, themeDir, fileStoreAssetsDir, "*")
 	paths, err = filepath.Glob(glob)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	for _, p := range paths {
 		q := path.Base(p)
@@ -194,12 +179,12 @@ func (f *FileStore) Get(themeName string) (*models.Theme, error) {
 		}
 		t.Assets[q] = &models.ThemeAsset{Name: &q}
 	}
-	return t, nil
-}
 
-func themeNameFromPath(p string) string {
-	dir, _ := path.Split(p)
-	return path.Base(dir)
+	latestRef, err := getLatestRef(path.Join(f.baseDir, themeDir))
+	if err != nil {
+		return t, "", nil
+	}
+	return t, latestRef, nil
 }
 
 // List all themes in the store
@@ -229,42 +214,14 @@ func (f *FileStore) List() ([]*models.Theme, error) {
 	return themes, nil
 }
 
-type themeFile interface {
-	SetData(*string)
-	GetData() string
-}
-
-// themeIterator iterates over theme files stored in a models.Theme struct
-func themeIterator(theme *models.Theme, iterFn func(fn string, el themeFile) error) error {
-	for fn, tmpl := range theme.Templates {
-		err := iterFn(path.Join(fileStoreTemplateDir, fn), tmpl)
-		if err != nil {
-			return errors.Wrap(err)
-		}
-	}
-
-	for fn, asset := range theme.Assets {
-		err := iterFn(path.Join(fileStoreAssetsDir, fn), asset)
-		if err != nil {
-			return errors.Wrap(err)
-		}
-	}
-	return nil
-}
-
-var jpb = &jsonpb.Marshaler{
-	EnumsAsInts:  false,
-	EmitDefaults: false,
-	Indent:       "  ",
-	OrigName:     false,
-}
-
-// Add a theme from a theme file.
+// AddPackage adds a theme from a theme file by cloning it from
+// the VCS location to the themeDir.
 func (f *FileStore) AddPackage(p *packages.Package) error {
 	themeDir := path.Join(f.baseDir, p.GetName())
 	return pkg.CloneToDir(themeDir, p.GetVcsUrl())
 }
 
+// Add a theme directly to the themeDir.
 func (f *FileStore) Add(theme *models.Theme) error {
 	theme = proto.Clone(theme).(*models.Theme)
 	templateDir := path.Join(f.baseDir, theme.GetName())
@@ -298,4 +255,13 @@ func (f *FileStore) Add(theme *models.Theme) error {
 		return err
 	}
 	return jpb.Marshal(fw, theme)
+}
+
+func (f *FileStore) UpdateThemeToRef(themeName, commitHash string) error {
+	themeDir := themeName
+	if altDir := f.themeDirMap[themeName]; altDir != "" {
+		themeDir = altDir
+	}
+	repoDir := path.Join(f.baseDir, themeDir)
+	return pkg.FetchDir(repoDir, commitHash)
 }
