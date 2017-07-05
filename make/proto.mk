@@ -1,10 +1,10 @@
 export PATH := $(GOPATH)/bin:$(PATH)
 
 # all proto files in subfolders
-PROTO_FILES=$(shell find . -name "*.proto")
+PROTO_FILES=$(shell find . -name "*.proto" | grep -v node_modules)
 
 # includes for all subfolders containing proto files, e.g. `-I./path/to/proto/folder`
-INCL_PROTO_DIR=$(shell find . -name "*.proto" -exec dirname {} \; | sort -u | sed -e 's/^/-I/')
+INCL_PROTO_DIR=$(shell find . -name "*.proto" -exec dirname {} \; | grep -v node_modules | sort -u | sed -e 's/^/-I/')
 INCL_WKT=-I $$GOPATH/src/github.com/golang/protobuf/ptypes/struct
 
 PROTO_PREFIX=import_prefix_proto=github.com/ketchuphq/ketchup/proto/
