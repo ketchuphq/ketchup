@@ -11,4 +11,3 @@ production:
 prepare:
 	go get -u github.com/jteeuwen/go-bindata/...
 	npm install
-	bower install
