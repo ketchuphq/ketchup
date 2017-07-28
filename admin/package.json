@@ -21,14 +21,14 @@
     "date-fns": "^1.28.4",
     "del": "^3.0.0",
     "gulp": "^3.9.1",
-    "gulp-clean-css": "^3.5.0",
+    "gulp-clean-css": "^3.7.0",
     "gulp-mocha": "^4.3.1",
     "gulp-plumber": "^1.1.0",
     "gulp-sass": "^3.1.0",
     "gulp-shell": "^0.6.3",
     "gulp-sourcemaps": "^2.6.0",
     "gulp-tslint": "^8.0.0",
-    "gulp-typescript": "^3.1.6",
+    "gulp-typescript": "^3.2.1",
     "gutil": "^1.6.4",
     "highlight.js": "^9.11.0",
     "lodash-es": "^4.17.4",
@@ -43,10 +43,10 @@
     "source-map-support": "^0.4.15",
     "store": "^2.0.12",
     "style-loader": "^0.18.2",
-    "ts-loader": "^2.2.2",
-    "tslint": "^5.2.0",
-    "typescript": "~2.3.2",
+    "ts-loader": "^2.3.2",
+    "tslint": "^5.5.0",
+    "typescript": "^2.4.2",
     "webfontloader": "^1.6.27",
-    "webpack": "^3.0.0"
+    "webpack": "^3.4.1"
   }
 }
