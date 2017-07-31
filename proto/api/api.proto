@@ -94,7 +94,7 @@ message ListDataResponse {
     repeated ketchup.models.Data data = 1;
 }
 
-message TLSSettingsReponse {
+message TLSSettingsResponse {
     optional string tls_email = 1;
     optional string tls_domain = 2;
     optional string agreed_on = 3;

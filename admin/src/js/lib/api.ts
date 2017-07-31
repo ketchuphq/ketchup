@@ -94,6 +94,7 @@ export abstract class Theme {
   uuid?: string;
   name?: string;
   description?: string;
+  package?: Package;
   templates?: { [key: string]: ThemeTemplate; };
   assets?: { [key: string]: ThemeAsset; };
   static copy(from: Theme, to?: Theme): Theme {
@@ -101,6 +102,9 @@ export abstract class Theme {
     to.uuid = from.uuid;
     to.name = from.name;
     to.description = from.description;
+    if ('package' in from) {
+      to.package = Package.copy(from.package || {}, to.package || {});
+    }
     to.templates = from.templates;
     to.assets = from.assets;
     return to;
@@ -296,13 +300,13 @@ export abstract class Registry {
   }
 }
 
-export abstract class TLSSettingsReponse {
+export abstract class TLSSettingsResponse {
   tlsEmail?: string;
   tlsDomain?: string;
   agreedOn?: string;
   termsOfService?: string;
   hasCertificate?: boolean;
-  static copy(from: TLSSettingsReponse, to?: TLSSettingsReponse): TLSSettingsReponse {
+  static copy(from: TLSSettingsResponse, to?: TLSSettingsResponse): TLSSettingsResponse {
     to = to || {};
     to.tlsEmail = from.tlsEmail;
     to.tlsDomain = from.tlsDomain;

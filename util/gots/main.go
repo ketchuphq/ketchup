@@ -42,7 +42,7 @@ func main() {
 		packages.PackageAuthor{},
 		packages.Registry{},
 
-		api.TLSSettingsReponse{},
+		api.TLSSettingsResponse{},
 		api.EnableTLSRequest{},
 		api.ListPageRequest{},
 		api.ListPageRequest_ListPageOptions{},
