@@ -46,19 +46,14 @@ export default class DataPage extends MustAuthController {
       })
   }
 
-  static oninit(v: Mithril.Vnode<{}, DataPage>) {
-    v.state = new DataPage();
-  };
-
-  static view(v: Mithril.Vnode<{}, DataPage>) {
-    let ctrl = v.state;
+  view() {
     return <div class='data'>
       <header>
         <h1>Data</h1>
       </header>
       <div class='table'>
-        {loading(ctrl.loading)}
-        {ctrl.data.map((data) =>
+        {loading(this.loading)}
+        {this.data.map((data) =>
           <div class='tr tr--center'>
             <label>{data.key}</label>
             <div>{renderEditor(data, true)}</div>
@@ -67,7 +62,7 @@ export default class DataPage extends MustAuthController {
         <div class='tr tr--right'>
           <Button
             class='button--green'
-            handler={() => Data.saveList(ctrl.data) }>
+            handler={() => Data.saveList(this.data) }>
             Save
           </Button>
         </div>
@@ -75,5 +70,3 @@ export default class DataPage extends MustAuthController {
     </div>;
   }
 }
-
-let _: Mithril.Component<{}, DataPage> = DataPage;

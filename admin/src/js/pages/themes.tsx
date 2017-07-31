@@ -18,12 +18,7 @@ export default class ThemesPage extends MustAuthController {
     });
   }
 
-  static oninit(v: Mithril.Vnode<{}, ThemesPage>) {
-    v.state = new ThemesPage();
-  };
-
-  static view(v: Mithril.Vnode<{}, ThemesPage>) {
-    let ctrl = v.state;
+  view() {
     return <div class='themes'>
       <header>
         <a class='button button--green button--center'
@@ -37,8 +32,8 @@ export default class ThemesPage extends MustAuthController {
 
       <h2>Installed themes</h2>
       <div class='table'>
-        {loading(ctrl.loading)}
-        {ctrl.themes.map((theme) => {
+        {loading(this.loading)}
+        {this.themes.map((theme) => {
           return <a class='tr'
             href={`/admin/themes/${theme.name}`}
             oncreate={m.route.link}
@@ -50,5 +45,3 @@ export default class ThemesPage extends MustAuthController {
     </div>;
   }
 }
-
-let _: Mithril.Component<{}, ThemesPage> = ThemesPage;

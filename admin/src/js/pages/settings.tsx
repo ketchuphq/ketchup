@@ -14,7 +14,6 @@ export default class SettingsPage extends MustAuthController {
 
   constructor() {
     super();
-    this.settings = false;
     m.request({
       method: 'GET',
       url: '/api/v1/settings/tls',
@@ -32,23 +31,19 @@ export default class SettingsPage extends MustAuthController {
     });
   }
 
-  static oninit(v: Mithril.Vnode<{}, SettingsPage>) {
-    v.state = new SettingsPage();
-  };
-
-  static view(v: Mithril.Vnode<{}, SettingsPage>) {
-    let settings = v.state.settings;
-    let tlsSection = null;
-    if (settings === false) {
-      tlsSection = m('div', 'loading...');
+  view() {
+    let settings = this.settings;
+    let tlsSection;
+    if (!settings) {
+      tlsSection = <div>loading...</div>;
     } else if (Object.keys(settings).length == 0 || !settings.hasCertificate) {
-      tlsSection = m(TLSNewComponent, {
-        user: v.state.user,
-        email: settings.tlsEmail,
-        domain: settings.tlsDomain
-      });
+      tlsSection = <TLSNewComponent
+        user={this.user}
+        email={settings.tlsEmail}
+        domain={settings.tlsDomain}
+      />;
     } else {
-      tlsSection = m(TLSComponent, settings);
+      tlsSection = <TLSComponent {...settings} />;
     }
     return <div class='settings'>
       <header>
@@ -58,11 +53,11 @@ export default class SettingsPage extends MustAuthController {
       <div class='table'>
         <div class='tr tr--center'>
           <label>Version</label>
-          <div>{v.state.version}</div>
+          <div>{this.version}</div>
         </div>
         <div class='tr tr--center'>
           <label>Theme Registry</label>
-          <div>{v.state.registryURL}</div>
+          <div>{this.registryURL}</div>
         </div>
         <div class='tr tr--center'>
           <label>Export your data as JSON</label>
@@ -79,5 +74,3 @@ export default class SettingsPage extends MustAuthController {
     </div>;
   }
 }
-
-let _: Mithril.Component<{}, SettingsPage> = SettingsPage;

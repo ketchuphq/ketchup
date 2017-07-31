@@ -2,16 +2,24 @@ import msx from 'lib/msx';
 import * as m from 'mithril';
 import Route from 'lib/route';
 import Page from 'lib/page';
+import { BaseComponent } from 'components/auth';
 
-export default class EditRoutesComponent {
+interface EditRoutesAttr {
+  page: Page;
+}
+
+export default class EditRoutesComponent extends BaseComponent<EditRoutesAttr> {
   dirty: boolean;
+  page: Page;
 
-  constructor(public page: Page) {
+  constructor(v: m.CVnode<EditRoutesAttr>) {
+    super(v)
+    this.page = v.attrs.page;
     this.dirty = true;
-    if (page.routes.length == 0) {
-      page.routes.push(new Route());
+    if (this.page.routes.length == 0) {
+      this.page.routes.push(new Route());
       this.dirty = false;
-    } else if (!page.routes[0].path) {
+    } else if (!this.page.routes[0].path) {
       this.dirty = false;
     }
   }
@@ -53,15 +61,10 @@ export default class EditRoutesComponent {
     </div>;
   }
 
-  static oninit(v: Mithril.Vnode<Page, EditRoutesComponent>) {
-    v.state = new EditRoutesComponent(v.attrs);
-  };
-
-  static view(v: Mithril.Vnode<Page, EditRoutesComponent>) {
-    let ctrl = v.state;
+  view() {
     return <div class='edit-route control'>
       <div class='label'>Permalink</div>
-      {ctrl.page.routes.map(ctrl.routeEditor.bind(ctrl))}
+      {this.page.routes.map(this.routeEditor.bind(this))}
     </div>;
   }
 }

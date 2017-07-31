@@ -56,15 +56,24 @@ export let getUser = (force = false): Promise<User> => {
   });
 }
 
+export interface BaseComponent<A = any> extends m.ClassComponent<A> { }
+export abstract class BaseComponent<A> {
+  protected readonly props: A;
+  constructor(v: m.CVnode<A>) {
+    this.props = v.attrs;
+  }
+}
+
 // AuthController is a super class for controllers which may require auth
-export class AuthController {
+export interface AuthController<A = any> extends BaseComponent<A> { }
+export abstract class AuthController<A> {
   user: User;
   _userPromise: Promise<User>;
   store: Storer;
 
-  constructor(user: User = null) {
+  constructor(_?: m.CVnode<A>) {
     this.store = store.disabled ? dummyStore : store;
-    this.user = user || cachedUser;
+    this.user = cachedUser;
     this._userPromise = getUser()
       .then((user) => {
         this.user = user;
@@ -127,7 +136,7 @@ export class AuthController {
   }
 }
 
-export class MustAuthController extends AuthController {
+export abstract class MustAuthController<A = any> extends AuthController<A> {
   ready: boolean;
   constructor() {
     super();

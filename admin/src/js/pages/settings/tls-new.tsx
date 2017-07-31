@@ -1,7 +1,7 @@
 import msx from 'lib/msx';
 import * as m from 'mithril';
 import * as API from 'lib/api';
-import { User } from 'components/auth';
+import { User, BaseComponent } from 'components/auth';
 import { ModalAttrs, ModalComponent } from 'components/modal';
 import { add } from 'components/toaster';
 import Button from 'components/button';
@@ -15,15 +15,16 @@ interface TLSNewComponentAttrs {
   domain: string;
 }
 
-export default class TLSNewComponent {
+export default class TLSNewComponent extends BaseComponent<TLSNewComponentAttrs> {
   initialHost: string;
   tlsEmail: string;
   tlsDomain: string;
   modal: ModalAttrs;
 
-  constructor(attrs: TLSNewComponentAttrs) {
-    this.tlsEmail = attrs.email || attrs.user.email;
-    this.initialHost = attrs.domain || window.location.hostname;
+  constructor(v: m.CVnode<TLSNewComponentAttrs>) {
+    super(v)
+    this.tlsEmail = v.attrs.email || v.attrs.user.email;
+    this.initialHost = v.attrs.domain || window.location.hostname;
     if (this.initialHost.match(ipRegex)) {
       this.initialHost = '';
     }
@@ -58,14 +59,9 @@ export default class TLSNewComponent {
       });
   }
 
-  static oninit(v: Mithril.Vnode<TLSNewComponentAttrs, TLSNewComponent>) {
-    v.state = new TLSNewComponent(v.attrs);
-  };
-
-  static view(v: Mithril.Vnode<TLSNewComponentAttrs, TLSNewComponent>) {
-    let ctrl = v.state;
+  view() {
     let warning = null;
-    if (ctrl.initialHost == '') {
+    if (this.initialHost == '') {
       warning = <div class='tr'>
         It looks like you're not using a domain; please ensure that you've set up your DNS records correctly.
       </div>;
@@ -77,8 +73,8 @@ export default class TLSNewComponent {
         <input
           class='large'
           type='text'
-          value={ctrl.tlsEmail}
-          onchange={m.withAttr('value', (e) => ctrl.tlsEmail = e)}
+          value={this.tlsEmail}
+          onchange={m.withAttr('value', (e) => this.tlsEmail = e)}
         />
       </div>
       <div class='tr tr--center'>
@@ -88,10 +84,10 @@ export default class TLSNewComponent {
           type='text'
           config={(el: HTMLInputElement, isInitialized: boolean) => {
             if (!isInitialized) {
-              el.value = ctrl.initialHost;
+              el.value = this.initialHost;
             }
           }}
-          onchange={m.withAttr('value', (v) => ctrl.tlsDomain = v)}
+          onchange={m.withAttr('value', (v) => this.tlsDomain = v)}
         />
       </div>
       <div class='tr tr--right tr--tos'>
@@ -102,10 +98,10 @@ export default class TLSNewComponent {
       <div class='tr tr--right tr--no-border'>
         <Button
           class='button--green button--small'
-          handler={() => ctrl.register()}>
+          handler={() => this.register()}>
           Enable TLS
         </Button>
-        <ModalComponent {...ctrl.modal}/>
+        <ModalComponent {...this.modal}/>
       </div>
     </div>;
   }

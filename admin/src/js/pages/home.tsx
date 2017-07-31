@@ -3,13 +3,7 @@ import { MustAuthController } from 'components/auth';
 import Button from 'components/button';
 
 export default class HomePage extends MustAuthController {
-  constructor() {
-    super();
-  }
-  static oninit() {
-    new HomePage();
-  }
-  static view() {
+  view() {
     return <div class='home'>
       <header>
         <img src='/admin/images/k.png' />

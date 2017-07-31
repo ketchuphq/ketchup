@@ -28,18 +28,13 @@ export default class PagesPage extends MustAuthController {
       });
   }
 
-  static oninit(v: Mithril.Vnode<{}, PagesPage>) {
-    v.state = new PagesPage();
-  };
-
-  static view(v: Mithril.Vnode<{}, PagesPage>) {
-    let ctrl = v.state;
+  view() {
     let tab = (v: API.ListPageRequest_ListPageFilter, desc?: string) => {
       let classes = 'tab-el';
-      if (ctrl.viewOption == v) {
+      if (this.viewOption == v) {
         classes += ' tab-selected';
       }
-      return <span class={classes} onclick={() => ctrl.fetch(v)}>
+      return <span class={classes} onclick={() => this.fetch(v)}>
         {desc || v}
       </span>;
     };
@@ -58,8 +53,8 @@ export default class PagesPage extends MustAuthController {
         {tab('published')}
       </h2>
       <div class='table'>
-        {loading(ctrl.loading)}
-        {ctrl.pages.map((page) => {
+        {loading(this.loading)}
+        {this.pages.map((page) => {
           let status = null;
           let klass = '';
           if (page.isPublished) {
@@ -82,5 +77,3 @@ export default class PagesPage extends MustAuthController {
     </div>;
   }
 }
-
-let _: Mithril.Component<{}, PagesPage> = PagesPage;

@@ -2,20 +2,21 @@ import msx from 'lib/msx';
 import * as m from 'mithril';
 import Page from 'lib/page';
 import Route from 'lib/route';
+import { BaseComponent } from 'components/auth';
 
 interface PagePickerAttrs {
   onselect: (option: Page) => void;
 }
 
-class PagePickerComponent {
-  _attrs: PagePickerAttrs;
+export class PagePickerComponent extends BaseComponent<PagePickerAttrs> {
   pages: Page[];
   selected: string;
   onselect: (option: Page) => void;
 
-  constructor(attrs: PagePickerAttrs) {
+  constructor(v: m.CVnode<PagePickerAttrs>) {
+    super(v);
     this.pages = [];
-    this.onselect = attrs.onselect;
+    this.onselect = v.attrs.onselect;
     Page.list().then((pages) => {
       this.pages = pages;
       if (pages.length > 0) {
@@ -25,37 +26,32 @@ class PagePickerComponent {
     });
   }
 
-
-  static oninit(v: Mithril.Vnode<PagePickerAttrs, PagePickerComponent>) {
-    v.state = new PagePickerComponent(v.attrs);
-  };
-
-  static view(v: Mithril.Vnode<PagePickerAttrs, PagePickerComponent>) {
-    let ctrl = v.state;
+  view() {
     return <select
-      value={ctrl.selected}
+      value={this.selected}
       onchange={m.withAttr('value', (v) => {
-        ctrl.selected = v;
-        for (var i = 0; i < ctrl.pages.length; i++) {
-          let page = ctrl.pages[i];
+        this.selected = v;
+        for (var i = 0; i < this.pages.length; i++) {
+          let page = this.pages[i];
           if (page.uuid == v) {
-            ctrl.onselect(page);
+            this.onselect(page);
             return;
           }
         }
       })}
     >
-    {ctrl.pages.map((page) =>
+    {this.pages.map((page) =>
       <option>{page.uuid}</option>
     )}
     </select>;
   }
 }
 
-class NewRouteComponent {
+export class NewRouteComponent extends BaseComponent {
   route: Route;
 
-  constructor() {
+  constructor(v: any) {
+    super(v);
     this.route = new Route();
   }
 
@@ -63,20 +59,15 @@ class NewRouteComponent {
     this.route.pageUuid = page.uuid;
   }
 
-  static oninit(v: Mithril.Vnode<{}, NewRouteComponent>) {
-    v.state = new NewRouteComponent();
-  };
-
-  static view(v: Mithril.Vnode<{}, NewRouteComponent>) {
-    let ctrl = v.state;
+  view() {
     return <div class='new-route'>
       <input type='text'
         placeholder='route name'
         onchange={m.withAttr('value', (v) => {
-          ctrl.route.path = v;
+          this.route.path = v;
         })}
       />
-      <PagePickerComponent onselect={ ctrl.selectPage.bind(ctrl) } />
+      <PagePickerComponent onselect={ this.selectPage.bind(this) } />
     </div>;
   }
 }

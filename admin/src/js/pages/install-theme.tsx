@@ -27,35 +27,30 @@ export default class InstallThemePage extends MustAuthController {
     return !!this.installedThemes[name];
   }
 
-  static oninit(v: Mithril.Vnode<{}, InstallThemePage>) {
-    v.state = new InstallThemePage();
-  }
-
-  static view(v: Mithril.Vnode<{}, InstallThemePage>) {
-    let ctrl = v.state;
+  view() {
     let themes;
     let themeInstall = (p: API.Package) => {
       return () => {
-        if (ctrl.installing) {
+        if (this.installing) {
           return;
         }
-        ctrl.installing = p.name;
+        this.installing = p.name;
         m.redraw();
         Theme.install(p).then(() => {
-          ctrl.installing = null;
+          this.installing = null;
           m.redraw();
         });
       };
     };
-    if (ctrl.themes) {
-      themes = ctrl.themes.packages.map((p: API.Package) =>
+    if (this.themes) {
+      themes = this.themes.packages.map((p: API.Package) =>
         <div class='tr'>
           <div>{p.name}</div>
           <div>{p.vcsUrl}</div>
           {
-          ctrl.themeInstalled(p.name) ? 'installed' :
-            <a disabled={!!ctrl.installing}
-              class={'button button--small' + (!!ctrl.installing ? 'button--disabled' : 'button--blue')}
+          this.themeInstalled(p.name) ? 'installed' :
+            <a disabled={!!this.installing}
+              class={'button button--small' + (!!this.installing ? 'button--disabled' : 'button--blue')}
               onclick={themeInstall(p)}
             >
               install
@@ -67,7 +62,7 @@ export default class InstallThemePage extends MustAuthController {
 
     return <div>
       <h1>Theme Manager</h1>
-      {!ctrl.installing ? '' : <div>{`Installing theme ${ctrl.installing}...`}</div>}
+      {!this.installing ? '' : <div>{`Installing theme ${this.installing}...`}</div>}
       <div class='table'>{themes}</div>
     </div>;
   }

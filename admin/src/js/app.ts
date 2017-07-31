@@ -16,7 +16,7 @@ import InstallThemePage from 'pages/install-theme';
 import * as WebFont from 'webfontloader';
 
 
-export let routes: Mithril.RouteDefs = {
+export let routes: m.RouteDefs = {
   '/admin': Layout(HomePage),
   // '/admin/routes': RoutesPage,
   '/admin/pages': Layout(PagesPage),

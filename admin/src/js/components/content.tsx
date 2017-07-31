@@ -1,3 +1,4 @@
+import * as m from 'mithril';
 import msx from 'lib/msx';
 import * as API from 'lib/api';
 import EditorComponent from 'components/editors/editor';
@@ -7,7 +8,7 @@ import CodeMirrorComponent from 'components/editors/markdown';
 
 interface ContentEditor {
   shouldRender(content: API.Content): boolean;
-  render(content: API.Content): Mithril.Vnode<any, any>;
+  render(content: API.Content): m.Vnode<any, any>;
 }
 
 let LongHTMLEditor: ContentEditor = {
@@ -36,7 +37,7 @@ let ShortTextEditor: ContentEditor = {
     content.short != null && (content.short.type == 'text' || content.short.type == 'markdown'),
   render: (content: API.Content) =>
     <input type='text'
-      oncreate={(v: Mithril.VnodeDOM<any, any>) => {
+      oncreate={(v: m.VnodeDOM<any, any>) => {
         (v.dom as HTMLTextAreaElement).value = content.value || '';
       }}
       onchange={(e: EventTarget) => {
@@ -60,7 +61,7 @@ let editors: ContentEditor[] = [
   ShortTextEditor,
 ];
 
-export function renderEditor(c: API.Content | API.Data, hideLabel: boolean): Mithril.Vnode<any, any> {
+export function renderEditor(c: API.Content | API.Data, hideLabel: boolean): m.Vnode<any, any> {
   for (var i = 0; i < editors.length; i++) {
     let editor = editors[i];
     if (editor.shouldRender(c)) {

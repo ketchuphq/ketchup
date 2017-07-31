@@ -17,17 +17,12 @@ export default class ThemePage extends MustAuthController {
     }
   }
 
-  static oninit(v: Mithril.Vnode<{}, ThemePage>) {
-    v.state = new ThemePage();
-  };
-
-  static view(v: Mithril.Vnode<{}, ThemePage>) {
-    let ctrl = v.state;
-    if (!ctrl.theme) {
+  view() {
+    if (!this.theme) {
       return;
     }
-    let templateKeys = Object.keys(ctrl.theme.templates);
-    let assetKeys = Object.keys(ctrl.theme.assets);
+    let templateKeys = Object.keys(this.theme.templates);
+    let assetKeys = Object.keys(this.theme.assets);
 
     let assetsList = [<a class='tr'>no assets</a>];
     if (assetKeys.length > 0) {
@@ -43,17 +38,17 @@ export default class ThemePage extends MustAuthController {
             Themes
           </a>
           {m.trust(' &rsaquo; ')}
-          <span class='unbold'>{ctrl.theme.name}</span>
+          <span class='unbold'>{this.theme.name}</span>
         </h1>
       </header>
 
       <h2>Templates</h2>
       <div class='table'>
         {templateKeys.sort().map((name) => {
-          let t = ctrl.theme.templates[name];
+          let t = this.theme.templates[name];
           return <a class='tr'
             oncreate={m.route.link}
-            href={`/admin/themes/${ctrl.theme.name}/templates/${t.name}`}
+            href={`/admin/themes/${this.theme.name}/templates/${t.name}`}
           >
             <div>{t.name}</div>
             <div>{t.engine}</div>
@@ -68,5 +63,3 @@ export default class ThemePage extends MustAuthController {
     </div>;
   }
 }
-
-let _: Mithril.Component<{}, ThemePage> = ThemePage;

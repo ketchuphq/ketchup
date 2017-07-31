@@ -31,15 +31,10 @@ export default class TemplatePage extends MustAuthController {
     }, 'hljs');
   }
 
-  static oninit(v: Mithril.Vnode<{}, TemplatePage>) {
-    v.state = new TemplatePage();
-  };
-
-  static view(v: Mithril.Vnode<{}, TemplatePage>) {
+  view() {
     let name = m.route.param('name');
-    let ctrl = v.state;
-    let lst: Mithril.Vnode<any, any>[] = [];
-    let p = ctrl.template.placeholders;
+    let lst: m.Vnode<any, any>[] = [];
+    let p = this.template.placeholders;
     if (p && p.length > 0) {
       p.forEach((placeholder) => {
         if (placeholder.key == 'content') {
@@ -48,11 +43,11 @@ export default class TemplatePage extends MustAuthController {
         lst.push(<div class='tr'>{placeholder.key}</div>);
       });
     }
-    if (!ctrl.template.hideContent) {
+    if (!this.template.hideContent) {
       lst.push(<div class='tr'>content</div>);
     }
 
-    let placeholders: Mithril.Vnode<any, any>;
+    let placeholders: m.Vnode<any, any>;
     if (lst.length > 0) {
       placeholders = <div>
         <h2>Fields</h2>
@@ -81,14 +76,12 @@ export default class TemplatePage extends MustAuthController {
       </header>
       {placeholders}
       <h2>Template</h2>
-      <pre onupdate={(v: Mithril.VnodeDOM<any, any>) => {
-          ctrl.colorize(v.dom as HTMLElement);
+      <pre onupdate={(v: m.VnodeDOM<any, any>) => {
+          this.colorize(v.dom as HTMLElement);
         }}
       >
-        {ctrl.template.data}
+        {this.template.data}
       </pre>
     </div>;
   }
 }
-
-let _: Mithril.Component<{}, TemplatePage> = TemplatePage;
