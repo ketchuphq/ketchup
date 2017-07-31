@@ -175,9 +175,8 @@ export default class PagePage extends MustAuthController {
 
   view() {
     if (!this.page) {
-      return;
+      return <div></div>;
     }
-
     let controls = <div class='page-max__controls'>
       <PageSaveButtonComponent
         page={this.page}
