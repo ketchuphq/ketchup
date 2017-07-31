@@ -5,39 +5,36 @@ import { BaseComponent } from 'components/auth';
 export interface ModalAttrs {
   title: string;
   klass?: string;
-  content: () => any;
+  visible: () => boolean;
+  toggle: () => void;
 }
 
 export class ModalComponent extends BaseComponent<ModalAttrs> {
-  content: ModalAttrs;
-  constructor(v: m.CVnode<ModalAttrs>) {
-    super(v);
-    this.content = v.attrs;
-  }
-
   view(v: m.CVnode<ModalAttrs>) {
-    if (!this.content || Object.keys(this.content).length == 0) {
+    // need to get attrs here, not in constructor which only
+    // gets called the first time.
+    if (!v.attrs.visible()) {
       return <div></div>;
     }
     return <div
       class='overlay'
-      onclick={() => {
-        delete this.content.title;
-        delete this.content.content;
-        delete this.content.klass;
-      }}
+      onclick={v.attrs.toggle}
     >
       <div class='modal-pad' />
-      <div class={`modal ${this.content.klass || ''}`}>
-        <div class='modal__title'>{this.content.title}</div>
-        <div class='modal__content'>{this.content.content()}</div>
-        {v.children}
+      <div class={`modal ${v.attrs.klass || ''}`}>
+        <div class='modal__title'>{v.attrs.title}</div>
+        <div class='modal__content'>
+          {v.children}
+        </div>
       </div>
     </div>;
   };
 }
 
-interface ConfirmModalAttrs extends ModalAttrs {
+interface ConfirmModalAttrs {
+  title: string;
+  klass?: string;
+  content: () => any;
   confirmText?: string;
   cancelText?: string;
   confirmColor?: ModalButtonColor;

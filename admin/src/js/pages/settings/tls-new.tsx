@@ -20,11 +20,14 @@ export default class TLSNewComponent extends BaseComponent<TLSNewComponentAttrs>
   tlsEmail: string;
   tlsDomain: string;
   modal: ModalAttrs;
+  showErrorModal: boolean;
+  errors: string;
 
   constructor(v: m.CVnode<TLSNewComponentAttrs>) {
     super(v)
     this.tlsEmail = v.attrs.email || v.attrs.user.email;
     this.initialHost = v.attrs.domain || window.location.hostname;
+    this.showErrorModal = false;
     if (this.initialHost.match(ipRegex)) {
       this.initialHost = '';
     }
@@ -49,13 +52,9 @@ export default class TLSNewComponent extends BaseComponent<TLSNewComponentAttrs>
           add('Unknown error', 'error');
           return;
         }
-        this.modal = {
-          title: 'Error',
-          klass: 'modal--error',
-          content: () => {
-            return <p>{res.errors[0].detail}</p>;
-          }
-        };
+        this.errors = res.errors[0].detail;
+        this.showErrorModal = true
+        m.redraw();
       });
   }
 
@@ -101,7 +100,17 @@ export default class TLSNewComponent extends BaseComponent<TLSNewComponentAttrs>
           handler={() => this.register()}>
           Enable TLS
         </Button>
-        <ModalComponent {...this.modal}/>
+        <ModalComponent
+          title='Error'
+          klass='modal--error'
+          visible={() => this.showErrorModal}
+          toggle={() => {
+            this.showErrorModal = !this.showErrorModal;
+            m.redraw();
+          }}
+          >
+            <p>{this.errors}</p>
+        </ModalComponent>
       </div>
     </div>;
   }
