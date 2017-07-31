@@ -8,10 +8,11 @@ interface PopoverAttrs {
 
 export default class Popover extends BaseComponent<PopoverAttrs> {
   view(v: m.CVnode<PopoverAttrs>) {
+    let klass = 'popover-outer';
     if (!v.attrs.visible) {
-      return <div></div>; // todo: figure out why we can't return null here.
+      klass += ' popover-outer-hidden'
     }
-    return <div class='popover-outer'>
+    return <div class={klass}>
       <div class='popover'>{v.children}</div>
     </div>;
   }
