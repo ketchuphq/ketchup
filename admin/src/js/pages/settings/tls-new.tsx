@@ -2,7 +2,7 @@ import msx from 'lib/msx';
 import * as m from 'mithril';
 import * as API from 'lib/api';
 import { User, BaseComponent } from 'components/auth';
-import { ModalAttrs, ModalComponent } from 'components/modal';
+import { ModalComponent } from 'components/modal';
 import { add } from 'components/toaster';
 import Button from 'components/button';
 
@@ -19,7 +19,6 @@ export default class TLSNewComponent extends BaseComponent<TLSNewComponentAttrs>
   initialHost: string;
   tlsEmail: string;
   tlsDomain: string;
-  modal: ModalAttrs;
   showErrorModal: boolean;
   errors: string;
 
