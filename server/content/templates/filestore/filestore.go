@@ -59,6 +59,9 @@ func New(baseDir string, updateInterval time.Duration, log func(args ...interfac
 	return f, nil
 }
 
+// updateThemeDirMap iterates over all folders in the base dir and reads all the
+// theme configs found. also updates the mapping of folder name to theme name,
+// if different.
 func (f *FileStore) updateThemeDirMap() error {
 	lst, err := ioutil.ReadDir(f.baseDir)
 	if err != nil {
@@ -148,37 +151,43 @@ func (f *FileStore) Get(themeName string) (*models.Theme, string, error) {
 	}
 
 	// get templates (todo: supported subdirs)
-	glob := path.Join(f.baseDir, themeDir, fileStoreTemplateDir, "*")
-	paths, err := filepath.Glob(glob)
-	if err != nil {
-		return nil, "", err
-	}
-	for _, p := range paths {
-		q := path.Base(p)
-		if strings.HasPrefix(q, ".") {
-			continue
+	baseTemplateDir := path.Clean(path.Join(f.baseDir, themeDir, fileStoreTemplateDir))
+	err = filepath.Walk(baseTemplateDir, func(p string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
 		}
+		if info.IsDir() {
+			return nil
+		}
+		p = strings.TrimPrefix(path.Clean(p), baseTemplateDir)
+		p = strings.TrimLeft(p, "/")
+		q := path.Base(p)
 		e := strings.TrimLeft(path.Ext(p), ".")
-		if t.Templates[q] == nil {
-			t.Templates[q] = &models.ThemeTemplate{}
+		if t.Templates[p] == nil {
+			t.Templates[p] = &models.ThemeTemplate{}
 		}
-		t.Templates[q].Name = &q
-		t.Templates[q].Engine = &e
-	}
+		t.Templates[p].Name = &q
+		t.Templates[p].Engine = &e
+		return nil
+	})
 
-	// get assets (todo: supported subdirs)
-	glob = path.Join(f.baseDir, themeDir, fileStoreAssetsDir, "*")
-	paths, err = filepath.Glob(glob)
-	if err != nil {
-		return nil, "", err
-	}
-	for _, p := range paths {
+	baseAssetDir := path.Clean(path.Join(f.baseDir, themeDir, fileStoreAssetsDir))
+	err = filepath.Walk(baseAssetDir, func(p string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		p = strings.TrimPrefix(path.Clean(p), baseAssetDir)
+		p = strings.TrimLeft(p, "/")
 		q := path.Base(p)
 		if strings.HasPrefix(q, ".") {
-			continue
+			return nil
 		}
-		t.Assets[q] = &models.ThemeAsset{Name: &q}
-	}
+		t.Assets[p] = &models.ThemeAsset{Name: &q}
+		return nil
+	})
 
 	latestRef, err := getLatestRef(path.Join(f.baseDir, themeDir))
 	if err != nil {
