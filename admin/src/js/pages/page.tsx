@@ -19,6 +19,7 @@ import PageEditorsComponent from 'pages/page/editors';
 export default class PagePage extends MustAuthController {
   page: Page;
   showSettings: boolean;
+  showLeaveModal: boolean;
   template: API.ThemeTemplate;
   _nextRoute: string;
   _clickStart: DOMTokenList; // keep track of click location to prevent firing on drag
@@ -30,6 +31,7 @@ export default class PagePage extends MustAuthController {
     super();
     this.dirty = false;
     this.showSettings = false;
+    this.showLeaveModal = false;
     let pageUUID = m.route.param('id');
     if (pageUUID) {
       Page.get(pageUUID)
@@ -51,6 +53,7 @@ export default class PagePage extends MustAuthController {
 
   goToIndex() {
     this._nextRoute = '/admin/pages';
+    return Promise.resolve();
   }
 
   updatePage(page: Page, initial = false) {
@@ -133,18 +136,7 @@ export default class PagePage extends MustAuthController {
     }
     this.dirty = this.dirty || !isEqual(this.initialContent, this.page.contents);
     if (this.dirty) {
-      ConfirmModalComponent.confirm({
-        title: 'You are about to leave this page',
-        content: () => <p>
-          You have unsaved changes. Are you sure
-        you want to leave this page?
-      </p>,
-        confirmText: 'Stay',
-        cancelText: 'Leave',
-        cancelColor: 'modal-button--red'
-      })
-        .then(() => { /* noop */ })
-        .catch(() => { this.goToIndex(); });
+      this.showLeaveModal = true;
       return;
     }
     this.goToIndex();
@@ -222,7 +214,22 @@ export default class PagePage extends MustAuthController {
         });
       }}
     >
-      <ConfirmModalComponent />
+      <ConfirmModalComponent
+        title='You are about to leave this page'
+        visible={() => this.showLeaveModal}
+        toggle={() => {
+          this.showLeaveModal = !this.showLeaveModal;
+          m.redraw();
+        }}
+        confirmText='Stay'
+        cancelText='Leave'
+        cancelColor='modal-button--red'
+        reject={() => this.goToIndex()}
+      >
+        <p>
+          You have unsaved changes. Are you sure you want to leave this page?
+        </p>
+      </ConfirmModalComponent>
       {controls}
       <div class='page-editor'
         oncreate={(v: m.VnodeDOM<any, any>) => {

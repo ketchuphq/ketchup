@@ -1,4 +1,4 @@
-import * as m from 'mithril'
+import * as m from 'mithril';
 import msx from 'lib/msx';
 import { BaseComponent } from 'components/auth';
 
@@ -9,91 +9,94 @@ export interface ModalAttrs {
   toggle: () => void;
 }
 
-export class ModalComponent extends BaseComponent<ModalAttrs> {
-  view(v: m.CVnode<ModalAttrs>) {
-    // need to get attrs here, not in constructor which only
-    // gets called the first time.
-    if (!v.attrs.visible()) {
-      return <div></div>;
+export class ModalComponent<A extends ModalAttrs = ModalAttrs> extends BaseComponent<A> {
+  protected controls: m.Children;
+
+  toggle(e?: Event) {
+    if (e && e.srcElement.className != 'overlay') {
+      return;
     }
-    return <div
-      class='overlay'
-      onclick={v.attrs.toggle}
-    >
-      <div class='modal-pad' />
-      <div class={`modal ${v.attrs.klass || ''}`}>
-        <div class='modal__title'>{v.attrs.title}</div>
-        <div class='modal__content'>
-          {v.children}
+    this.props.toggle();
+  }
+
+  view(v: m.CVnode<ModalAttrs>) {
+    if (!this.props.visible()) {
+      return <div />;
+    }
+    return (
+      <div class='overlay' onclick={(e: Event) => this.toggle(e)}>
+        <div class='modal-pad' />
+        <div class={`modal ${this.props.klass || ''}`}>
+          <div class='modal__title'>{this.props.title}</div>
+          <div class='modal__content'>{v.children}</div>
+          {this.controls}
         </div>
       </div>
-    </div>;
-  };
+    );
+  }
 }
 
-interface ConfirmModalAttrs {
-  title: string;
-  klass?: string;
-  content: () => any;
+type ModalButtonColor = '' | 'modal-button--green' | 'modal-button--red';
+
+interface ConfirmModalAttrs extends ModalAttrs {
+  resolve?: () => Promise<any>;
+  reject?: () => Promise<any>;
   confirmText?: string;
   cancelText?: string;
   confirmColor?: ModalButtonColor;
   cancelColor?: ModalButtonColor;
+  hideCancel?: boolean;
 }
 
-type ModalButtonColor = '' | 'modal-button--green' | 'modal-button--red'
+export class ConfirmModalComponent extends ModalComponent<ConfirmModalAttrs> {
+  confirmColor: ModalButtonColor;
+  cancelColor: ModalButtonColor;
+  constructor(v: m.CVnode<ConfirmModalAttrs>) {
+    super(v);
+    this.confirmColor = this.props.confirmColor || 'modal-button--green';
+    this.cancelColor = this.props.cancelColor || '';
+  }
 
-export class ConfirmModalComponent extends BaseComponent {
-  private static content: ConfirmModalAttrs;
-  private static resolve: () => void;
-  private static reject: () => void;
-
-  static confirm(content: ConfirmModalAttrs) {
-    this.reset();
-    this.content = content;
-
-    return new Promise((resolve, reject) => {
-      this.resolve = resolve;
-      this.reject = reject;
+  resolve() {
+    let promise = Promise.resolve();
+    if (this.props.resolve) {
+      promise = this.props.resolve();
+    }
+    promise.then(() => {
+      this.toggle();
     });
   }
 
-  static reset() {
-    this.content = null;
-    this.resolve = null;
-    this.reject = null;
+  reject() {
+    let promise = Promise.resolve();
+    if (this.props.reject) {
+      promise = this.props.reject();
+    }
+    promise.then(() => {
+      this.toggle();
+    });
   }
 
-  view() {
-    let content = ConfirmModalComponent.content;
-    if (!content || Object.keys(content).length == 0) {
-      return <div></div>;
-    }
-    return <div
-      class='overlay'
-      onclick={() => {
-        ConfirmModalComponent.reset();
-      }}
-    >
-      <div class='modal-pad' />
-      <div class={`modal ${content.klass || ''}`}>
-        <div class='modal__title'>{content.title}</div>
-        <div class='modal__content'>{content.content()}</div>
-        <div class='modal__controls'>
-          <div class={`modal-button ${content.confirmColor || ''}`} onclick={() => {
-            ConfirmModalComponent.resolve();
-            ConfirmModalComponent.reset();
-          }}>
-            {content.confirmText || 'Yes'}
-          </div>
-          <div class={`modal-button ${content.cancelColor || ''}`} onclick={() => {
-            ConfirmModalComponent.reject();
-            ConfirmModalComponent.reset();
-          }}>
-            {content.cancelText || 'Cancel'}
-          </div>
-        </div>
+  view(v: m.CVnode<ConfirmModalAttrs>) {
+    let confirm = (
+      <div class={`modal-button ${this.confirmColor}`} onclick={() => this.resolve()}>
+        {v.attrs.confirmText || 'Yes'}
       </div>
-    </div>;
-  };
+    );
+    let cancel;
+    if (!v.attrs.hideCancel) {
+      cancel = (
+        <div class={`modal-button ${this.cancelColor}`} onclick={() => this.reject()}>
+          {v.attrs.cancelText || 'Cancel'}
+        </div>
+      );
+    }
+    this.controls = (
+      <div class='modal__controls'>
+        {confirm} {cancel}
+      </div>
+    );
+
+    return super.view(v);
+  }
 }
