@@ -54,13 +54,18 @@
     margin-left: 8px
 
   &--loading
-    display: flex !important
-    justify-content: center
-    align-items: center
+    position: relative;
     .button__inner
       opacity: 0
     .loader
       position: absolute
+      left: 0
+      right: 0
+      top: 0
+      bottom: 0
+      display: flex
+      justify-content: center
+      align-items: center
     .loading0, .loading1, .loading2
       display: inline-block;
       margin: 2px;
