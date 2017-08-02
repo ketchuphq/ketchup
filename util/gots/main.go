@@ -50,6 +50,8 @@ func main() {
 		api.ListOptions{},
 		api.ListDataResponse{},
 		api.UpdateDataRequest{},
+		api.GetThemeResponse{},
+		api.CheckThemeForUpdateResponse{},
 
 		router_api.Error{},
 		router_api.ErrorResponse{},

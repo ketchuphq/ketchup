@@ -1,19 +1,15 @@
 import * as API from 'lib/api';
 import * as m from 'mithril';
 
-export default class Theme implements API.Theme {
-  name: string;
-  templates: { [key: string]: API.ThemeTemplate };
-  assets: { [key: string]: API.ThemeAsset };
+export default class Theme extends API.Theme {
+  ref: string;
 
-  constructor(config?: API.Theme) {
-    this.templates = {};
-    this.assets = {};
-    if (config) {
-      this.name = config.name;
-      this.templates = config.templates || {};
-      this.assets = config.assets || {};
-    }
+  constructor(config?: API.Theme, ref?: string) {
+    super();
+    API.Theme.copy(config, this);
+    this.templates = this.templates || {};
+    this.assets = this.assets || {};
+    this.ref = ref;
   }
 
   getTemplate(name: string): API.ThemeTemplate {
@@ -25,8 +21,8 @@ export default class Theme implements API.Theme {
       method: 'GET',
       url: `/api/v1/themes/${name}`
     })
-      .then((data: Theme) => {
-        return new Theme(data);
+      .then((data: API.GetThemeResponse) => {
+        return new Theme(data.theme, data.ref);
       });
   }
 

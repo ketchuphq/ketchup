@@ -86,6 +86,11 @@ message ListThemeResponse {
     repeated ketchup.models.Theme themes = 1;
 }
 
+message GetThemeResponse {
+    optional ketchup.models.Theme theme = 1;
+    optional string ref = 2;
+}
+
 message UpdateDataRequest {
     repeated ketchup.models.Data data = 1;
 }

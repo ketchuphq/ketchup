@@ -388,6 +388,30 @@ export abstract class UpdateDataRequest {
   }
 }
 
+export abstract class GetThemeResponse {
+  theme?: Theme;
+  ref?: string;
+  static copy(from: GetThemeResponse, to?: GetThemeResponse): GetThemeResponse {
+    to = to || {};
+    if ('theme' in from) {
+      to.theme = Theme.copy(from.theme || {}, to.theme || {});
+    }
+    to.ref = from.ref;
+    return to;
+  }
+}
+
+export abstract class CheckThemeForUpdateResponse {
+  oldRef?: string;
+  currentRef?: string;
+  static copy(from: CheckThemeForUpdateResponse, to?: CheckThemeForUpdateResponse): CheckThemeForUpdateResponse {
+    to = to || {};
+    to.oldRef = from.oldRef;
+    to.currentRef = from.currentRef;
+    return to;
+  }
+}
+
 export abstract class Error {
   code?: string;
   title?: string;

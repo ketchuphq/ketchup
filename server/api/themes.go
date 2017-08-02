@@ -21,7 +21,7 @@ func (m *Module) ListThemes(rw http.ResponseWriter, req *http.Request, _ httprou
 
 func (m *Module) GetTheme(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	name := par.ByName("name")
-	theme, _, err := m.Templates.GetTheme(name)
+	theme, ref, err := m.Templates.GetTheme(name)
 	if err != nil {
 		return err
 	}
@@ -29,10 +29,10 @@ func (m *Module) GetTheme(rw http.ResponseWriter, req *http.Request, par httprou
 	if theme == nil {
 		return router.ErrNotFound
 	}
-	// m.DB.GetThemeByName(name
-	// m.Templates
-	// additional data for a theme: which store it is in?
-	return router.Proto(rw, theme)
+	return router.Proto(rw, &api.GetThemeResponse{
+		Theme: theme,
+		Ref:   &ref,
+	})
 }
 
 func (m *Module) GetTemplate(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
