@@ -16,6 +16,13 @@ export default class Theme extends API.Theme {
     return this.templates[name];
   }
 
+  checkForUpdates() {
+    return m.request<API.CheckThemeForUpdateResponse>({
+      method: 'GET',
+      url: `/api/v1/themes/${this.name}/updates`
+    });
+  }
+
   static get(name: string): Promise<Theme> {
     return m.request({
       method: 'GET',
