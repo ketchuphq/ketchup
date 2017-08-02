@@ -8,7 +8,7 @@ import TLSComponent from 'pages/settings/tls';
 // add redirect
 // setup static upload
 export default class SettingsPage extends MustAuthController {
-  settings: API.TLSSettingsReponse;
+  settings: API.TLSSettingsResponse;
   version: string;
   registryURL: string;
 
@@ -17,7 +17,7 @@ export default class SettingsPage extends MustAuthController {
     m.request({
       method: 'GET',
       url: '/api/v1/settings/tls',
-    }).then((settings: API.TLSSettingsReponse) => {
+    }).then((settings: API.TLSSettingsResponse) => {
       this.settings = settings;
       m.redraw();
     });

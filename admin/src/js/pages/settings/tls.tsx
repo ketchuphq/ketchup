@@ -3,8 +3,8 @@ import msx from 'lib/msx';
 import * as API from 'lib/api';
 import { BaseComponent } from 'components/auth';
 
-export default class TLSComponent extends BaseComponent<API.TLSSettingsReponse> {
-  constructor(v: m.CVnode<API.TLSSettingsReponse>) {
+export default class TLSComponent extends BaseComponent<API.TLSSettingsResponse> {
+  constructor(v: m.CVnode<API.TLSSettingsResponse>) {
     super(v);
   }
 
