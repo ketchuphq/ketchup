@@ -60,6 +60,14 @@ export default class Theme extends API.Theme {
         if (!data.themes) {
           return [];
         }
+        for (let i = 0; i < data.themes.length; i++) {
+          if (data.themes[i].name == 'none') {
+            let none = data.themes.splice(i, 1)[0];
+            data.themes.push(none);
+            break;
+          }
+        }
+
         return data.themes.map((el) => new Theme(el));
       });
   }
