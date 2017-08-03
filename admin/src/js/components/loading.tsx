@@ -1,8 +1,11 @@
 import msx from 'lib/msx';
 
-export let loading = (show: boolean) => !show ? null :
+export const Loader = (
   <div class='loader loader-large'>
     <div class='loading0' />
     <div class='loading1' />
     <div class='loading2' />
-  </div>;
+  </div>
+);
+
+export const loading = (show: boolean) => (!show ? null : Loader);
