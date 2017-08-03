@@ -13,7 +13,7 @@ export default class EditRoutesComponent extends BaseComponent<EditRoutesAttr> {
   page: Page;
 
   constructor(v: m.CVnode<EditRoutesAttr>) {
-    super(v)
+    super(v);
     this.page = v.attrs.page;
     this.dirty = true;
     if (this.page.routes.length == 0) {
@@ -38,33 +38,36 @@ export default class EditRoutesComponent extends BaseComponent<EditRoutesAttr> {
       return;
     }
     this.page.routes[0].path = Route.format(this.page.title);
-  };
+  }
 
   routeEditor(route: Route, i: number) {
     this.infer();
     let r;
     if (i > 0) {
-      r = <a onclick={() => this.page.routes.splice(i, 1)}>
-        {m.trust('&times;')}
-      </a>;
+      r = <a onclick={() => this.page.routes.splice(i, 1)}>{m.trust('&times;')}</a>;
     }
-    return <div>
-      <input type='text'
-        placeholder='/path/to/page'
-        value={Route.format(route.path)}
-        onchange={m.withAttr('value', (v) => {
-          this.dirty = true;
-          route.path = Route.format(v);
-        })}
-      />
-      {r}
-    </div>;
+    return (
+      <div>
+        <input
+          type='text'
+          placeholder='/path/to/page'
+          value={Route.format(route.path)}
+          onchange={m.withAttr('value', (v) => {
+            this.dirty = true;
+            route.path = Route.format(v);
+          })}
+        />
+        {r}
+      </div>
+    );
   }
 
   view() {
-    return <div class='edit-route control'>
-      <div class='label'>Permalink</div>
-      {this.page.routes.map(this.routeEditor.bind(this))}
-    </div>;
+    return (
+      <div class='edit-route control'>
+        <div class='label'>Permalink</div>
+        {this.page.routes.map(this.routeEditor.bind(this))}
+      </div>
+    );
   }
 }

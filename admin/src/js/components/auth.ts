@@ -41,22 +41,25 @@ export let getUser = (force = false): Promise<User> => {
       resolve(cachedUser);
     });
   }
-  return m.request({
-    method: 'GET',
-    url: '/api/v1/user',
-  }).then((res: User) => {
-    if (!res.uuid) {
+  return m
+    .request({
+      method: 'GET',
+      url: '/api/v1/user'
+    })
+    .then((res: User) => {
+      if (!res.uuid) {
+        throw new Error('not logged in');
+      }
+      cachedUser = res;
+      return res;
+    })
+    .catch(() => {
+      cachedUser = null;
       throw new Error('not logged in');
-    }
-    cachedUser = res;
-    return res;
-  }).catch(() => {
-    cachedUser = null;
-    throw new Error('not logged in');
-  });
-}
+    });
+};
 
-export interface BaseComponent<A = {}> extends m.ClassComponent<A> { }
+export interface BaseComponent<A = {}> extends m.ClassComponent<A> {}
 export abstract class BaseComponent<A> {
   protected readonly props: A;
   constructor(v: m.CVnode<A>) {
@@ -65,7 +68,7 @@ export abstract class BaseComponent<A> {
 }
 
 // AuthController is a super class for controllers which may require auth
-export interface AuthController<A = {}> extends BaseComponent<A> { }
+export interface AuthController<A = {}> extends BaseComponent<A> {}
 export abstract class AuthController<A> {
   user: User;
   _userPromise: Promise<User>;
@@ -74,24 +77,25 @@ export abstract class AuthController<A> {
   constructor(_?: m.CVnode<A>) {
     this.store = store.disabled ? dummyStore : store;
     this.user = cachedUser;
-    this._userPromise = getUser()
-      .then((user) => {
-        this.user = user;
-        return user;
-      });
+    this._userPromise = getUser().then((user) => {
+      this.user = user;
+      return user;
+    });
   }
 
   logout() {
-    m.request({
-      method: 'GET',
-      url: '/api/v1/logout',
-      background: false
-    }).then(() => {
-      Toaster.add('logged out');
-      setTimeout(() => {
-        location.reload();
-      }, 2000);
-    });
+    m
+      .request({
+        method: 'GET',
+        url: '/api/v1/logout',
+        background: false
+      })
+      .then(() => {
+        Toaster.add('logged out');
+        setTimeout(() => {
+          location.reload();
+        }, 2000);
+      });
   }
 
   private get storeKey(): string {
@@ -108,7 +112,7 @@ export abstract class AuthController<A> {
     let prefs: Preferences = this.store.get(this.storeKey);
     if (!prefs) {
       prefs = {
-        hideMenu: false,
+        hideMenu: false
       };
       this.store.set(this.storeKey, prefs);
     }

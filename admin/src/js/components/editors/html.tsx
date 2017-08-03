@@ -31,52 +31,58 @@ export default class QuillComponent extends BaseComponent<QuillAttrs> {
   }
 
   initializeQuill(element: HTMLElement) {
-    require.ensure(['quill'], (require) => {
-      let Quill: Quill.Quill = require<Quill.Quill>('quill');
-      this.quill = new Quill(`#${this.id}`, {
-        placeholder: 'start typing...',
-        theme: 'snow',
-        modules: {
-          toolbar: `#${this.id}-toolbar`
-        }
-      });
-      let updateContent = () => {
-        let editor = element.getElementsByClassName('ql-editor')[0];
-        this.content.value = editor.innerHTML;
-      };
-      this.quill.on('text-change', updateContent.bind(this));
-    }, 'quill');
+    require.ensure(
+      ['quill'],
+      (require) => {
+        let Quill: Quill.Quill = require<Quill.Quill>('quill');
+        this.quill = new Quill(`#${this.id}`, {
+          placeholder: 'start typing...',
+          theme: 'snow',
+          modules: {
+            toolbar: `#${this.id}-toolbar`
+          }
+        });
+        let updateContent = () => {
+          let editor = element.getElementsByClassName('ql-editor')[0];
+          this.content.value = editor.innerHTML;
+        };
+        this.quill.on('text-change', updateContent.bind(this));
+      },
+      'quill'
+    );
   }
 
   view() {
-    return <div class={this.klass}>
-      <div id={`${this.id}-toolbar`}>
-        <div class='ql-formats'>
-          <select class='ql-header' />
+    return (
+      <div class={this.klass}>
+        <div id={`${this.id}-toolbar`}>
+          <div class='ql-formats'>
+            <select class='ql-header' />
+          </div>
+          <div class='ql-formats'>
+            <button class='ql-bold' />
+            <button class='ql-italic' />
+            <button class='ql-underline' />
+            <button class='ql-link' />
+          </div>
+          <div class='ql-formats'>
+            <button class='ql-list' value='ordered' />
+            <button class='ql-list' value='bullet' />
+          </div>
+          <div class='ql-formats'>
+            <button class='ql-clean' />
+          </div>
         </div>
-        <div class='ql-formats'>
-          <button class='ql-bold' />
-          <button class='ql-italic' />
-          <button class='ql-underline' />
-          <button class='ql-link' />
-        </div>
-        <div class='ql-formats'>
-          <button class='ql-list' value='ordered' />
-          <button class='ql-list' value='bullet' />
-        </div>
-        <div class='ql-formats'>
-          <button class='ql-clean' />
-        </div>
+        <div
+          id={this.id}
+          oncreate={(v: m.VnodeDOM<any, any>) => {
+            if (this.content.value) {
+              v.dom.innerHTML = this.content.value;
+            }
+            this.initializeQuill(v.dom as HTMLElement);
+          }}
+        />
       </div>
-      <div id={this.id}
-        oncreate={(v: m.VnodeDOM<any, any>) => {
-          if (this.content.value) {
-            v.dom.innerHTML = this.content.value;
-          }
-          this.initializeQuill(v.dom as HTMLElement);
-        }}
-      >
-      </div>
-    </div>;
+    );
   }
-};
+}

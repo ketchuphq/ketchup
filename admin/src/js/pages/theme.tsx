@@ -3,7 +3,6 @@ import * as m from 'mithril';
 import Theme from 'lib/theme';
 import { MustAuthController, BaseComponent } from 'components/auth';
 import Button from 'components/button';
-import { ModalAttrs, ModalComponent } from 'components/modal';
 import { Package } from 'lib/api';
 import { Table, Row, LinkRow } from 'components/table';
 import { ConfirmModalComponent } from 'components/modal';
@@ -41,7 +40,6 @@ class VersionSection extends BaseComponent<ThemeProps> {
   }
 
   view() {
-    let checkUpdates;
     if (!this.props.theme.ref) {
       return;
     }
