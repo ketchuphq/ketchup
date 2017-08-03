@@ -8,9 +8,17 @@ export class Table extends BaseComponent {
   }
 }
 
-export class Row extends BaseComponent {
-  view(v: m.CVnode<any>) {
-    return <div class='tr'>{v.children}</div>;
+interface RowProps {
+  center?: boolean;
+}
+
+export class Row extends BaseComponent<RowProps> {
+  view(v: m.CVnode<RowProps>) {
+    let k = 'tr';
+    if (v.attrs.center) {
+      k += ' tr--center';
+    }
+    return <div class={k}>{v.children}</div>;
   }
 }
 
