@@ -5,10 +5,7 @@ import { loading } from 'components/loading';
 import { renderEditor } from 'components/content';
 import Button from 'components/button';
 
-
-let defaultData = [
-  'title',
-]
+let defaultData = ['title'];
 
 export default class DataPage extends MustAuthController {
   data: Data[];
@@ -18,55 +15,54 @@ export default class DataPage extends MustAuthController {
     super();
     this.data = [];
     this.loading = true;
-    Data.list()
-      .then((data) => {
-        let headMap: { [key: string]: Data} = {}
-        let head: Data[] = []
-        let tail: Data[] = []
-        data.map((d) => {
-          if (defaultData.indexOf(d.key) > -1) {
-            headMap[d.key] = d
-          } else {
-            tail.push(d)
-          }
-        })
-        defaultData.map((k) => {
-          if (k in headMap) {
-            head.push(headMap[k])
-          } else {
-            head.push({
-              key: k,
-              short: { type: 'text' }
-            })
-          }
-        })
+    Data.list().then((data) => {
+      let headMap: { [key: string]: Data } = {};
+      let head: Data[] = [];
+      let tail: Data[] = [];
+      data.map((d) => {
+        if (defaultData.indexOf(d.key) > -1) {
+          headMap[d.key] = d;
+        } else {
+          tail.push(d);
+        }
+      });
+      defaultData.map((k) => {
+        if (k in headMap) {
+          head.push(headMap[k]);
+        } else {
+          head.push({
+            key: k,
+            short: { type: 'text' }
+          });
+        }
+      });
 
-        this.data = head.concat(tail)
-        this.loading = false
-      })
+      this.data = head.concat(tail);
+      this.loading = false;
+    });
   }
 
   view() {
-    return <div class='data'>
-      <header>
-        <h1>Data</h1>
-      </header>
-      <div class='table'>
-        {loading(this.loading)}
-        {this.data.map((data) =>
-          <div class='tr tr--center'>
-            <label>{data.key}</label>
-            <div>{renderEditor(data, true)}</div>
+    return (
+      <div class='data'>
+        <header>
+          <h1>Data</h1>
+        </header>
+        <div class='table'>
+          {loading(this.loading)}
+          {this.data.map((data) => (
+            <div class='tr tr--center'>
+              <label>{data.key}</label>
+              <div>{renderEditor(data, true)}</div>
+            </div>
+          ))}
+          <div class='tr tr--right'>
+            <Button class='button--green' handler={() => Data.saveList(this.data)}>
+              Save
+            </Button>
           </div>
-        )}
-        <div class='tr tr--right'>
-          <Button
-            class='button--green'
-            handler={() => Data.saveList(this.data) }>
-            Save
-          </Button>
         </div>
       </div>
-    </div>;
+    );
   }
 }

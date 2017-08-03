@@ -4,7 +4,7 @@ import * as API from 'lib/api';
 export default class Data extends API.Data {
   constructor(config?: API.Data) {
     super();
-    API.Data.copy(config, this)
+    API.Data.copy(config, this);
   }
 
   static saveList(data: API.Data[]): Promise<API.Data> {
@@ -16,12 +16,13 @@ export default class Data extends API.Data {
   }
 
   static list(): Promise<Data[]> {
-    return m.request({
-      method: 'GET',
-      url: `/api/v1/data`,
-    })
+    return m
+      .request({
+        method: 'GET',
+        url: `/api/v1/data`
+      })
       .then((res: API.ListDataResponse) => {
-        return res.data.map((el) => new Data(el))
+        return res.data.map((el) => new Data(el));
       });
   }
 }
