@@ -24,10 +24,11 @@ export default class Theme extends API.Theme {
   }
 
   static get(name: string): Promise<Theme> {
-    return m.request({
-      method: 'GET',
-      url: `/api/v1/themes/${name}`
-    })
+    return m
+      .request({
+        method: 'GET',
+        url: `/api/v1/themes/${name}`
+      })
       .then((data: API.GetThemeResponse) => {
         return new Theme(data.theme, data.ref);
       });
@@ -48,21 +49,25 @@ export default class Theme extends API.Theme {
   }
 
   static install(p: API.Package): Promise<API.Registry> {
+    let data: API.InstallThemeRequest = {
+      name: p.name,
+      vcsUrl: p.vcsUrl
+    };
+
     return m.request({
       method: 'POST',
       url: '/api/v1/theme-install',
       background: true,
-      data: {
-        package: p.name // different id?
-      }
+      data: data
     });
   }
 
   static list(): Promise<Theme[]> {
-    return m.request({
-      method: 'GET',
-      url: '/api/v1/themes'
-    })
+    return m
+      .request({
+        method: 'GET',
+        url: '/api/v1/themes'
+      })
       .then((data: { themes: API.ThemeTemplate[] }) => {
         if (!data.themes) {
           return [];

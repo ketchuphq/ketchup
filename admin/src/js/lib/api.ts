@@ -401,6 +401,19 @@ export abstract class GetThemeResponse {
   }
 }
 
+export abstract class InstallThemeRequest {
+  name?: string;
+  vcsUrl?: string;
+  registryUrl?: string;
+  static copy(from: InstallThemeRequest, to?: InstallThemeRequest): InstallThemeRequest {
+    to = to || {};
+    to.name = from.name;
+    to.vcsUrl = from.vcsUrl;
+    to.registryUrl = from.registryUrl;
+    return to;
+  }
+}
+
 export abstract class CheckThemeForUpdateResponse {
   oldRef?: string;
   currentRef?: string;
