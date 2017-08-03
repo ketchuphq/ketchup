@@ -26,7 +26,7 @@ export default class EditorComponent extends BaseComponent<EditorComponentAttrs>
       return m('.editor', m(QuillComponent, data));
     }
     return m('.editor', [
-      m('div', m('a.small', { onclick: () => this.editor = 'quill' }, 'show editor')),
+      m('div', m('a.txt-small', { onclick: () => this.editor = 'quill' }, 'show editor')),
       m(TextEditorComponent, data)
     ]);
   }

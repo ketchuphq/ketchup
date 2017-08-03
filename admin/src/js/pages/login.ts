@@ -59,7 +59,7 @@ export default class LoginPage extends AuthController {
               })
             ),
             m('button.button.button--green', 'Log In'),
-            m('.button.small', {
+            m('.button.txt-small', {
               onclick: () => this.showReset = true
             }, 'Forgot your password?')
           ]),
