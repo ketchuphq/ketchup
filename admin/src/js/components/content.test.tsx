@@ -1,3 +1,4 @@
+import * as Mithril from 'mithril';
 import { assert } from 'chai';
 import * as mq from 'mithril-query';
 import * as API from 'lib/api';
@@ -28,7 +29,8 @@ describe('renderEditor', function() {
       ]
     });
 
-    let editor = out.find('.control-full')[0].children[1];
+    let children = out.find('.control-full')[0].children as Array<Mithril.Vnode<any, any>>;
+    let editor = children[1];
     assert.equal(editor.tag, editorComponent);
     assert.strictEqual(editor.attrs.content, content);
 

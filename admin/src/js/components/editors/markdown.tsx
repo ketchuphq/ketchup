@@ -36,7 +36,7 @@ export default class CodeMirrorComponent extends BaseComponent<CodeMirrorAttrs> 
       'codemirror/mode/markdown/markdown',
       'codemirror/addon/display/placeholder',
       'codemirror/addon/mode/overlay'
-    ], () => {
+    ], (require) => {
       let cm = require<typeof CodeMirror>('codemirror');
       require('codemirror/mode/gfm/gfm');
       require('codemirror/mode/markdown/markdown');
