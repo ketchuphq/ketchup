@@ -59,12 +59,17 @@ export let getUser = (force = false): Promise<User> => {
     });
 };
 
+
 export interface BaseComponent<A = {}> extends m.ClassComponent<A> {}
 export abstract class BaseComponent<A> {
   protected readonly props: A;
   constructor(v: m.CVnode<A>) {
     this.props = v.attrs;
   }
+}
+
+export interface IBaseComponent<A = {}> {
+  new(v: m.CVnode<A>): BaseComponent<A>;
 }
 
 // AuthController is a super class for controllers which may require auth

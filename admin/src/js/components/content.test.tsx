@@ -6,9 +6,10 @@ import { renderEditor } from 'components/content';
 import CodeMirrorComponent from 'components/editors/markdown';
 import TextEditorComponent from 'components/editors/text';
 import EditorComponent from 'components/editors/editor';
+import { IBaseComponent } from 'components/auth';
 
 describe('renderEditor', function() {
-  function testEditor(content: API.Content, editorComponent: any) {
+  function testEditor(content: API.Content, editorComponent: IBaseComponent<any>) {
     let out = mq(renderEditor(content, false));
     assert.containSubset(out.rootNode, {
       tag: 'div',
