@@ -8,6 +8,7 @@ import (
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 	"github.com/ketchuphq/ketchup/proto/ketchup/packages"
 	"github.com/ketchuphq/ketchup/server/content/engines"
+	"github.com/ketchuphq/ketchup/server/content/templates/store"
 )
 
 var noneTemplate = `<html>
@@ -66,20 +67,13 @@ func (d *DefaultStore) AddPackage(p *packages.Package) error {
 	return errors.New("templates: cannot add to default store")
 }
 
-func (d *DefaultStore) Get(themeName string) (*models.Theme, string, error) {
+func (d *DefaultStore) Get(themeName string) (store.Theme, error) {
 	if themeName == "" || themeName == noneTheme.GetName() {
-		return noneTheme, "", nil
+		return &Theme{}, nil
 	}
-	return nil, "", nil
+	return nil, nil
 }
 
-func (d *DefaultStore) GetTemplate(t *models.Theme, template string) (*models.ThemeTemplate, error) {
-	if t.GetName() != "" && t.GetName() != noneTheme.GetName() {
-		return nil, nil
-	}
-	return t.Templates[template], nil
-}
-
-func (d *DefaultStore) GetAsset(t *models.Theme, asset string) (*models.ThemeAsset, error) {
+func (d *DefaultStore) GetAsset(assetName string) (*models.ThemeAsset, error) {
 	return nil, nil
 }

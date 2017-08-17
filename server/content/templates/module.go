@@ -10,6 +10,7 @@ import (
 	"github.com/ketchuphq/ketchup/server/config"
 	"github.com/ketchuphq/ketchup/server/content/templates/defaultstore"
 	"github.com/ketchuphq/ketchup/server/content/templates/filestore"
+	"github.com/ketchuphq/ketchup/server/content/templates/store"
 )
 
 const (
@@ -37,7 +38,7 @@ type Module struct {
 	themeRegistryURL string
 	themeStore       *filestore.FileStore
 	internalStore    *filestore.FileStore
-	Stores           []ThemeStore
+	Stores           []store.ThemeStore
 
 	config ThemesConfig
 }
@@ -65,7 +66,7 @@ func (m *Module) Init(c *service.Config) {
 			return err
 		}
 
-		m.Stores = []ThemeStore{
+		m.Stores = []store.ThemeStore{
 			&defaultstore.DefaultStore{},
 			m.themeStore,
 			m.internalStore,

@@ -3,6 +3,7 @@ package templates
 import (
 	"github.com/ketchuphq/ketchup/plugins/pkg"
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/server/content/templates/store"
 	"github.com/ketchuphq/ketchup/util/errors"
 )
 
@@ -12,28 +13,30 @@ import (
 // - theme object
 // - ref of the theme
 // - (error)
-func (m *Module) getTheme(name string) (ThemeStore, *models.Theme, string, error) {
+// theme returns the thing
+func (m *Module) getTheme(name string) (store.Theme, error) {
 	for i := len(m.Stores) - 1; i > -1; i-- {
 		store := m.Stores[i]
-		theme, ref, err := store.Get(name)
+		theme, err := store.Get(name)
 		if err != nil {
-			return nil, nil, "", errors.Wrap(err)
+			return theme, errors.Wrap(err)
 		}
 		if theme != nil {
-			theme.Name = &name
-			return store, theme, ref, nil
+			theme.Proto().Name = &name
+			return theme, nil
 		}
 	}
-	return nil, nil, "", nil
+	return nil, nil
 }
 
 // GetTheme returns an installed theme with all related assets populated.
 func (m *Module) GetTheme(name string) (*models.Theme, string, error) {
-	_, theme, ref, err := m.getTheme(name)
+	theme, err := m.getTheme(name)
 	if err != nil {
 		return nil, "", errors.Wrap(err)
 	}
-	return theme, ref, nil
+	ref, _ := theme.Ref()
+	return theme.Proto(), ref, nil
 }
 
 // ListThemes returns a list of all installed themes.
@@ -53,18 +56,12 @@ func (m *Module) ListThemes() ([]*models.Theme, error) {
 func (m *Module) GetAsset(name string) (*models.ThemeAsset, error) {
 	for i := len(m.Stores) - 1; i != 0; i-- {
 		store := m.Stores[i]
-		themes, err := store.List()
+		asset, err := store.GetAsset(name)
 		if err != nil {
 			return nil, err
 		}
-		for _, theme := range themes {
-			asset, err := store.GetAsset(theme, name)
-			if err != nil {
-				return nil, err
-			}
-			if asset != nil {
-				return asset, nil
-			}
+		if asset != nil {
+			return asset, nil
 		}
 	}
 	return nil, nil
@@ -73,14 +70,15 @@ func (m *Module) GetAsset(name string) (*models.ThemeAsset, error) {
 // CheckThemeForUpdate checks the given theme for updates,
 // and if true, returns the current ref and the latest ref.
 func (m *Module) CheckThemeForUpdate(name string) (bool, string, string, error) {
-	_, theme, ref, err := m.getTheme(name)
+	theme, err := m.getTheme(name)
 	if err != nil {
 		return false, "", "", err
 	}
-	if ref == "" {
+	ref, ok := theme.Ref()
+	if !ok {
 		return false, "", "", nil
 	}
-	vcsURL := theme.GetPackage().GetVcsUrl()
+	vcsURL := theme.Proto().GetPackage().GetVcsUrl()
 	if vcsURL == "" {
 		return false, ref, "", nil
 	}

@@ -15,6 +15,7 @@ import (
 	"github.com/ketchuphq/ketchup/plugins/pkg"
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 	"github.com/ketchuphq/ketchup/proto/ketchup/packages"
+	"github.com/ketchuphq/ketchup/server/content/templates/store"
 	"github.com/ketchuphq/ketchup/util/errors"
 )
 
@@ -87,7 +88,7 @@ func (f *FileStore) updateThemeDirMap() error {
 
 // GetTemplate fetches a theme's template from the filesystem. The
 // template's Engine is inferred from the extension in templateName
-func (f *FileStore) GetTemplate(theme *models.Theme, templateName string) (*models.ThemeTemplate, error) {
+func (f *FileStore) getTemplate(theme *models.Theme, templateName string) (*models.ThemeTemplate, error) {
 	if theme == nil || theme.GetName() == "" {
 		return nil, nil
 	}
@@ -111,7 +112,7 @@ func (f *FileStore) GetTemplate(theme *models.Theme, templateName string) (*mode
 }
 
 // GetAsset fetches an asset from the filesystem
-func (f *FileStore) GetAsset(theme *models.Theme, assetName string) (*models.ThemeAsset, error) {
+func (f *FileStore) getAsset(theme *models.Theme, assetName string) (*models.ThemeAsset, error) {
 	if theme == nil || theme.GetName() == "" {
 		return nil, nil
 	}
@@ -138,7 +139,7 @@ func (f *FileStore) GetAsset(theme *models.Theme, assetName string) (*models.The
 }
 
 // Get a theme from the file store
-func (f *FileStore) Get(themeName string) (*models.Theme, string, error) {
+func (f *FileStore) Get(themeName string) (store.Theme, error) {
 	themeDir := themeName
 	if altDir := f.themeDirMap[themeName]; altDir != "" {
 		themeDir = altDir
@@ -147,7 +148,7 @@ func (f *FileStore) Get(themeName string) (*models.Theme, string, error) {
 	themeConfigPath := path.Join(f.baseDir, themeDir, configFileName)
 	t, err := readConfig(themeConfigPath)
 	if err != nil || t == nil {
-		return nil, "", nil
+		return nil, nil
 	}
 
 	// get templates (todo: supported subdirs)
@@ -174,7 +175,7 @@ func (f *FileStore) Get(themeName string) (*models.Theme, string, error) {
 	baseAssetDir := path.Clean(path.Join(f.baseDir, themeDir, fileStoreAssetsDir))
 	err = filepath.Walk(baseAssetDir, func(p string, info os.FileInfo, err error) error {
 		if err != nil {
-			return err
+			return errors.Wrap(err)
 		}
 		if info.IsDir() {
 			return nil
@@ -189,11 +190,16 @@ func (f *FileStore) Get(themeName string) (*models.Theme, string, error) {
 		return nil
 	})
 
+	if err != nil {
+		return nil, err
+	}
+
 	latestRef, err := getLatestRef(path.Join(f.baseDir, themeDir))
 	if err != nil {
-		return t, "", nil
+		return nil, errors.Wrap(err)
 	}
-	return t, latestRef, nil
+
+	return &Theme{Theme: t, store: f, ref: latestRef}, nil
 }
 
 // List all themes in the store
@@ -273,4 +279,33 @@ func (f *FileStore) UpdateThemeToRef(themeName, commitHash string) error {
 	}
 	repoDir := path.Join(f.baseDir, themeDir)
 	return pkg.FetchDir(repoDir, commitHash)
+}
+
+func (f *FileStore) GetAsset(assetName string) (*models.ThemeAsset, error) {
+	lst, err := ioutil.ReadDir(f.baseDir)
+	if err != nil {
+		return nil, errors.Wrap(err)
+	}
+	for _, fi := range lst {
+		if !fi.IsDir() {
+			continue
+		}
+		p := path.Join(f.baseDir, fi.Name(), fileStoreAssetsDir, assetName)
+		b, err := ioutil.ReadFile(p)
+		if err != nil {
+			if os.IsNotExist(err) {
+				continue
+			}
+			return nil, errors.Wrap(err)
+		}
+		data := string(b)
+		t := &models.ThemeAsset{
+			// Theme: theme.Name,
+			Data: &data,
+			Name: &assetName,
+		}
+		return t, nil
+	}
+
+	return nil, nil
 }
