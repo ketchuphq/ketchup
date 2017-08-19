@@ -18,7 +18,8 @@ type themeFile interface {
 	GetData() string
 }
 
-// readConfig unmarshals a theme.json file to a model.Theme
+// readConfig unmarshals a theme.json file to a model.Theme.
+// if there is no file, return an error.
 func readConfig(themeConfigPath string) (*models.Theme, error) {
 	_, err := os.Stat(themeConfigPath)
 	if os.IsNotExist(err) {

@@ -138,7 +138,8 @@ func (f *FileStore) getAsset(theme *models.Theme, assetName string) (*models.The
 	return t, nil
 }
 
-// Get a theme from the file store
+// Get a theme from the file store. Template and asset data (i.e. the file
+// contents) are NOT loaded.
 func (f *FileStore) Get(themeName string) (store.Theme, error) {
 	themeDir := themeName
 	if altDir := f.themeDirMap[themeName]; altDir != "" {

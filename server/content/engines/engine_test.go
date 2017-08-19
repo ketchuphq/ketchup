@@ -1,4 +1,4 @@
-package engines
+package engines_test
 
 import (
 	"bytes"
@@ -8,6 +8,9 @@ import (
 
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 	"github.com/ketchuphq/ketchup/server/content/context"
+	"github.com/ketchuphq/ketchup/server/content/engines"
+	_ "github.com/ketchuphq/ketchup/server/content/engines/html"
+	"github.com/ketchuphq/ketchup/server/content/templates/dummystore"
 )
 
 func TestRenderTemplate(t *testing.T) {
@@ -25,6 +28,7 @@ func TestRenderTemplate(t *testing.T) {
 			"test render html template",
 			args{
 				&models.ThemeTemplate{
+					Name:   proto.String("index.html"),
 					Engine: proto.String("html"),
 					Data:   proto.String(`<h1>hello {{.Page.Data "world"}}</h1>`),
 				},
@@ -41,7 +45,13 @@ func TestRenderTemplate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		w := &bytes.Buffer{}
-		if err := Render(w, tt.args.template, tt.args.contents); (err != nil) != tt.expectedErr {
+		tmpl := tt.args.template
+		theme := &dummy.Theme{
+			Theme: &models.Theme{
+				Templates: map[string]*models.ThemeTemplate{tmpl.GetName(): tmpl},
+			},
+		}
+		if err := engines.Render(w, theme, tmpl.GetName(), tt.args.contents); (err != nil) != tt.expectedErr {
 			t.Errorf("%q. renderTemplate() error = %v, expectedErr %v", tt.name, err, tt.expectedErr)
 			continue
 		}

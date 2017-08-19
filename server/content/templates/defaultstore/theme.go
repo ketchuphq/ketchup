@@ -5,10 +5,6 @@ import "github.com/ketchuphq/ketchup/proto/ketchup/models"
 type Theme struct {
 }
 
-func (t *Theme) Render(templateName string) (string, error) {
-	return "", nil
-}
-
 func (t *Theme) Ref() (string, bool) {
 	return "", false
 }

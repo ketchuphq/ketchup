@@ -8,10 +8,6 @@ type Theme struct {
 	ref   string
 }
 
-func (t *Theme) Render(templateName string) (string, error) {
-	return "", nil
-}
-
 func (t *Theme) Ref() (string, bool) {
 	if t.ref == "" {
 		return "", false

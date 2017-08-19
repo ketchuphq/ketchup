@@ -23,9 +23,6 @@ type ThemeStore interface {
 }
 
 type Theme interface {
-	// Render converts template to html
-	Render(templateName string) (string, error)
-
 	// Ref returns the current ref of the theme, if valid
 	Ref() (string, bool)
 
@@ -35,5 +32,6 @@ type Theme interface {
 	// GetTemplate returns the given template
 	GetTemplate(templateName string) (*models.ThemeTemplate, error)
 
+	// GetAsset returns the given asset
 	GetAsset(assetName string) (*models.ThemeAsset, error)
 }

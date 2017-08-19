@@ -7,7 +7,7 @@ import (
 
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 	"github.com/ketchuphq/ketchup/proto/ketchup/packages"
-	"github.com/ketchuphq/ketchup/server/content/engines"
+	"github.com/ketchuphq/ketchup/server/content/engines/html"
 	"github.com/ketchuphq/ketchup/server/content/templates/store"
 )
 
@@ -21,7 +21,7 @@ var noneTheme = &models.Theme{
 	Templates: map[string]*models.ThemeTemplate{
 		"html": {
 			Name:   proto.String("html"),
-			Engine: proto.String(engines.EngineTypeHTML),
+			Engine: proto.String(html.EngineTypeHTML),
 			Data:   &noneTemplate,
 			Placeholders: []*models.ThemePlaceholder{
 				{
@@ -36,7 +36,7 @@ var noneTheme = &models.Theme{
 		},
 		"markdown": {
 			Name:   proto.String("markdown"),
-			Engine: proto.String(engines.EngineTypeHTML),
+			Engine: proto.String(html.EngineTypeHTML),
 			Data:   &noneTemplate,
 			Placeholders: []*models.ThemePlaceholder{
 				{
