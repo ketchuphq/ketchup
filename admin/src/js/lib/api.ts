@@ -97,6 +97,7 @@ export abstract class Theme {
   package?: Package;
   templates?: { [key: string]: ThemeTemplate; };
   assets?: { [key: string]: ThemeAsset; };
+  placeholders?: Data[];
   static copy(from: Theme, to?: Theme): Theme {
     to = to || {};
     to.uuid = from.uuid;
@@ -107,6 +108,7 @@ export abstract class Theme {
     }
     to.templates = from.templates;
     to.assets = from.assets;
+    to.placeholders = from.placeholders;
     return to;
   }
 }
