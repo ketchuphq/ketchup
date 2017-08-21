@@ -2,6 +2,7 @@ import * as m from 'mithril';
 import msx from 'lib/msx';
 import * as API from 'lib/api';
 import { BaseComponent } from 'components/auth';
+import * as Quill from 'quill';
 
 interface QuillAttrs {
   readonly elementId?: string;
@@ -34,8 +35,8 @@ export default class QuillComponent extends BaseComponent<QuillAttrs> {
     require.ensure(
       ['quill'],
       (require) => {
-        let Quill: Quill.Quill = require<Quill.Quill>('quill');
-        this.quill = new Quill(`#${this.id}`, {
+        let q = require<typeof Quill>('quill')['default'];
+        this.quill = new q(`#${this.id}`, {
           placeholder: 'start typing...',
           theme: 'snow',
           modules: {
