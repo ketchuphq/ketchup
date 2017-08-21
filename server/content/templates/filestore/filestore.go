@@ -163,15 +163,20 @@ func (f *FileStore) Get(themeName string) (store.Theme, error) {
 		}
 		p = strings.TrimPrefix(path.Clean(p), baseTemplateDir)
 		p = strings.TrimLeft(p, "/")
-		q := path.Base(p)
+		if strings.HasPrefix(path.Base(p), ".") {
+			return nil
+		}
 		e := strings.TrimLeft(path.Ext(p), ".")
 		if t.Templates[p] == nil {
 			t.Templates[p] = &models.ThemeTemplate{}
 		}
-		t.Templates[p].Name = &q
+		t.Templates[p].Name = &p
 		t.Templates[p].Engine = &e
 		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	baseAssetDir := path.Clean(path.Join(f.baseDir, themeDir, fileStoreAssetsDir))
 	err = filepath.Walk(baseAssetDir, func(p string, info os.FileInfo, err error) error {
@@ -183,11 +188,10 @@ func (f *FileStore) Get(themeName string) (store.Theme, error) {
 		}
 		p = strings.TrimPrefix(path.Clean(p), baseAssetDir)
 		p = strings.TrimLeft(p, "/")
-		q := path.Base(p)
-		if strings.HasPrefix(q, ".") {
+		if strings.HasPrefix(path.Base(p), ".") {
 			return nil
 		}
-		t.Assets[p] = &models.ThemeAsset{Name: &q}
+		t.Assets[p] = &models.ThemeAsset{Name: &p}
 		return nil
 	})
 
