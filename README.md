@@ -122,10 +122,13 @@ A brief run through of the things without which this project would not exist:
   - Kudos to mithril for [#1922](https://github.com/MithrilJS/mithril.js/pull/1922)!
 - Lots of progress on theme installation
   - Install themes via git; update with git pull; and check latest git version.
-  - Rework theme store and rendering engines.
-  - Now supports nested templates via `{{ template "helper.html"}}` (closes [#6](https://github.com/ketchuphq/ketchup/issues/6))
+- Rework theme store, now supports nested templates via `{{ template "helper.html"}}` (closes [#6](https://github.com/ketchuphq/ketchup/issues/6))
+- Reworked rendering to add additional context in templates, e.g. `{{ .Page.Content }}`
+  - `.Page` context: `Content`, `PublishedAt`, `Theme`, `Template`, `Route`
+  - `.Site` context: `Pages` (sorted in published order).
+  - Page functions from [sprig](https://github.com/Masterminds/sprig): `date`, `dateModify`, `dateInZone`, `now`, and also custom `dateParseMillis`.
 - Add support for global data variables and specifying global data variables in top-level `placeholders` field in `theme.json`.
-- Remove bower, update frontend deps.
+- Remove bower, update deps.
 
 ### 0.1.0 - Initial Release!
 
