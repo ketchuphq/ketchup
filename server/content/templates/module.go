@@ -10,6 +10,7 @@ import (
 	"github.com/ketchuphq/ketchup/server/config"
 	"github.com/ketchuphq/ketchup/server/content/templates/defaultstore"
 	"github.com/ketchuphq/ketchup/server/content/templates/filestore"
+	"github.com/ketchuphq/ketchup/server/content/templates/store"
 )
 
 const (
@@ -33,9 +34,11 @@ type Module struct {
 	Logger       *logger.Module
 	Pkg          *pkg.Module
 
-	themeRegistry *pkg.Registry
-	internalStore *filestore.FileStore
-	Stores        []ThemeStore
+	themeRegistry    *pkg.Registry
+	themeRegistryURL string
+	themeStore       *filestore.FileStore
+	internalStore    *filestore.FileStore
+	Stores           []store.ThemeStore
 
 	config ThemesConfig
 }
@@ -49,7 +52,7 @@ func (m *Module) Init(c *service.Config) {
 		}
 
 		m.config.Themes.Path = m.ConfigModule.DataPath(m.config.Themes.Path, themeDir)
-		themeStore, err := filestore.New(m.config.Themes.Path, time.Second*10, m.Logger.Error)
+		m.themeStore, err = filestore.New(m.config.Themes.Path, time.Second*10, m.Logger.Error)
 		if err != nil {
 			return err
 		}
@@ -63,15 +66,16 @@ func (m *Module) Init(c *service.Config) {
 			return err
 		}
 
-		m.Stores = []ThemeStore{
+		m.Stores = []store.ThemeStore{
 			&defaultstore.DefaultStore{},
-			themeStore,
+			m.themeStore,
 			m.internalStore,
 		}
 		registryURL := defaultRegistryURL
 		if c.Env().IsDevelopment() {
 			registryURL = devRegistryURL
 		}
+		m.themeRegistryURL = registryURL
 		m.themeRegistry = m.Pkg.Registry(registryURL)
 		err = m.themeRegistry.Sync()
 		if err != nil {
@@ -79,4 +83,9 @@ func (m *Module) Init(c *service.Config) {
 		}
 		return nil
 	}
+}
+
+// GetRegistryURL returns the configured registry URL
+func (m *Module) GetRegistryURL() string {
+	return m.themeRegistryURL
 }

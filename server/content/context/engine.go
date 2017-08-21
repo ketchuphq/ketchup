@@ -27,7 +27,7 @@ func NewContext(l logger.Logger, page *models.Page, backend db.Backend, contents
 
 // Page returns a PageContext
 func (e *EngineContext) Page() *PageContext {
-	return &PageContext{e}
+	return &PageContext{e, e.page}
 }
 
 // Site returns a PageContext

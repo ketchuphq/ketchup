@@ -6,6 +6,7 @@
       "jsx-single"
     ],
     "semicolon": [
+      true,
       "always"
     ],
     "no-console": [
@@ -23,6 +24,7 @@
         "ignore-pattern": "(^_|msx)"
       }
     ],
-    "arrow-parens": true
+    "arrow-parens": true,
+    "eofline": true
   }
 }

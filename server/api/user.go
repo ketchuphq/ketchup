@@ -50,7 +50,7 @@ func (m *Module) GetTLS(rw http.ResponseWriter, req *http.Request, par httproute
 	if err != nil {
 		m.Logger.Error(err)
 	}
-	res := &api.TLSSettingsReponse{
+	res := &api.TLSSettingsResponse{
 		TlsEmail:       &r.Email,
 		TlsDomain:      &r.Domain,
 		AgreedOn:       &r.AgreedOn,
@@ -83,7 +83,7 @@ func (m *Module) EnableTLS(rw http.ResponseWriter, req *http.Request, par httpro
 	if r.Registration != nil {
 		tosURL = r.Registration.TosURL
 	}
-	res := &api.TLSSettingsReponse{
+	res := &api.TLSSettingsResponse{
 		TlsEmail:       &r.Email,
 		TlsDomain:      &r.Domain,
 		AgreedOn:       &r.AgreedOn,

@@ -5,6 +5,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/satori/go.uuid"
 
+	"github.com/ketchuphq/ketchup/proto/ketchup/api"
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 )
 
@@ -35,7 +36,8 @@ func (m *Module) DeleteRoute(route *models.Route) error {
 }
 
 // ListRoutes returns all routes stored in the DB (unsorted)
-func (m *Module) ListRoutes() ([]*models.Route, error) {
+func (m *Module) ListRoutes(opts *api.ListRouteRequest) ([]*models.Route, error) {
+	pageUUID := opts.GetOptions().GetPageUuid()
 	lst := []*models.Route{}
 	err := m.Bolt.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(ROUTE_BUCKET))
@@ -44,6 +46,9 @@ func (m *Module) ListRoutes() ([]*models.Route, error) {
 			err := proto.Unmarshal(v, pb)
 			if err != nil {
 				return err
+			}
+			if pageUUID != "" && pageUUID != pb.GetPageUuid() {
+				return nil
 			}
 			lst = append(lst, pb)
 			return nil

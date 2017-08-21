@@ -1,10 +1,9 @@
 package api
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/julienschmidt/httprouter"
 
 	"github.com/ketchuphq/ketchup/proto/ketchup/api"
@@ -22,7 +21,7 @@ func (m *Module) ListThemes(rw http.ResponseWriter, req *http.Request, _ httprou
 
 func (m *Module) GetTheme(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	name := par.ByName("name")
-	theme, err := m.Templates.GetTheme(name)
+	theme, ref, err := m.Templates.GetTheme(name)
 	if err != nil {
 		return err
 	}
@@ -30,10 +29,10 @@ func (m *Module) GetTheme(rw http.ResponseWriter, req *http.Request, par httprou
 	if theme == nil {
 		return router.ErrNotFound
 	}
-	// m.DB.GetThemeByName(name
-	// m.Templates
-	// additional data for a theme: which store it is in?
-	return router.Proto(rw, theme)
+	return router.Proto(rw, &api.GetThemeResponse{
+		Theme: theme,
+		Ref:   &ref,
+	})
 }
 
 func (m *Module) GetTemplate(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
@@ -62,11 +61,7 @@ func (m *Module) ThemeRegistry(rw http.ResponseWriter, req *http.Request, par ht
 // InstallTheme installs a theme from a registry
 func (m *Module) InstallTheme(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
 	r := &api.InstallThemeRequest{}
-	b, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		return errors.Wrap(err)
-	}
-	err = json.Unmarshal(b, r)
+	err := jsonpb.Unmarshal(req.Body, r)
 	if err != nil {
 		return errors.Wrap(err)
 	}
@@ -76,20 +71,43 @@ func (m *Module) InstallTheme(rw http.ResponseWriter, req *http.Request, par htt
 	}
 
 	// search the registry for the theme package
-	// install the package
 	p, err := m.Templates.SearchRegistry(r.GetName())
 	if err != nil {
 		return errors.New("error searching registry: %s", err)
 	}
-	if p == nil {
-		return errors.New("Theme %s not found", r.GetName())
+	if p == nil || p.GetVcsUrl() != r.GetVcsUrl() {
+		return errors.New("Theme %s not found %s, %s", r.GetName(),
+			p.GetVcsUrl(), r.GetVcsUrl())
 	}
 
 	m.Logger.Infof("cloning package %s from %s", p.GetName(), p.GetVcsUrl())
-	err = m.Templates.InstallThemeFromPackage(p)
+
+	// install the package
+	return m.Templates.InstallThemeFromPackage(p)
+}
+
+func (m *Module) CheckThemeForUpdate(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+	name := par.ByName("name")
+	_, oldRef, currentRef, err := m.Templates.CheckThemeForUpdate(name)
 	if err != nil {
-		return errors.New("error searching registry: %s", err)
+		return errors.Wrap(err)
 	}
 
-	return nil
+	return m.Router.JSON(rw, http.StatusOK, &api.CheckThemeForUpdateResponse{
+		OldRef:     &oldRef,
+		CurrentRef: &currentRef,
+	})
+}
+
+func (m *Module) UpdateTheme(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+	themeName := par.ByName("name")
+	r := &api.UpdateThemeRequest{}
+	err := jsonpb.Unmarshal(req.Body, r)
+	if err != nil {
+		return errors.Wrap(err)
+	}
+	if r.GetName() != "" && r.GetName() != themeName {
+		return errors.New("theme name mismatch")
+	}
+	return m.Templates.UpdateTheme(r.GetName(), r.GetRef())
 }

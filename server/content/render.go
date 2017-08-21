@@ -15,7 +15,7 @@ func (m *Module) render(w io.Writer, page *models.Page) error {
 		return err
 	}
 	context := context.NewContext(m.Logger, page, m.DB.Backend, contents)
-	return m.Templates.Render(w, page, context)
+	return m.Templates.RenderPage(w, page, context)
 }
 
 type contentMap map[string]interface{}

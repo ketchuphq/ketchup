@@ -82,7 +82,7 @@ func (m *Module) servePage(pageUUID string) httprouter.Handle {
 // buildRouter returns a handler configured to serve content.
 func (m *Module) buildRouter() (http.Handler, map[string]bool, error) {
 	rt := httprouter.New()
-	routes, err := m.DB.ListRoutes()
+	routes, err := m.DB.ListRoutes(nil)
 	if err != nil {
 		return nil, nil, err
 	}

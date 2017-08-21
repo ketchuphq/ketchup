@@ -1,4 +1,5 @@
 import * as m from 'mithril';
+import { BaseComponent } from 'components/auth';
 
 interface ButtonAttrs {
   handler?: () => Promise<any>;
@@ -9,49 +10,41 @@ interface ButtonAttrs {
   href?: string;
 }
 
-export default class Button {
-  private _attrs: ButtonAttrs;
+export default class Button extends BaseComponent<ButtonAttrs> {
   loading: boolean;
   handler: () => void;
 
-  constructor(readonly config: ButtonAttrs) {
+  constructor(v: m.CVnode<ButtonAttrs>) {
+    super(v);
     this.loading = false;
     this.handler = () => {
-      if (!config.handler) {
+      if (!v.attrs.handler) {
         return;
       }
       this.loading = true;
       m.redraw();
-      config.handler()
-        .then(() => this.loading = false)
-        .catch(() => this.loading = false);
+      v.attrs
+        .handler()
+        .then(() => (this.loading = false))
+        .catch(() => (this.loading = false));
     };
   }
 
-  static oninit(v: Mithril.Vnode<ButtonAttrs, Button>) {
-    v.state = new Button(v.attrs);
-  }
-  static view = (v: Mithril.Vnode<ButtonAttrs, Button>) => {
-    let ctrl = v.state;
+  view(v: m.Vnode<ButtonAttrs, Button>) {
     let c: ButtonAttrs = {
       class: v.attrs.class,
       id: v.attrs.id,
-      href: v.attrs.href,
+      href: v.attrs.href
     };
     if (v.attrs.handler) {
-      c.onclick = ctrl.handler;
+      c.onclick = this.handler;
     }
 
     let loader = null;
-    if (ctrl.loading) {
+    if (this.loading) {
       c = { class: c.class + ' button--loading' };
       loader = m('.loader', [m('.loading0'), m('.loading1'), m('.loading2')]);
     }
-    return m('a.button', c, [
-      loader,
-      m('.button__inner', v.children)
-    ]);
+    return m('a.button', c, [loader, m('.button__inner', v.children)]);
   }
 }
-
-let _: Mithril.Component<ButtonAttrs, Button> = Button;

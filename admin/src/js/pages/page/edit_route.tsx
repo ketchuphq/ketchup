@@ -2,16 +2,24 @@ import msx from 'lib/msx';
 import * as m from 'mithril';
 import Route from 'lib/route';
 import Page from 'lib/page';
+import { BaseComponent } from 'components/auth';
 
-export default class EditRoutesComponent {
+interface EditRoutesAttr {
+  page: Page;
+}
+
+export default class EditRoutesComponent extends BaseComponent<EditRoutesAttr> {
   dirty: boolean;
+  page: Page;
 
-  constructor(public page: Page) {
+  constructor(v: m.CVnode<EditRoutesAttr>) {
+    super(v);
+    this.page = v.attrs.page;
     this.dirty = true;
-    if (page.routes.length == 0) {
-      page.routes.push(new Route());
+    if (this.page.routes.length == 0) {
+      this.page.routes.push(new Route());
       this.dirty = false;
-    } else if (!page.routes[0].path) {
+    } else if (!this.page.routes[0].path) {
       this.dirty = false;
     }
   }
@@ -30,38 +38,36 @@ export default class EditRoutesComponent {
       return;
     }
     this.page.routes[0].path = Route.format(this.page.title);
-  };
+  }
 
   routeEditor(route: Route, i: number) {
     this.infer();
     let r;
     if (i > 0) {
-      r = <a onclick={() => this.page.routes.splice(i, 1)}>
-        {m.trust('&times;')}
-      </a>;
+      r = <a onclick={() => this.page.routes.splice(i, 1)}>{m.trust('&times;')}</a>;
     }
-    return <div>
-      <input type='text'
-        placeholder='/path/to/page'
-        value={Route.format(route.path)}
-        onchange={m.withAttr('value', (v) => {
-          this.dirty = true;
-          route.path = Route.format(v);
-        })}
-      />
-      {r}
-    </div>;
+    return (
+      <div>
+        <input
+          type='text'
+          placeholder='/path/to/page'
+          value={Route.format(route.path)}
+          onchange={m.withAttr('value', (v) => {
+            this.dirty = true;
+            route.path = Route.format(v);
+          })}
+        />
+        {r}
+      </div>
+    );
   }
 
-  static oninit(v: Mithril.Vnode<Page, EditRoutesComponent>) {
-    v.state = new EditRoutesComponent(v.attrs);
-  };
-
-  static view(v: Mithril.Vnode<Page, EditRoutesComponent>) {
-    let ctrl = v.state;
-    return <div class='edit-route control'>
-      <div class='label'>Permalink</div>
-      {ctrl.page.routes.map(ctrl.routeEditor.bind(ctrl))}
-    </div>;
+  view() {
+    return (
+      <div class='edit-route control'>
+        <div class='label'>Permalink</div>
+        {this.page.routes.map(this.routeEditor.bind(this))}
+      </div>
+    );
   }
 }

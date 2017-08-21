@@ -93,14 +93,22 @@ export abstract class Timestamp {
 export abstract class Theme {
   uuid?: string;
   name?: string;
+  description?: string;
+  package?: Package;
   templates?: { [key: string]: ThemeTemplate; };
   assets?: { [key: string]: ThemeAsset; };
+  placeholders?: Data[];
   static copy(from: Theme, to?: Theme): Theme {
     to = to || {};
     to.uuid = from.uuid;
     to.name = from.name;
+    to.description = from.description;
+    if ('package' in from) {
+      to.package = Package.copy(from.package || {}, to.package || {});
+    }
     to.templates = from.templates;
     to.assets = from.assets;
+    to.placeholders = from.placeholders;
     return to;
   }
 }
@@ -244,59 +252,63 @@ export abstract class Data {
 }
 
 export abstract class Package {
+  type?: PackageType;
   name?: string;
-  author?: string[];
-  type?: Package_Type;
+  authors?: PackageAuthor[];
   description?: string;
-  readme?: string;
+  homepage?: string;
+  tags?: string[];
+  readmeUrl?: string;
   vcsUrl?: string;
-  releases?: PackageRelease;
-  labels?: string[];
+  screenshotUrls?: string[];
+  ketchupVersion?: string;
   static copy(from: Package, to?: Package): Package {
     to = to || {};
-    to.name = from.name;
-    to.author = from.author;
     to.type = from.type;
+    to.name = from.name;
+    to.authors = from.authors;
     to.description = from.description;
-    to.readme = from.readme;
+    to.homepage = from.homepage;
+    to.tags = from.tags;
+    to.readmeUrl = from.readmeUrl;
     to.vcsUrl = from.vcsUrl;
-    if ('releases' in from) {
-      to.releases = PackageRelease.copy(from.releases || {}, to.releases || {});
-    }
-    to.labels = from.labels;
+    to.screenshotUrls = from.screenshotUrls;
+    to.ketchupVersion = from.ketchupVersion;
     return to;
   }
 }
 
-export abstract class PackageRelease {
-  ketchupMin?: string;
-  tags?: boolean;
-  static copy(from: PackageRelease, to?: PackageRelease): PackageRelease {
+export abstract class PackageAuthor {
+  name?: string;
+  email?: string;
+  static copy(from: PackageAuthor, to?: PackageAuthor): PackageAuthor {
     to = to || {};
-    to.ketchupMin = from.ketchupMin;
-    to.tags = from.tags;
+    to.name = from.name;
+    to.email = from.email;
     return to;
   }
 }
 
 export abstract class Registry {
   registryVersion?: string;
+  registryType?: string;
   packages?: Package[];
   static copy(from: Registry, to?: Registry): Registry {
     to = to || {};
     to.registryVersion = from.registryVersion;
+    to.registryType = from.registryType;
     to.packages = from.packages;
     return to;
   }
 }
 
-export abstract class TLSSettingsReponse {
+export abstract class TLSSettingsResponse {
   tlsEmail?: string;
   tlsDomain?: string;
   agreedOn?: string;
   termsOfService?: string;
   hasCertificate?: boolean;
-  static copy(from: TLSSettingsReponse, to?: TLSSettingsReponse): TLSSettingsReponse {
+  static copy(from: TLSSettingsResponse, to?: TLSSettingsResponse): TLSSettingsResponse {
     to = to || {};
     to.tlsEmail = from.tlsEmail;
     to.tlsDomain = from.tlsDomain;
@@ -378,6 +390,43 @@ export abstract class UpdateDataRequest {
   }
 }
 
+export abstract class GetThemeResponse {
+  theme?: Theme;
+  ref?: string;
+  static copy(from: GetThemeResponse, to?: GetThemeResponse): GetThemeResponse {
+    to = to || {};
+    if ('theme' in from) {
+      to.theme = Theme.copy(from.theme || {}, to.theme || {});
+    }
+    to.ref = from.ref;
+    return to;
+  }
+}
+
+export abstract class InstallThemeRequest {
+  name?: string;
+  vcsUrl?: string;
+  registryUrl?: string;
+  static copy(from: InstallThemeRequest, to?: InstallThemeRequest): InstallThemeRequest {
+    to = to || {};
+    to.name = from.name;
+    to.vcsUrl = from.vcsUrl;
+    to.registryUrl = from.registryUrl;
+    return to;
+  }
+}
+
+export abstract class CheckThemeForUpdateResponse {
+  oldRef?: string;
+  currentRef?: string;
+  static copy(from: CheckThemeForUpdateResponse, to?: CheckThemeForUpdateResponse): CheckThemeForUpdateResponse {
+    to = to || {};
+    to.oldRef = from.oldRef;
+    to.currentRef = from.currentRef;
+    return to;
+  }
+}
+
 export abstract class Error {
   code?: string;
   title?: string;
@@ -405,4 +454,4 @@ export abstract class ErrorResponse {
 export type ContentMultiple_DropdownType = 'dropdown' | 'radio' | 'unknown';
 export type ContentTextType = 'html' | 'markdown' | 'text';
 export type ListPageRequest_ListPageFilter = 'all' | 'draft' | 'published';
-export type Package_Type = 'plugin' | 'theme' | 'unknown';
+export type PackageType = 'plugin' | 'theme' | 'unknown';

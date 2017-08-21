@@ -39,10 +39,10 @@ func main() {
 		models.Author{},
 		models.Data{},
 		packages.Package{},
-		packages.PackageRelease{},
+		packages.PackageAuthor{},
 		packages.Registry{},
 
-		api.TLSSettingsReponse{},
+		api.TLSSettingsResponse{},
 		api.EnableTLSRequest{},
 		api.ListPageRequest{},
 		api.ListPageRequest_ListPageOptions{},
@@ -50,6 +50,9 @@ func main() {
 		api.ListOptions{},
 		api.ListDataResponse{},
 		api.UpdateDataRequest{},
+		api.GetThemeResponse{},
+		api.InstallThemeRequest{},
+		api.CheckThemeForUpdateResponse{},
 
 		router_api.Error{},
 		router_api.ErrorResponse{},

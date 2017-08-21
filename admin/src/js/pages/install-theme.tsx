@@ -3,72 +3,90 @@ import * as m from 'mithril';
 import * as API from 'lib/api';
 import Theme from 'lib/theme';
 import { MustAuthController } from 'components/auth';
+import { LinkRow, Row } from 'components/table';
+import { ModalComponent } from 'components/modal';
+import { Loader } from 'components/loading';
+import * as Toaster from 'components/toaster';
 
 export default class InstallThemePage extends MustAuthController {
-  installedThemes: { [key:string]: boolean };
+  installedThemes: { [key: string]: boolean };
   themes: API.Registry;
   installing: string;
 
   constructor() {
     super();
     this.installedThemes = {};
+    this.loadThemes();
+    Theme.getAll().then((registry: API.Registry) => (this.themes = registry));
+  }
+
+  loadThemes() {
     Theme.list().then((themes) => {
-      let installed: { [key:string]: boolean } = {};
+      let installed: { [key: string]: boolean } = {};
       themes.forEach((theme) => {
         installed[theme.name] = true;
       });
       this.installedThemes = installed;
+      m.redraw();
     });
-    Theme.getAll()
-      .then((registry: API.Registry) => this.themes = registry);
   }
 
   themeInstalled(name: string): boolean {
     return !!this.installedThemes[name];
   }
 
-  static oninit(v: Mithril.Vnode<{}, InstallThemePage>) {
-    v.state = new InstallThemePage();
+  installTheme(p: API.Package) {
+    if (this.installing) {
+      return;
+    }
+    this.installing = p.name;
+    Theme.install(p).then(() => {
+      Toaster.add(this.installing + ' theme installed.');
+      this.installing = null;
+      return this.loadThemes();
+    });
   }
 
-  static view(v: Mithril.Vnode<{}, InstallThemePage>) {
-    let ctrl = v.state;
-    let themes;
-    let themeInstall = (p: API.Package) => {
-      return () => {
-        if (ctrl.installing) {
-          return;
-        }
-        ctrl.installing = p.name;
-        m.redraw();
-        Theme.install(p).then(() => {
-          ctrl.installing = null;
-          m.redraw();
-        });
-      };
-    };
-    if (ctrl.themes) {
-      themes = ctrl.themes.packages.map((p: API.Package) =>
-        <div class='tr'>
+  view() {
+    let packages = this.themes && this.themes.packages ? this.themes.packages : [];
+    let themes = packages.map((p: API.Package) => {
+      if (this.themeInstalled(p.name)) {
+        return (
+          <LinkRow href={`/admin/themes/${p.name}`} link>
+            <div>{p.name}</div>
+            <div>{p.vcsUrl}</div>
+            <div>installed</div>
+          </LinkRow>
+        );
+      }
+
+      return (
+        <Row center>
           <div>{p.name}</div>
           <div>{p.vcsUrl}</div>
-          {
-          ctrl.themeInstalled(p.name) ? 'installed' :
-            <a disabled={!!ctrl.installing}
-              class={'button button--small' + (!!ctrl.installing ? 'button--disabled' : 'button--blue')}
-              onclick={themeInstall(p)}
-            >
-              install
-            </a>
-          }
-        </div>
+          <a
+            class='button button--small button--blue'
+            disabled={!!this.installing}
+            onclick={() => this.installTheme(p)}
+          >
+            install
+          </a>
+        </Row>
       );
-    }
+    });
 
-    return <div>
-      <h1>Theme Manager</h1>
-      {!ctrl.installing ? '' : <div>{`Installing theme ${ctrl.installing}...`}</div>}
-      <div class='table'>{themes}</div>
-    </div>;
+    return (
+      <div>
+        <h1>Theme Manager</h1>
+        <div class='table'>{themes}</div>
+        <ModalComponent
+          title='Installing theme...'
+          visible={() => !!this.installing}
+          toggle={() => {}}
+        >
+          {Loader}
+        </ModalComponent>
+      </div>
+    );
   }
 }

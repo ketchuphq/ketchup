@@ -45,26 +45,21 @@ export default class NavigationComponent extends AuthController {
     </a>;
   }
 
-  static oninit(v: Mithril.Vnode<{}, NavigationComponent>) {
-    v.state = new NavigationComponent();
-  }
-
-  static view(v: Mithril.Vnode<{}, NavigationComponent>) {
-    let ctrl = v.state;
+  view() {
     let navClass = 'navigation';
-    if (ctrl.collapsed) {
+    if (this.collapsed) {
       navClass += ' navigation--hidden';
     }
 
-    if (!ctrl.user) {
+    if (!this.user) {
       return <div class={navClass}>
-        {ctrl.link('/admin', 'K', { additionalClasses: 'nav-title' })}
-        {ctrl.link('/admin/login', 'Login')}
+        {this.link('/admin', 'K', { additionalClasses: 'nav-title' })}
+        {this.link('/admin/login', 'Login')}
       </div>;
     }
 
     return <div class={navClass}>
-      {ctrl.link('/admin', 'K', { additionalClasses: 'nav-title' })}
+      {this.link('/admin', 'K', { additionalClasses: 'nav-title' })}
       <div class='nav-button'>
         <Button
           class='button--green button--center'
@@ -74,16 +69,14 @@ export default class NavigationComponent extends AuthController {
           <span class='nav-link__text'>Compose</span>
         </Button>
       </div>
-      {ctrl.link('/admin/pages', 'Pages', { icon: 'document-text' })}
-      {ctrl.link('/admin/themes', 'Theme', { icon: 'brush' })}
-      {ctrl.link('/admin/data', 'Data', { icon: 'th-small' })}
-      {ctrl.link('/admin/settings', 'Settings', { icon: 'spanner-outline' })}
-      {ctrl.link('/admin/logout', 'Logout', { onclick: () => ctrl.logout(), icon: 'weather-night' })}
-      <a class='nav-link nav-link--toggle' onclick={() => ctrl.toggle()}>
-        <span class={`typcn typcn-arrow-${ctrl.collapsed ? 'maximise' : 'minimise'}`} />
+      {this.link('/admin/pages', 'Pages', { icon: 'document-text' })}
+      {this.link('/admin/themes', 'Theme', { icon: 'brush' })}
+      {this.link('/admin/data', 'Data', { icon: 'th-small' })}
+      {this.link('/admin/settings', 'Settings', { icon: 'spanner-outline' })}
+      {this.link('/admin/logout', 'Logout', { onclick: () => this.logout(), icon: 'weather-night' })}
+      <a class='nav-link nav-link--toggle' onclick={() => this.toggle()}>
+        <span class={`typcn typcn-arrow-${this.collapsed ? 'maximise' : 'minimise'}`} />
       </a>
     </div>;
   }
 }
-
-let _: Mithril.Component<{}, NavigationComponent> = NavigationComponent;

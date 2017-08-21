@@ -1,6 +1,7 @@
 package context
 
 import (
+	"github.com/ketchuphq/ketchup/proto/ketchup/api"
 	"github.com/ketchuphq/ketchup/server/content/content"
 )
 
@@ -27,4 +28,26 @@ func (s *SiteContext) Data(key string) interface{} {
 		return ""
 	}
 	return rendered
+}
+
+func (s *SiteContext) Pages() SortablePages {
+	req := &api.ListPageRequest{
+		List: &api.ListOptions{
+		// sort options?
+		},
+		Options: &api.ListPageRequest_ListPageOptions{
+			Filter: api.ListPageRequest_published.Enum(),
+		},
+	}
+
+	pages, err := s.backend.ListPages(req)
+	if err != nil {
+		s.logger.Error(err)
+		return nil
+	}
+	sp := SortablePages{}
+	for _, p := range pages {
+		sp = append(sp, &PageContext{s.EngineContext, p})
+	}
+	return sp
 }

@@ -1,10 +1,7 @@
 package filestore
 
 import (
-	"archive/tar"
 	"bytes"
-	"compress/gzip"
-	"io"
 	"io/ioutil"
 	"os"
 	"path"
@@ -15,7 +12,10 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 
+	"github.com/ketchuphq/ketchup/plugins/pkg"
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/proto/ketchup/packages"
+	"github.com/ketchuphq/ketchup/server/content/templates/store"
 	"github.com/ketchuphq/ketchup/util/errors"
 )
 
@@ -24,6 +24,13 @@ const (
 	fileStoreTemplateDir = "templates"
 	fileStoreAssetsDir   = "assets"
 )
+
+var jpb = &jsonpb.Marshaler{
+	EnumsAsInts:  false,
+	EmitDefaults: false,
+	Indent:       "  ",
+	OrigName:     false,
+}
 
 // FileStore stores and loads templates on the filesystem
 type FileStore struct {
@@ -53,29 +60,9 @@ func New(baseDir string, updateInterval time.Duration, log func(args ...interfac
 	return f, nil
 }
 
-func (f *FileStore) readConfig(themeConfigPath string) (*models.Theme, error) {
-	_, err := os.Stat(themeConfigPath)
-	if os.IsNotExist(err) {
-		return nil, nil
-	}
-	if err != nil {
-		return nil, errors.Wrap(err)
-	}
-	b, err := ioutil.ReadFile(themeConfigPath)
-	if err != nil {
-		return nil, errors.Wrap(err)
-	}
-	t := &models.Theme{
-		Templates: map[string]*models.ThemeTemplate{},
-		Assets:    map[string]*models.ThemeAsset{},
-	}
-	err = jsonpb.Unmarshal(bytes.NewBuffer(b), t)
-	if err != nil {
-		return nil, errors.Wrap(err)
-	}
-	return t, nil
-}
-
+// updateThemeDirMap iterates over all folders in the base dir and reads all the
+// theme configs found. also updates the mapping of folder name to theme name,
+// if different.
 func (f *FileStore) updateThemeDirMap() error {
 	lst, err := ioutil.ReadDir(f.baseDir)
 	if err != nil {
@@ -87,7 +74,7 @@ func (f *FileStore) updateThemeDirMap() error {
 			continue
 		}
 		themeConfigPath := path.Join(f.baseDir, fi.Name(), configFileName)
-		c, err := f.readConfig(themeConfigPath)
+		c, err := readConfig(themeConfigPath)
 		if err != nil {
 			return nil
 		}
@@ -101,7 +88,7 @@ func (f *FileStore) updateThemeDirMap() error {
 
 // GetTemplate fetches a theme's template from the filesystem. The
 // template's Engine is inferred from the extension in templateName
-func (f *FileStore) GetTemplate(theme *models.Theme, templateName string) (*models.ThemeTemplate, error) {
+func (f *FileStore) getTemplate(theme *models.Theme, templateName string) (*models.ThemeTemplate, error) {
 	if theme == nil || theme.GetName() == "" {
 		return nil, nil
 	}
@@ -125,7 +112,7 @@ func (f *FileStore) GetTemplate(theme *models.Theme, templateName string) (*mode
 }
 
 // GetAsset fetches an asset from the filesystem
-func (f *FileStore) GetAsset(theme *models.Theme, assetName string) (*models.ThemeAsset, error) {
+func (f *FileStore) getAsset(theme *models.Theme, assetName string) (*models.ThemeAsset, error) {
 	if theme == nil || theme.GetName() == "" {
 		return nil, nil
 	}
@@ -151,92 +138,69 @@ func (f *FileStore) GetAsset(theme *models.Theme, assetName string) (*models.The
 	return t, nil
 }
 
-func (f *FileStore) loadTheme(t *models.Theme) error {
-	// get templates (todo: supported subdirs)
-	glob := path.Join(f.baseDir, t.GetName(), fileStoreTemplateDir, "*")
-	paths, err := filepath.Glob(glob)
-	if err != nil {
-		return err
-	}
-	for _, p := range paths {
-		q := path.Base(p)
-		if strings.HasPrefix(q, ".") {
-			continue
-		}
-		e := strings.TrimLeft(path.Ext(p), ".")
-		if t.Templates[q] == nil {
-			t.Templates[q] = &models.ThemeTemplate{}
-		}
-		t.Templates[q].Name = &q
-		t.Templates[q].Engine = &e
-	}
-
-	// get assets (todo: supported subdirs)
-	glob = path.Join(f.baseDir, t.GetName(), fileStoreAssetsDir, "*")
-	paths, err = filepath.Glob(glob)
-	if err != nil {
-		return err
-	}
-	for _, p := range paths {
-		q := path.Base(p)
-		if strings.HasPrefix(q, ".") {
-			continue
-		}
-		t.Assets[q] = &models.ThemeAsset{Name: &q}
-	}
-	return nil
-}
-
-// Get a theme from the file store
-func (f *FileStore) Get(themeName string) (*models.Theme, error) {
+// Get a theme from the file store. Template and asset data (i.e. the file
+// contents) are NOT loaded.
+func (f *FileStore) Get(themeName string) (store.Theme, error) {
 	themeDir := themeName
 	if altDir := f.themeDirMap[themeName]; altDir != "" {
 		themeDir = altDir
 	}
+
 	themeConfigPath := path.Join(f.baseDir, themeDir, configFileName)
-	t, err := f.readConfig(themeConfigPath)
+	t, err := readConfig(themeConfigPath)
 	if err != nil || t == nil {
 		return nil, nil
 	}
 
 	// get templates (todo: supported subdirs)
-	glob := path.Join(f.baseDir, themeDir, fileStoreTemplateDir, "*")
-	paths, err := filepath.Glob(glob)
-	if err != nil {
-		return nil, err
-	}
-	for _, p := range paths {
-		q := path.Base(p)
-		if strings.HasPrefix(q, ".") {
-			continue
+	baseTemplateDir := path.Clean(path.Join(f.baseDir, themeDir, fileStoreTemplateDir))
+	err = filepath.Walk(baseTemplateDir, func(p string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
 		}
+		if info.IsDir() {
+			return nil
+		}
+		p = strings.TrimPrefix(path.Clean(p), baseTemplateDir)
+		p = strings.TrimLeft(p, "/")
+		q := path.Base(p)
 		e := strings.TrimLeft(path.Ext(p), ".")
-		if t.Templates[q] == nil {
-			t.Templates[q] = &models.ThemeTemplate{}
+		if t.Templates[p] == nil {
+			t.Templates[p] = &models.ThemeTemplate{}
 		}
-		t.Templates[q].Name = &q
-		t.Templates[q].Engine = &e
-	}
+		t.Templates[p].Name = &q
+		t.Templates[p].Engine = &e
+		return nil
+	})
 
-	// get assets (todo: supported subdirs)
-	glob = path.Join(f.baseDir, themeDir, fileStoreAssetsDir, "*")
-	paths, err = filepath.Glob(glob)
+	baseAssetDir := path.Clean(path.Join(f.baseDir, themeDir, fileStoreAssetsDir))
+	err = filepath.Walk(baseAssetDir, func(p string, info os.FileInfo, err error) error {
+		if err != nil {
+			return errors.Wrap(err)
+		}
+		if info.IsDir() {
+			return nil
+		}
+		p = strings.TrimPrefix(path.Clean(p), baseAssetDir)
+		p = strings.TrimLeft(p, "/")
+		q := path.Base(p)
+		if strings.HasPrefix(q, ".") {
+			return nil
+		}
+		t.Assets[p] = &models.ThemeAsset{Name: &q}
+		return nil
+	})
+
 	if err != nil {
 		return nil, err
 	}
-	for _, p := range paths {
-		q := path.Base(p)
-		if strings.HasPrefix(q, ".") {
-			continue
-		}
-		t.Assets[q] = &models.ThemeAsset{Name: &q}
-	}
-	return t, nil
-}
 
-func themeNameFromPath(p string) string {
-	dir, _ := path.Split(p)
-	return path.Base(dir)
+	latestRef, err := getLatestRef(path.Join(f.baseDir, themeDir))
+	if err != nil {
+		return nil, errors.Wrap(err)
+	}
+
+	return &Theme{Theme: t, store: f, ref: latestRef}, nil
 }
 
 // List all themes in the store
@@ -266,40 +230,18 @@ func (f *FileStore) List() ([]*models.Theme, error) {
 	return themes, nil
 }
 
-type themeFile interface {
-	SetData(*string)
-	GetData() string
+// AddPackage adds a theme from a theme file by cloning it from
+// the VCS location to the themeDir.
+func (f *FileStore) AddPackage(p *packages.Package) error {
+	themeDir := path.Join(f.baseDir, p.GetName())
+	return pkg.CloneToDir(themeDir, p.GetVcsUrl())
 }
 
-func themeIterator(theme *models.Theme, iterFn func(fn string, el themeFile) error) error {
-	for fn, tmpl := range theme.Templates {
-		err := iterFn(fn, tmpl)
-		if err != nil {
-			return errors.Wrap(err)
-		}
-	}
-
-	for fn, asset := range theme.Assets {
-		err := iterFn(fn, asset)
-		if err != nil {
-			return errors.Wrap(err)
-		}
-	}
-	return nil
-}
-
-var jpb = &jsonpb.Marshaler{
-	EnumsAsInts:  false,
-	EmitDefaults: false,
-	Indent:       "  ",
-	OrigName:     false,
-}
-
-// Add a theme from a theme file.
+// Add a theme directly to the themeDir.
 func (f *FileStore) Add(theme *models.Theme) error {
 	theme = proto.Clone(theme).(*models.Theme)
 	templateDir := path.Join(f.baseDir, theme.GetName())
-	perm := os.FileMode(0700)
+	perm := os.FileMode(0600)
 
 	err := themeIterator(theme, func(fn string, el themeFile) error {
 		p := path.Clean(path.Join(templateDir, fn))
@@ -307,7 +249,7 @@ func (f *FileStore) Add(theme *models.Theme) error {
 			return nil
 		}
 
-		err := os.MkdirAll(path.Dir(p), perm)
+		err := os.MkdirAll(path.Dir(p), os.ModePerm)
 		if err != nil {
 			return errors.Wrap(err)
 		}
@@ -321,7 +263,7 @@ func (f *FileStore) Add(theme *models.Theme) error {
 	})
 
 	if err != nil {
-		return nil
+		return err
 	}
 
 	fw, err := os.Create(path.Join(templateDir, configFileName))
@@ -331,47 +273,40 @@ func (f *FileStore) Add(theme *models.Theme) error {
 	return jpb.Marshal(fw, theme)
 }
 
-// extract tar.gz from reader into dir
-func (f *FileStore) extract(r io.Reader, dir string) (string, error) {
-	templateDir := path.Join(f.baseDir, dir)
-	gr, err := gzip.NewReader(r)
+func (f *FileStore) UpdateThemeToRef(themeName, commitHash string) error {
+	themeDir := themeName
+	if altDir := f.themeDirMap[themeName]; altDir != "" {
+		themeDir = altDir
+	}
+	repoDir := path.Join(f.baseDir, themeDir)
+	return pkg.FetchDir(repoDir, commitHash)
+}
+
+func (f *FileStore) GetAsset(assetName string) (*models.ThemeAsset, error) {
+	lst, err := ioutil.ReadDir(f.baseDir)
 	if err != nil {
-		return "", err
+		return nil, errors.Wrap(err)
 	}
-	defer gr.Close()
-
-	tr := tar.NewReader(gr)
-	for {
-		hdr, err := tr.Next()
-		if err == io.EOF {
-			break
-		}
-
-		// ignore links
-		if hdr.Mode == tar.TypeSymlink {
+	for _, fi := range lst {
+		if !fi.IsDir() {
 			continue
 		}
-
-		p := path.Clean(path.Join(templateDir, hdr.Name))
-		if strings.HasPrefix(p, "..") {
-			// no relative paths
-			continue
-		}
-		err = os.MkdirAll(path.Dir(p), os.FileMode(0700))
+		p := path.Join(f.baseDir, fi.Name(), fileStoreAssetsDir, assetName)
+		b, err := ioutil.ReadFile(p)
 		if err != nil {
-			return "", err
+			if os.IsNotExist(err) {
+				continue
+			}
+			return nil, errors.Wrap(err)
 		}
-
-		f, err := os.Create(p)
-		if err != nil {
-			return "", err
+		data := string(b)
+		t := &models.ThemeAsset{
+			// Theme: theme.Name,
+			Data: &data,
+			Name: &assetName,
 		}
-
-		defer f.Close()
-		_, err = io.Copy(f, tr)
-		if err != nil {
-			return "", err
-		}
+		return t, nil
 	}
-	return templateDir, nil
+
+	return nil, nil
 }

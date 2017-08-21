@@ -17,6 +17,7 @@ import (
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 	"github.com/ketchuphq/ketchup/server/content/templates"
 	dummytmpl "github.com/ketchuphq/ketchup/server/content/templates/dummystore"
+	"github.com/ketchuphq/ketchup/server/content/templates/store"
 	"github.com/ketchuphq/ketchup/server/router"
 )
 
@@ -56,7 +57,7 @@ func testModule() (*Module, func()) {
 			Backend: dummydb.New(),
 		},
 		Templates: &templates.Module{
-			Stores: []templates.ThemeStore{dummytmpl.New()},
+			Stores: []store.ThemeStore{dummytmpl.New()},
 		},
 	}, stopper
 }

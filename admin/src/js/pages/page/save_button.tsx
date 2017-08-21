@@ -1,7 +1,9 @@
+import * as m from 'mithril';
 import msx from 'lib/msx';
 import * as API from 'lib/api';
 import Page from 'lib/page';
 import * as Toaster from 'components/toaster';
+import { BaseComponent } from 'components/auth';
 
 interface PageSaveButtonAttrs {
   page: Page;
@@ -9,13 +11,13 @@ interface PageSaveButtonAttrs {
   classes?: string;
 }
 
-export default class PageSaveButtonComponent {
-  private readonly _attrs: PageSaveButtonAttrs;
-
-  constructor(private onsave: (page: Page) => void) {
+export default class PageSaveButtonComponent extends BaseComponent<PageSaveButtonAttrs> {
+  constructor(v: m.CVnode<PageSaveButtonAttrs>) {
+    super(v);
   }
 
-  save(page: Page) {
+  save() {
+    let page = this.props.page;
     page.save().then((p: API.Page) => {
       page.uuid = p.uuid;
       window.history.replaceState(null, page.title, `/admin/pages/${p.uuid}`);
@@ -23,7 +25,7 @@ export default class PageSaveButtonComponent {
     })
       .then(() => {
         Toaster.add('Page successfully saved');
-        this.onsave(page);
+        this.props.onsave(page);
       })
       .catch((err: any) => {
         if (err.detail) {
@@ -34,14 +36,10 @@ export default class PageSaveButtonComponent {
       });
   }
 
-  static oninit(v: Mithril.Vnode<PageSaveButtonAttrs, PageSaveButtonComponent>) {
-    v.state = new PageSaveButtonComponent(v.attrs.onsave);
-  }
-
-  static view({ attrs: { page, classes }, state }: Mithril.Vnode<PageSaveButtonAttrs, PageSaveButtonComponent>) {
+  view() {
     return <a
-      class={`button button--green ${classes || ''}`}
-      onclick={(e: Event) => { e.stopPropagation(); state.save(page); }}
+      class={`button button--green ${this.props.classes || ''}`}
+      onclick={(e: Event) => { e.stopPropagation(); this.save(); }}
     >
       Save
     </a>;

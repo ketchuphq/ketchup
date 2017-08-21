@@ -13,84 +13,93 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-type Package_Type int32
+type PackageType int32
 
 const (
-	Package_unknown Package_Type = 0
-	Package_theme   Package_Type = 1
-	Package_plugin  Package_Type = 2
+	PackageType_unknown PackageType = 0
+	PackageType_theme   PackageType = 1
+	PackageType_plugin  PackageType = 2
 )
 
-var Package_Type_name = map[int32]string{
+var PackageType_name = map[int32]string{
 	0: "unknown",
 	1: "theme",
 	2: "plugin",
 }
-var Package_Type_value = map[string]int32{
+var PackageType_value = map[string]int32{
 	"unknown": 0,
 	"theme":   1,
 	"plugin":  2,
 }
 
-func (x Package_Type) Enum() *Package_Type {
-	p := new(Package_Type)
+func (x PackageType) Enum() *PackageType {
+	p := new(PackageType)
 	*p = x
 	return p
 }
-func (x Package_Type) String() string {
-	return proto.EnumName(Package_Type_name, int32(x))
+func (x PackageType) String() string {
+	return proto.EnumName(PackageType_name, int32(x))
 }
-func (x *Package_Type) UnmarshalJSON(data []byte) error {
-	value, err := proto.UnmarshalJSONEnum(Package_Type_value, data, "Package_Type")
+func (x *PackageType) UnmarshalJSON(data []byte) error {
+	value, err := proto.UnmarshalJSONEnum(PackageType_value, data, "PackageType")
 	if err != nil {
 		return err
 	}
-	*x = Package_Type(value)
+	*x = PackageType(value)
 	return nil
 }
-func (Package_Type) EnumDescriptor() ([]byte, []int) { return fileDescriptor9, []int{1, 0} }
+func (PackageType) EnumDescriptor() ([]byte, []int) { return fileDescriptor9, []int{0} }
 
-type PackageRelease struct {
-	KetchupMin       *string `protobuf:"bytes,1,opt,name=ketchup_min,json=ketchupMin" json:"ketchup_min,omitempty"`
-	Tags             *bool   `protobuf:"varint,2,opt,name=tags" json:"tags,omitempty"`
+type PackageAuthor struct {
+	Name             *string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Email            *string `protobuf:"bytes,2,opt,name=email" json:"email,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
-func (m *PackageRelease) Reset()                    { *m = PackageRelease{} }
-func (m *PackageRelease) String() string            { return proto.CompactTextString(m) }
-func (*PackageRelease) ProtoMessage()               {}
-func (*PackageRelease) Descriptor() ([]byte, []int) { return fileDescriptor9, []int{0} }
+func (m *PackageAuthor) Reset()                    { *m = PackageAuthor{} }
+func (m *PackageAuthor) String() string            { return proto.CompactTextString(m) }
+func (*PackageAuthor) ProtoMessage()               {}
+func (*PackageAuthor) Descriptor() ([]byte, []int) { return fileDescriptor9, []int{0} }
 
-func (m *PackageRelease) GetKetchupMin() string {
-	if m != nil && m.KetchupMin != nil {
-		return *m.KetchupMin
+func (m *PackageAuthor) GetName() string {
+	if m != nil && m.Name != nil {
+		return *m.Name
 	}
 	return ""
 }
 
-func (m *PackageRelease) GetTags() bool {
-	if m != nil && m.Tags != nil {
-		return *m.Tags
+func (m *PackageAuthor) GetEmail() string {
+	if m != nil && m.Email != nil {
+		return *m.Email
 	}
-	return false
+	return ""
 }
 
 type Package struct {
-	Name             *string         `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	Author           []string        `protobuf:"bytes,2,rep,name=author" json:"author,omitempty"`
-	Type             *Package_Type   `protobuf:"varint,3,opt,name=type,enum=ketchup.packages.Package_Type" json:"type,omitempty"`
-	Description      *string         `protobuf:"bytes,4,opt,name=description" json:"description,omitempty"`
-	Readme           *string         `protobuf:"bytes,5,opt,name=readme" json:"readme,omitempty"`
-	VcsUrl           *string         `protobuf:"bytes,6,opt,name=vcs_url,json=vcsUrl" json:"vcs_url,omitempty"`
-	Releases         *PackageRelease `protobuf:"bytes,11,opt,name=releases" json:"releases,omitempty"`
-	Labels           []string        `protobuf:"bytes,12,rep,name=labels" json:"labels,omitempty"`
-	XXX_unrecognized []byte          `json:"-"`
+	Type             *PackageType     `protobuf:"varint,1,opt,name=type,enum=ketchup.packages.PackageType" json:"type,omitempty"`
+	Name             *string          `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
+	Authors          []*PackageAuthor `protobuf:"bytes,3,rep,name=authors" json:"authors,omitempty"`
+	Description      *string          `protobuf:"bytes,4,opt,name=description" json:"description,omitempty"`
+	Homepage         *string          `protobuf:"bytes,5,opt,name=homepage" json:"homepage,omitempty"`
+	Tags             []string         `protobuf:"bytes,6,rep,name=tags" json:"tags,omitempty"`
+	ReadmeUrl        *string          `protobuf:"bytes,7,opt,name=readme_url,json=readmeUrl" json:"readme_url,omitempty"`
+	VcsUrl           *string          `protobuf:"bytes,8,opt,name=vcs_url,json=vcsUrl" json:"vcs_url,omitempty"`
+	ScreenshotUrls   []string         `protobuf:"bytes,9,rep,name=screenshot_urls,json=screenshotUrls" json:"screenshot_urls,omitempty"`
+	KetchupVersion   *string          `protobuf:"bytes,10,opt,name=ketchup_version,json=ketchupVersion" json:"ketchup_version,omitempty"`
+	XXX_unrecognized []byte           `json:"-"`
 }
 
 func (m *Package) Reset()                    { *m = Package{} }
 func (m *Package) String() string            { return proto.CompactTextString(m) }
 func (*Package) ProtoMessage()               {}
 func (*Package) Descriptor() ([]byte, []int) { return fileDescriptor9, []int{1} }
+
+func (m *Package) GetType() PackageType {
+	if m != nil && m.Type != nil {
+		return *m.Type
+	}
+	return PackageType_unknown
+}
 
 func (m *Package) GetName() string {
 	if m != nil && m.Name != nil {
@@ -99,18 +108,11 @@ func (m *Package) GetName() string {
 	return ""
 }
 
-func (m *Package) GetAuthor() []string {
+func (m *Package) GetAuthors() []*PackageAuthor {
 	if m != nil {
-		return m.Author
+		return m.Authors
 	}
 	return nil
-}
-
-func (m *Package) GetType() Package_Type {
-	if m != nil && m.Type != nil {
-		return *m.Type
-	}
-	return Package_unknown
 }
 
 func (m *Package) GetDescription() string {
@@ -120,9 +122,23 @@ func (m *Package) GetDescription() string {
 	return ""
 }
 
-func (m *Package) GetReadme() string {
-	if m != nil && m.Readme != nil {
-		return *m.Readme
+func (m *Package) GetHomepage() string {
+	if m != nil && m.Homepage != nil {
+		return *m.Homepage
+	}
+	return ""
+}
+
+func (m *Package) GetTags() []string {
+	if m != nil {
+		return m.Tags
+	}
+	return nil
+}
+
+func (m *Package) GetReadmeUrl() string {
+	if m != nil && m.ReadmeUrl != nil {
+		return *m.ReadmeUrl
 	}
 	return ""
 }
@@ -134,23 +150,23 @@ func (m *Package) GetVcsUrl() string {
 	return ""
 }
 
-func (m *Package) GetReleases() *PackageRelease {
+func (m *Package) GetScreenshotUrls() []string {
 	if m != nil {
-		return m.Releases
+		return m.ScreenshotUrls
 	}
 	return nil
 }
 
-func (m *Package) GetLabels() []string {
-	if m != nil {
-		return m.Labels
+func (m *Package) GetKetchupVersion() string {
+	if m != nil && m.KetchupVersion != nil {
+		return *m.KetchupVersion
 	}
-	return nil
+	return ""
 }
 
 type Registry struct {
-	// include other registry files
 	RegistryVersion  *string    `protobuf:"bytes,1,opt,name=registry_version,json=registryVersion" json:"registry_version,omitempty"`
+	RegistryType     *string    `protobuf:"bytes,2,opt,name=registry_type,json=registryType" json:"registry_type,omitempty"`
 	Packages         []*Package `protobuf:"bytes,10,rep,name=packages" json:"packages,omitempty"`
 	XXX_unrecognized []byte     `json:"-"`
 }
@@ -167,6 +183,13 @@ func (m *Registry) GetRegistryVersion() string {
 	return ""
 }
 
+func (m *Registry) GetRegistryType() string {
+	if m != nil && m.RegistryType != nil {
+		return *m.RegistryType
+	}
+	return ""
+}
+
 func (m *Registry) GetPackages() []*Package {
 	if m != nil {
 		return m.Packages
@@ -175,53 +198,65 @@ func (m *Registry) GetPackages() []*Package {
 }
 
 func init() {
-	proto.RegisterType((*PackageRelease)(nil), "ketchup.packages.PackageRelease")
+	proto.RegisterType((*PackageAuthor)(nil), "ketchup.packages.PackageAuthor")
 	proto.RegisterType((*Package)(nil), "ketchup.packages.Package")
 	proto.RegisterType((*Registry)(nil), "ketchup.packages.Registry")
-	proto.RegisterEnum("ketchup.packages.Package_Type", Package_Type_name, Package_Type_value)
+	proto.RegisterEnum("ketchup.packages.PackageType", PackageType_name, PackageType_value)
 }
-func (m *PackageRelease) SetKetchupMin(v *string) {
-	m.KetchupMin = v
+func (m *PackageAuthor) SetName(v *string) {
+	m.Name = v
 }
 
-func (m *PackageRelease) SetTags(v *bool) {
-	m.Tags = v
+func (m *PackageAuthor) SetEmail(v *string) {
+	m.Email = v
+}
+
+func (m *Package) SetType(v *PackageType) {
+	m.Type = v
 }
 
 func (m *Package) SetName(v *string) {
 	m.Name = v
 }
 
-func (m *Package) SetAuthor(v []string) {
-	m.Author = v
-}
-
-func (m *Package) SetType(v *Package_Type) {
-	m.Type = v
+func (m *Package) SetAuthors(v []*PackageAuthor) {
+	m.Authors = v
 }
 
 func (m *Package) SetDescription(v *string) {
 	m.Description = v
 }
 
-func (m *Package) SetReadme(v *string) {
-	m.Readme = v
+func (m *Package) SetHomepage(v *string) {
+	m.Homepage = v
+}
+
+func (m *Package) SetTags(v []string) {
+	m.Tags = v
+}
+
+func (m *Package) SetReadmeUrl(v *string) {
+	m.ReadmeUrl = v
 }
 
 func (m *Package) SetVcsUrl(v *string) {
 	m.VcsUrl = v
 }
 
-func (m *Package) SetReleases(v *PackageRelease) {
-	m.Releases = v
+func (m *Package) SetScreenshotUrls(v []string) {
+	m.ScreenshotUrls = v
 }
 
-func (m *Package) SetLabels(v []string) {
-	m.Labels = v
+func (m *Package) SetKetchupVersion(v *string) {
+	m.KetchupVersion = v
 }
 
 func (m *Registry) SetRegistryVersion(v *string) {
 	m.RegistryVersion = v
+}
+
+func (m *Registry) SetRegistryType(v *string) {
+	m.RegistryType = v
 }
 
 func (m *Registry) SetPackages(v []*Package) {
@@ -231,26 +266,29 @@ func (m *Registry) SetPackages(v []*Package) {
 func init() { proto.RegisterFile("packages.proto", fileDescriptor9) }
 
 var fileDescriptor9 = []byte{
-	// 329 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x50, 0x3d, 0x6f, 0xab, 0x40,
-	0x10, 0x7c, 0x60, 0x6c, 0xe3, 0xe5, 0xc9, 0x0f, 0x6d, 0xf1, 0x72, 0x69, 0x92, 0x13, 0x15, 0x49,
-	0x41, 0x81, 0x94, 0x2e, 0x6d, 0xca, 0x48, 0x11, 0x4a, 0xd2, 0x5a, 0x17, 0xbc, 0xc2, 0xc8, 0x70,
-	0xa0, 0xbb, 0xc3, 0x91, 0xff, 0x5c, 0x7e, 0x5b, 0x04, 0x77, 0xb6, 0xa2, 0x48, 0xee, 0x66, 0x67,
-	0x3f, 0x66, 0x66, 0x61, 0xdd, 0x8b, 0x72, 0x2f, 0x2a, 0xd2, 0x59, 0xaf, 0x3a, 0xd3, 0x61, 0xbc,
-	0x27, 0x53, 0xee, 0x86, 0x3e, 0x3b, 0xf1, 0xc9, 0x13, 0xac, 0x5f, 0x2c, 0x2e, 0xa8, 0x21, 0xa1,
-	0x09, 0x6f, 0x21, 0x72, 0x53, 0x9b, 0xb6, 0x96, 0xcc, 0xe3, 0x5e, 0xba, 0x2a, 0xc0, 0x51, 0xcf,
-	0xb5, 0x44, 0x84, 0xc0, 0x88, 0x4a, 0x33, 0x9f, 0x7b, 0x69, 0x58, 0x4c, 0x38, 0xf9, 0xf2, 0x61,
-	0xe9, 0xee, 0x8c, 0x7d, 0x29, 0x5a, 0x72, 0x9b, 0x13, 0xc6, 0xff, 0xb0, 0x10, 0x83, 0xd9, 0x75,
-	0x8a, 0xf9, 0x7c, 0x96, 0xae, 0x0a, 0x57, 0x61, 0x0e, 0x81, 0x39, 0xf6, 0xc4, 0x66, 0xdc, 0x4b,
-	0xd7, 0xf9, 0x4d, 0xf6, 0xdb, 0x5f, 0xe6, 0x8e, 0x66, 0xaf, 0xc7, 0x9e, 0x8a, 0x69, 0x16, 0x39,
-	0x44, 0x5b, 0xd2, 0xa5, 0xaa, 0x7b, 0x53, 0x77, 0x92, 0x05, 0x93, 0xcc, 0x4f, 0x6a, 0x54, 0x53,
-	0x24, 0xb6, 0x2d, 0xb1, 0xf9, 0xd4, 0x74, 0x15, 0x5e, 0xc1, 0xf2, 0x50, 0xea, 0xcd, 0xa0, 0x1a,
-	0xb6, 0xb0, 0x8d, 0x43, 0xa9, 0xdf, 0x54, 0x83, 0x8f, 0x10, 0x2a, 0x1b, 0x5f, 0xb3, 0x88, 0x7b,
-	0x69, 0x94, 0xf3, 0x8b, 0x56, 0xdc, 0x9f, 0x8a, 0xf3, 0xc6, 0x28, 0xd7, 0x88, 0x0f, 0x6a, 0x34,
-	0xfb, 0x6b, 0xc3, 0xd9, 0x2a, 0xb9, 0x87, 0x60, 0xb4, 0x8d, 0x11, 0x2c, 0x07, 0xb9, 0x97, 0xdd,
-	0xa7, 0x8c, 0xff, 0xe0, 0x0a, 0xe6, 0x66, 0x47, 0x2d, 0xc5, 0x1e, 0x02, 0x2c, 0xfa, 0x66, 0xa8,
-	0x6a, 0x19, 0xfb, 0x49, 0x03, 0x61, 0x41, 0x55, 0xad, 0x8d, 0x3a, 0xe2, 0x1d, 0xc4, 0xca, 0xe1,
-	0xcd, 0x81, 0x94, 0x1e, 0x53, 0xda, 0x67, 0xfe, 0x3b, 0xf1, 0xef, 0x96, 0xc6, 0x07, 0x08, 0x4f,
-	0xfe, 0x18, 0xf0, 0x59, 0x1a, 0xe5, 0xd7, 0x97, 0x8d, 0x9f, 0x47, 0xbf, 0x03, 0x00, 0x00, 0xff,
-	0xff, 0x26, 0xd6, 0x72, 0xd0, 0x18, 0x02, 0x00, 0x00,
+	// 369 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x51, 0x4b, 0xca, 0xdb, 0x30,
+	0x10, 0xae, 0x9d, 0x87, 0xed, 0x71, 0xe3, 0x18, 0x51, 0xa8, 0x5a, 0x08, 0x35, 0xe9, 0xa2, 0x69,
+	0x17, 0x86, 0x04, 0xba, 0xc8, 0xb2, 0x37, 0x28, 0xa6, 0xe9, 0x36, 0x08, 0x67, 0xb0, 0x4d, 0xfc,
+	0x10, 0x92, 0x9c, 0x92, 0x63, 0xf4, 0x94, 0xbd, 0x46, 0x91, 0x64, 0xfb, 0x0f, 0x3f, 0x64, 0x37,
+	0xfa, 0x1e, 0x33, 0x9f, 0x66, 0x20, 0xe2, 0x2c, 0xbf, 0xb2, 0x02, 0x65, 0xca, 0x45, 0xa7, 0x3a,
+	0x12, 0x5f, 0x51, 0xe5, 0x65, 0xcf, 0xd3, 0x11, 0xdf, 0x1e, 0x61, 0xf5, 0xd3, 0xd6, 0x3f, 0x7a,
+	0x55, 0x76, 0x82, 0x10, 0x98, 0xb7, 0xac, 0x41, 0xea, 0x24, 0xce, 0x2e, 0xc8, 0x4c, 0x4d, 0xde,
+	0xc1, 0x02, 0x1b, 0x56, 0xd5, 0xd4, 0x35, 0xa0, 0x7d, 0x6c, 0xff, 0xb9, 0xe0, 0x0d, 0x5e, 0xb2,
+	0x87, 0xb9, 0xba, 0x73, 0xeb, 0x8a, 0x0e, 0x9b, 0xf4, 0xf5, 0x9c, 0x74, 0x10, 0xfe, 0xba, 0x73,
+	0xcc, 0x8c, 0x74, 0x1a, 0xe4, 0x3e, 0x0c, 0x3a, 0x82, 0xc7, 0x4c, 0x0c, 0x49, 0x67, 0xc9, 0x6c,
+	0x17, 0x1e, 0x3e, 0x3d, 0xed, 0x64, 0xe3, 0x66, 0xa3, 0x9e, 0x24, 0x10, 0x5e, 0x50, 0xe6, 0xa2,
+	0xe2, 0xaa, 0xea, 0x5a, 0x3a, 0x37, 0x5d, 0x1f, 0x21, 0xf2, 0x11, 0xfc, 0xb2, 0x6b, 0x90, 0xb3,
+	0x02, 0xe9, 0xc2, 0xd0, 0xd3, 0x5b, 0x87, 0x51, 0xac, 0x90, 0x74, 0x99, 0xcc, 0x74, 0x18, 0x5d,
+	0x93, 0x0d, 0x80, 0x40, 0x76, 0x69, 0xf0, 0xdc, 0x8b, 0x9a, 0x7a, 0xc6, 0x11, 0x58, 0xe4, 0x24,
+	0x6a, 0xf2, 0x1e, 0xbc, 0x5b, 0x2e, 0x0d, 0xe7, 0x1b, 0x6e, 0x79, 0xcb, 0xa5, 0x26, 0xbe, 0xc0,
+	0x5a, 0xe6, 0x02, 0xb1, 0x95, 0x65, 0xa7, 0x34, 0x2f, 0x69, 0x60, 0xda, 0x46, 0x2f, 0xf0, 0x49,
+	0xd4, 0x52, 0x0b, 0x87, 0xdf, 0x9d, 0x6f, 0x28, 0xa4, 0x8e, 0x0d, 0xa6, 0x53, 0x34, 0xc0, 0xbf,
+	0x2d, 0xba, 0xfd, 0xeb, 0x80, 0x9f, 0x61, 0x51, 0x49, 0x25, 0xee, 0xe4, 0x2b, 0xc4, 0x62, 0xa8,
+	0x27, 0x9b, 0x3d, 0xd6, 0x7a, 0xc4, 0x07, 0x1f, 0xf9, 0x0c, 0xab, 0x49, 0x6a, 0xce, 0x63, 0x77,
+	0xfd, 0x76, 0x04, 0xf5, 0x35, 0xc8, 0x77, 0xf0, 0xc7, 0xdd, 0x52, 0x30, 0x4b, 0xff, 0xf0, 0x74,
+	0xe9, 0xd9, 0x24, 0xfd, 0xb6, 0x87, 0xf0, 0xe1, 0xa6, 0x24, 0x04, 0xaf, 0x6f, 0xaf, 0x6d, 0xf7,
+	0xa7, 0x8d, 0xdf, 0x90, 0x00, 0x16, 0xaa, 0xc4, 0x06, 0x63, 0x87, 0x00, 0x2c, 0x79, 0xdd, 0x17,
+	0x55, 0x1b, 0xbb, 0xff, 0x03, 0x00, 0x00, 0xff, 0xff, 0xf7, 0x33, 0xfb, 0x55, 0x8e, 0x02, 0x00,
+	0x00,
 }

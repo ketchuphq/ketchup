@@ -4,7 +4,7 @@ import Navigation from 'components/navigation';
 import * as Toaster from 'components/toaster';
 import { getUser } from 'components/auth';
 
-export default (component: Mithril.Component<any, any>) => ({
+export default (component: m.ComponentTypes<any, any>) => ({
   onmatch: (_: any, requestedPath: string) => {
     getUser()
       .catch(() => {

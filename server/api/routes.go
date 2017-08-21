@@ -39,7 +39,16 @@ func formatRoute(r *models.Route) *models.Route {
 
 // ListRoutes returns all routes.
 func (m *Module) ListRoutes(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
-	routes, err := m.DB.ListRoutes()
+	opts := &api.ListRouteRequest{}
+	err := req.ParseForm()
+	if err != nil {
+		return err
+	}
+	err = m.decoder.Decode(opts, req.Form)
+	if err != nil {
+		return err
+	}
+	routes, err := m.DB.ListRoutes(opts)
 	if err != nil {
 		return err
 	}
@@ -50,19 +59,17 @@ func (m *Module) ListRoutes(rw http.ResponseWriter, req *http.Request, par httpr
 
 // ListRoutesByPage returns all routes for a given page, identified by uuid in the parameter.
 func (m *Module) ListRoutesByPage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
-	routes, err := m.DB.ListRoutes()
+	pageUUID := par.ByName("uuid")
+	routes, err := m.DB.ListRoutes(&api.ListRouteRequest{
+		Options: &api.ListRouteRequest_ListRouteOptions{
+			PageUuid: &pageUUID,
+		},
+	})
 	if err != nil {
 		return err
 	}
-	pageUUID := par.ByName("uuid")
-	filteredRoutes := []*models.Route{}
-	for _, route := range routes {
-		if route.GetPageUuid() == pageUUID {
-			filteredRoutes = append(filteredRoutes, route)
-		}
-	}
 	return router.Proto(rw, &api.ListRouteResponse{
-		Routes: db.SortRoutesByPath(filteredRoutes),
+		Routes: db.SortRoutesByPath(routes),
 	})
 }
 
@@ -105,7 +112,11 @@ func (m *Module) UpdateRoutesByPage(rw http.ResponseWriter, req *http.Request, p
 		return errors.Wrap(err)
 	}
 
-	oldRoutes, err := m.DB.ListRoutes()
+	oldRoutes, err := m.DB.ListRoutes(&api.ListRouteRequest{
+		Options: &api.ListRouteRequest_ListRouteOptions{
+			PageUuid: &pageUUID,
+		},
+	})
 	if err != nil {
 		return err
 	}
@@ -128,13 +139,11 @@ func (m *Module) UpdateRoutesByPage(rw http.ResponseWriter, req *http.Request, p
 
 	// loop over all routes
 	for _, route := range oldRoutes {
-		if route.GetPageUuid() == pageUUID {
-			if newList[route.GetUuid()] == nil {
-				// if we're not adding this existing route, then delete it
-				err = m.DB.DeleteRoute(route)
-				if err != nil {
-					return err
-				}
+		if newList[route.GetUuid()] == nil {
+			// if we're not adding this existing route, then delete it
+			err = m.DB.DeleteRoute(route)
+			if err != nil {
+				return err
 			}
 		}
 	}

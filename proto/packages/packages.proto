@@ -2,41 +2,35 @@ syntax = "proto2";
 
 package ketchup.packages;
 
-message PackageRelease {
-  optional string ketchup_min = 1;
-  optional bool tags = 2; // "{prefix}{semantic_version}"
-  // optional string tag_prefix
-  // dependencies
-  // release_version for self hosting
-  // optional string version
-  // optional string archive_url zip containing the package
-  // optional string released_at
-}
-message Package {
-  enum Type {
-    unknown = 0;
-    theme = 1;
-    plugin = 2;
-  }
+message PackageAuthor {
   optional string name = 1;
-  repeated string author = 2;
-  optional Type type = 3; // plugin type
-  optional string description = 4; // short description
-  optional string readme = 5; // raw readme url
-  optional string vcs_url = 6; // support github, bitbucket
-
-  optional PackageRelease releases = 11;
-  repeated string labels = 12;
-  // issues
-  // donate
-  // buy
-  // previous_names
+  optional string email = 2;
+  // twitter, github, etc.
 }
+
+enum PackageType {
+  unknown = 0;
+  theme = 1;
+  plugin = 2;
+}
+
+message Package {
+  optional PackageType type = 1;
+  optional string name = 2;
+  repeated PackageAuthor authors = 3;
+  optional string description = 4;
+  optional string homepage = 5;
+  repeated string tags = 6;
+
+  optional string readme_url = 7;
+  optional string vcs_url = 8; // support github, bitbucket
+  repeated string screenshot_urls = 9;
+  optional string ketchup_version = 10; // minimum required ketchup version
+}
+
 
 message Registry {
-  // include other registry files
-  optional string registry_version = 1; // ketchup version?
+  optional string registry_version = 1;
+  optional string registry_type = 2;
   repeated Package packages = 10;
-
-  // format
 }

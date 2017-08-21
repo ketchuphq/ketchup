@@ -1,5 +1,7 @@
+import * as m from 'mithril';
 import msx from 'lib/msx';
 import * as API from 'lib/api';
+import { BaseComponent } from 'components/auth';
 
 interface TextEditorAttrs {
   elementId?: string;
@@ -7,20 +9,21 @@ interface TextEditorAttrs {
   readonly short?: boolean;
 }
 
-export default class TextEditorComponent {
+export default class TextEditorComponent extends BaseComponent<TextEditorAttrs> {
   private readonly _attrs: TextEditorAttrs;
   content: API.Content;
   element: HTMLElement;
   id: string;
   readonly short: boolean;
 
-  constructor(attrs: TextEditorAttrs) {
-    this.content = attrs.content;
-    if (attrs.elementId == null) {
-      attrs.elementId = Math.random().toString().slice(2, 10);
+  constructor(v: m.CVnode<TextEditorAttrs>) {
+    super(v);
+    this.content = v.attrs.content;
+    if (v.attrs.elementId == null) {
+      v.attrs.elementId = Math.random().toString().slice(2, 10);
     }
-    this.id = `#text-${attrs.elementId}`;
-    this.short = attrs.short;
+    this.id = `#text-${v.attrs.elementId}`;
+    this.short = v.attrs.short;
   }
 
   get klass(): string {
@@ -31,23 +34,16 @@ export default class TextEditorComponent {
     return k;
   }
 
-  static oninit(v: Mithril.Vnode<TextEditorAttrs, TextEditorComponent>) {
-    v.state = new TextEditorComponent(v.attrs);
-  };
-
-  static view(v: Mithril.Vnode<TextEditorAttrs, TextEditorComponent>) {
-    let ctrl = v.state;
-    return <div id={ctrl.id} class={ctrl.klass}>
+  view() {
+    return <div id={this.id} class={this.klass}>
       <textarea
         onchange={(el: Event) => {
-          ctrl.content.value = (el.target as any).value;
+          this.content.value = (el.target as any).value;
         }}
-        oncreate={(v: Mithril.VnodeDOM<any, any>) => {
-          (v.dom as HTMLTextAreaElement).value = ctrl.content.value;
+        oncreate={(v: m.VnodeDOM<any, any>) => {
+          (v.dom as HTMLTextAreaElement).value = this.content.value;
         }}
       />
     </div>;
   }
 }
-
-let _: Mithril.Component<TextEditorAttrs, TextEditorComponent> = TextEditorComponent;

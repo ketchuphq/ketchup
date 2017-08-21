@@ -70,12 +70,25 @@ message ListPageResponse {
     repeated ketchup.models.Page pages = 1;
 }
 
+message ListRouteRequest {
+    message ListRouteOptions {
+        optional string page_uuid = 1;
+    }
+    optional ListOptions list = 1;
+    optional ListRouteOptions options = 2;
+}
+
 message ListRouteResponse {
     repeated ketchup.models.Route routes = 1;
 }
 
 message ListThemeResponse {
     repeated ketchup.models.Theme themes = 1;
+}
+
+message GetThemeResponse {
+    optional ketchup.models.Theme theme = 1;
+    optional string ref = 2;
 }
 
 message UpdateDataRequest {
@@ -86,7 +99,7 @@ message ListDataResponse {
     repeated ketchup.models.Data data = 1;
 }
 
-message TLSSettingsReponse {
+message TLSSettingsResponse {
     optional string tls_email = 1;
     optional string tls_domain = 2;
     optional string agreed_on = 3;
@@ -100,6 +113,18 @@ message EnableTLSRequest {
     optional bool agreed = 3;
 }
 
+message CheckThemeForUpdateResponse {
+    optional string old_ref = 1;
+    optional string current_ref = 2;
+}
+
 message InstallThemeRequest {
     optional string name = 1;
+    optional string vcs_url = 2;
+    optional string registry_url = 3;
+}
+
+message UpdateThemeRequest {
+    optional string name = 1; // extracted from URL
+    optional string ref = 2;
 }

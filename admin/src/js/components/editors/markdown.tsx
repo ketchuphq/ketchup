@@ -1,22 +1,24 @@
+import * as m from 'mithril';
 import msx from 'lib/msx';
 import * as API from 'lib/api';
+import { BaseComponent } from '../auth';
 
 interface CodeMirrorAttrs {
   readonly content: API.Content;
   readonly short?: boolean;
 }
 
-export default class CodeMirrorComponent {
-  private readonly _attrs: CodeMirrorAttrs;
+export default class CodeMirrorComponent extends BaseComponent<CodeMirrorAttrs> {
   codemirror: CodeMirror.Editor;
   content: API.Content;
   element: HTMLElement;
   id: string;
   short: boolean;
 
-  constructor(attrs: CodeMirrorAttrs) {
-    this.content = attrs.content;
-    this.short = attrs.short;
+  constructor(v: any) {
+    super(v);
+    this.content = v.attrs.content;
+    this.short = v.attrs.short;
     this.id = `codemirror-${Math.random().toString().slice(2, 10)}`;
   }
 
@@ -34,7 +36,7 @@ export default class CodeMirrorComponent {
       'codemirror/mode/markdown/markdown',
       'codemirror/addon/display/placeholder',
       'codemirror/addon/mode/overlay'
-    ], () => {
+    ], (require) => {
       let cm = require<typeof CodeMirror>('codemirror');
       require('codemirror/mode/gfm/gfm');
       require('codemirror/mode/markdown/markdown');
@@ -57,20 +59,13 @@ export default class CodeMirrorComponent {
     }, 'codemirror');
   }
 
-  static oninit(v: Mithril.Vnode<CodeMirrorAttrs, CodeMirrorComponent>) {
-    v.state = new CodeMirrorComponent(v.attrs);
-  };
-
-  static view(v: Mithril.Vnode<CodeMirrorAttrs, CodeMirrorComponent>) {
-    let ctrl = v.state;
-    return <div id={ctrl.id} class={ctrl.klass}>
+  view() {
+    return <div id={this.id} class={this.klass}>
       <textarea
-        oncreate={(v: Mithril.VnodeDOM<any, any>) => {
-          ctrl.initializeCodeMirror(v.dom as HTMLTextAreaElement);
+        oncreate={(v: m.VnodeDOM<any, any>) => {
+          this.initializeCodeMirror(v.dom as HTMLTextAreaElement);
         }}
       />
     </div>;
   }
 }
-
-let _: Mithril.Component<CodeMirrorAttrs, CodeMirrorComponent> = CodeMirrorComponent;

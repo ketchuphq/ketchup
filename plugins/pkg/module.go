@@ -38,7 +38,7 @@ func (m *Module) Init(c *service.Config) {
 	// todo: keep track of all registries
 }
 
-// FetchPackage fetches information about the given package
+// FetchPackage fetches tag information about the given package
 // from upstream vcs repo
 func (m *Module) FetchPackage(p *packages.Package) ([]*packages.Registry, error) {
 	matches := regexp.MustCompile(`^https://([^/])/([^/])/([^/])$`).FindStringSubmatch(p.GetVcsUrl())

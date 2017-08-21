@@ -7,8 +7,10 @@ import (
 
 // getTemplate returns the desired template. If the theme or template
 // does not exist, and an error is returned.
+// themeName (e.g. 'san-marzano')
+// template (e.g. 'index.html')
 func (m *Module) getTemplate(themeName string, template string) (*models.ThemeTemplate, error) {
-	store, theme, err := m.getTheme(themeName)
+	theme, err := m.getTheme(themeName)
 	if err != nil {
 		return nil, err
 	}
@@ -16,12 +18,12 @@ func (m *Module) getTemplate(themeName string, template string) (*models.ThemeTe
 		return nil, errors.New("content: theme %q not found", themeName)
 	}
 
-	tmpl, err := store.GetTemplate(theme, template)
+	tmpl, err := theme.GetTemplate(template)
 	if err != nil {
 		return nil, err
 	}
 	if tmpl == nil {
-		return nil, errors.New("content: template %q not found for theme %q", template, theme.GetName())
+		return nil, errors.New("content: template %q not found for theme %q", template, theme.Proto().GetName())
 	}
 	return tmpl, nil
 }

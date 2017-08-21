@@ -34,11 +34,7 @@ export default class LoginPage extends AuthController {
     });
   }
 
-  static oninit(v: Mithril.Vnode<{}, LoginPage>) {
-    v.state = new LoginPage();
-  }
-  static view(v: Mithril.Vnode<{}, LoginPage>) {
-    let ctrl = v.state;
+  view() {
     return m('.login',
       Toaster.render(),
       m('.login-logo', 'Ketchup'),
@@ -47,27 +43,27 @@ export default class LoginPage extends AuthController {
         m('form', {
           onsubmit: (event: Event) => {
             event.preventDefault();
-            ctrl.login();
+            this.login();
           }
         }, [
             m('div',
               m('input[type=text]', {
                 placeholder: 'email',
-                onchange: m.withAttr('value', (val) => ctrl.email = val)
+                onchange: m.withAttr('value', (val) => this.email = val)
               }),
             ),
             m('div',
               m('input[type=password]', {
                 placeholder: 'password',
-                onchange: m.withAttr('value', (val) => ctrl.password = val)
+                onchange: m.withAttr('value', (val) => this.password = val)
               })
             ),
             m('button.button.button--green', 'Log In'),
-            m('.button.small', {
-              onclick: () => ctrl.showReset = true
+            m('.button.txt-small', {
+              onclick: () => this.showReset = true
             }, 'Forgot your password?')
           ]),
-        !ctrl.showReset ? '' : m('.reset',
+        !this.showReset ? '' : m('.reset',
           m('p', 'You can reset your password in the command-line using the following command:'),
           m('pre', './ketchup users:password youremail@gmail.com')
         )
@@ -75,5 +71,3 @@ export default class LoginPage extends AuthController {
     );
   }
 }
-
-let _: Mithril.Component<{}, LoginPage> = LoginPage;

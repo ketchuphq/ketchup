@@ -1,32 +1,36 @@
 import * as API from 'lib/api';
 import * as m from 'mithril';
 
-export default class Theme implements API.Theme {
-  name: string;
-  templates: { [key: string]: API.ThemeTemplate };
-  assets: { [key: string]: API.ThemeAsset };
+export default class Theme extends API.Theme {
+  ref: string;
 
-  constructor(config?: API.Theme) {
-    this.templates = {};
-    this.assets = {};
-    if (config) {
-      this.name = config.name;
-      this.templates = config.templates || {};
-      this.assets = config.assets || {};
-    }
+  constructor(config?: API.Theme, ref?: string) {
+    super();
+    API.Theme.copy(config, this);
+    this.templates = this.templates || {};
+    this.assets = this.assets || {};
+    this.ref = ref;
   }
 
   getTemplate(name: string): API.ThemeTemplate {
     return this.templates[name];
   }
 
-  static get(name: string): Promise<Theme> {
-    return m.request({
+  checkForUpdates() {
+    return m.request<API.CheckThemeForUpdateResponse>({
       method: 'GET',
-      url: `/api/v1/themes/${name}`
-    })
-      .then((data: Theme) => {
-        return new Theme(data);
+      url: `/api/v1/themes/${this.name}/updates`
+    });
+  }
+
+  static get(name: string): Promise<Theme> {
+    return m
+      .request({
+        method: 'GET',
+        url: `/api/v1/themes/${name}`
+      })
+      .then((data: API.GetThemeResponse) => {
+        return new Theme(data.theme, data.ref);
       });
   }
 
@@ -45,25 +49,37 @@ export default class Theme implements API.Theme {
   }
 
   static install(p: API.Package): Promise<API.Registry> {
+    let data: API.InstallThemeRequest = {
+      name: p.name,
+      vcsUrl: p.vcsUrl
+    };
+
     return m.request({
       method: 'POST',
       url: '/api/v1/theme-install',
       background: true,
-      data: {
-        package: p.name // different id?
-      }
+      data: data
     });
   }
 
   static list(): Promise<Theme[]> {
-    return m.request({
-      method: 'GET',
-      url: '/api/v1/themes'
-    })
+    return m
+      .request({
+        method: 'GET',
+        url: '/api/v1/themes'
+      })
       .then((data: { themes: API.ThemeTemplate[] }) => {
         if (!data.themes) {
           return [];
         }
+        for (let i = 0; i < data.themes.length; i++) {
+          if (data.themes[i].name == 'none') {
+            let none = data.themes.splice(i, 1)[0];
+            data.themes.push(none);
+            break;
+          }
+        }
+
         return data.themes.map((el) => new Theme(el));
       });
   }

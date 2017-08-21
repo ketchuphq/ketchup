@@ -1,18 +1,21 @@
+import * as m from 'mithril';
 import msx from 'lib/msx';
+import { BaseComponent } from 'components/auth';
 
 interface PopoverAttrs {
   visible: boolean;
 }
 
-export default class Popover {
-  private readonly _attrs: PopoverAttrs;
-
-  static view({ attrs: {visible}, children }: Mithril.Vnode<PopoverAttrs, {}>) {
-    if (!visible) {
-      return;
+export default class Popover extends BaseComponent<PopoverAttrs> {
+  view(v: m.CVnode<PopoverAttrs>) {
+    let klass = 'popover-outer';
+    if (!v.attrs.visible) {
+      klass += ' popover-outer-hidden';
     }
-    return <div class='popover-outer'>
-      <div class='popover'>{children}</div>
-    </div>;
+    return (
+      <div class={klass}>
+        <div class='popover'>{v.children}</div>
+      </div>
+    );
   }
 }

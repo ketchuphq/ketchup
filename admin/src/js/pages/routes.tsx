@@ -1,25 +1,22 @@
 import msx from 'lib/msx';
 import * as m from 'mithril';
 import Route from 'lib/route';
+import { BaseComponent } from 'components/auth';
 
-export default class RoutesPage {
+export default class RoutesPage extends BaseComponent {
   routes: Route[];
 
-  constructor() {
+  constructor(v: any) {
+    super(v);
     this.routes = [];
     Route.list().then((data) => this.routes = data);
   }
 
-  static oninit(v: Mithril.Vnode<{}, RoutesPage>) {
-    v.state = new RoutesPage();
-  }
-
-  static view(v: Mithril.Vnode<{}, RoutesPage>) {
-    let ctrl = v.state;
+  view() {
     return <div class='routes'>
       <h1>Routes</h1>
       <div class='table'>
-        {ctrl.routes.map((r) =>
+        {this.routes.map((r) =>
           <div class='tr'>
             <a href={r.path ? r.path : '#'}>{r.path}</a>
             {
