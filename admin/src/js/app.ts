@@ -24,7 +24,7 @@ export let routes: m.RouteDefs = {
   '/admin/compose': Layout(PagePage),
   '/admin/themes': Layout(ThemesPage),
   '/admin/themes/:name': Layout(ThemePage),
-  '/admin/themes/:name/templates/:template': Layout(TemplatePage),
+  '/admin/themes/:name/templates/:template...': Layout(TemplatePage),
   '/admin/themes-install': Layout(InstallThemePage),
   '/admin/login': LoginPage,
   '/admin/settings': Layout(SettingsPage),
