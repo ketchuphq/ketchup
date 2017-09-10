@@ -8,9 +8,9 @@ import (
 	"sync"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/octavore/nagax/util/errors"
 
 	"github.com/ketchuphq/ketchup/proto/ketchup/packages"
-	"github.com/ketchuphq/ketchup/util/errors"
 )
 
 type Registry struct {

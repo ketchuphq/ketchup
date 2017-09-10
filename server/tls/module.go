@@ -13,11 +13,11 @@ import (
 	"github.com/octavore/naga/service"
 	"github.com/octavore/nagax/keystore"
 	"github.com/octavore/nagax/logger"
+	"github.com/octavore/nagax/util/errors"
 	"github.com/xenolf/lego/acme"
 
 	"github.com/ketchuphq/ketchup/server/config"
 	"github.com/ketchuphq/ketchup/server/router"
-	"github.com/ketchuphq/ketchup/util/errors"
 )
 
 const (

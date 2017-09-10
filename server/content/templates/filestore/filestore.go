@@ -11,12 +11,12 @@ import (
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
+	"github.com/octavore/nagax/util/errors"
 
 	"github.com/ketchuphq/ketchup/plugins/pkg"
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 	"github.com/ketchuphq/ketchup/proto/ketchup/packages"
 	"github.com/ketchuphq/ketchup/server/content/templates/store"
-	"github.com/ketchuphq/ketchup/util/errors"
 )
 
 const (

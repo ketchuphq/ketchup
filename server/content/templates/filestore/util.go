@@ -7,10 +7,10 @@ import (
 	"path"
 
 	"github.com/golang/protobuf/jsonpb"
+	"github.com/octavore/nagax/util/errors"
 	git "gopkg.in/src-d/go-git.v4"
 
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
-	"github.com/ketchuphq/ketchup/util/errors"
 )
 
 type themeFile interface {

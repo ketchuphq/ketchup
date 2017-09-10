@@ -7,11 +7,11 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/octavore/nagax/router"
+	"github.com/octavore/nagax/util/errors"
 
 	"github.com/ketchuphq/ketchup/db/bolt"
 	"github.com/ketchuphq/ketchup/proto/ketchup/api"
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
-	"github.com/ketchuphq/ketchup/util/errors"
 )
 
 var defaultPlaceholders = []*models.Data{

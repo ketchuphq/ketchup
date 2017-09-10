@@ -3,9 +3,9 @@ package bolt
 import (
 	"github.com/boltdb/bolt"
 	"github.com/golang/protobuf/proto"
+	"github.com/octavore/nagax/util/errors"
 
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
-	"github.com/ketchuphq/ketchup/util/errors"
 )
 
 const DATA_BUCKET = "data"

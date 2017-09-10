@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"html/template"
 
+	"github.com/octavore/nagax/util/errors"
 	"github.com/russross/blackfriday"
 
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
-	"github.com/ketchuphq/ketchup/util/errors"
 )
 
 type ErrUnknownContentType struct {

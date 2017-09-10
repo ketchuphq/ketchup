@@ -3,10 +3,11 @@ package content
 import (
 	"io"
 
+	"github.com/octavore/nagax/util/errors"
+
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 	"github.com/ketchuphq/ketchup/server/content/content"
 	"github.com/ketchuphq/ketchup/server/content/context"
-	"github.com/ketchuphq/ketchup/util/errors"
 )
 
 func (m *Module) render(w io.Writer, page *models.Page) error {

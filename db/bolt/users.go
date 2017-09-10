@@ -3,10 +3,10 @@ package bolt
 import (
 	"github.com/boltdb/bolt"
 	"github.com/golang/protobuf/proto"
+	"github.com/octavore/nagax/util/errors"
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
-	"github.com/ketchuphq/ketchup/util/errors"
 )
 
 const USER_BUCKET = "users"

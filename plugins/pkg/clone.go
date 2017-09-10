@@ -5,12 +5,12 @@ import (
 	"os"
 	"path"
 
+	"github.com/octavore/nagax/util/errors"
 	git "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 
 	"github.com/ketchuphq/ketchup/proto/ketchup/packages"
-	"github.com/ketchuphq/ketchup/util/errors"
 )
 
 // Clone the given package to {data_dir}/{dataSubdir}/{package name}

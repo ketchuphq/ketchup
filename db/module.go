@@ -4,8 +4,7 @@ import (
 	"fmt"
 
 	"github.com/octavore/naga/service"
-
-	"github.com/ketchuphq/ketchup/util/errors"
+	"github.com/octavore/nagax/util/errors"
 )
 
 type Module struct {

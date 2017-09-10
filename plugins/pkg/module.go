@@ -14,10 +14,10 @@ import (
 	"strings"
 
 	"github.com/octavore/naga/service"
+	"github.com/octavore/nagax/util/errors"
 
 	"github.com/ketchuphq/ketchup/proto/ketchup/packages"
 	"github.com/ketchuphq/ketchup/server/config"
-	"github.com/ketchuphq/ketchup/util/errors"
 )
 
 // Module pkg manages downloading pkg

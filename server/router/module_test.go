@@ -10,10 +10,10 @@ import (
 	"github.com/octavore/naga/service"
 	"github.com/octavore/nagax/router"
 	"github.com/octavore/nagax/router/middleware"
+	"github.com/octavore/nagax/util/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
-	"github.com/ketchuphq/ketchup/util/errors"
 	"github.com/ketchuphq/ketchup/util/testutil/memlogger"
 )
 

@@ -7,10 +7,10 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/octavore/nagax/router"
 	"github.com/octavore/nagax/users"
+	"github.com/octavore/nagax/util/errors"
 
 	"github.com/ketchuphq/ketchup/proto/ketchup/api"
 	"github.com/ketchuphq/ketchup/server/tls"
-	"github.com/ketchuphq/ketchup/util/errors"
 )
 
 func (m *Module) GetUser(rw http.ResponseWriter, req *http.Request, par router.Params) error {

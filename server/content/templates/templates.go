@@ -1,8 +1,9 @@
 package templates
 
 import (
+	"github.com/octavore/nagax/util/errors"
+
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
-	"github.com/ketchuphq/ketchup/util/errors"
 )
 
 // getTemplate returns the desired template. If the theme or template
