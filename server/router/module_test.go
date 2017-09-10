@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/octavore/naga/service"
+	"github.com/octavore/nagax/router"
 	"github.com/octavore/nagax/router/middleware"
 	"github.com/stretchr/testify/assert"
 
@@ -50,7 +51,7 @@ func setup() testEnv {
 func TestSubrouter(t *testing.T) {
 	te := setup()
 	defer te.stop()
-	te.module.HandleFunc("/test-path", func(rw http.ResponseWriter, req *http.Request) {
+	te.module.Handle("GET", "/test-path", func(rw http.ResponseWriter, req *http.Request) {
 		rw.Write([]byte("good night"))
 	})
 
@@ -60,17 +61,17 @@ func TestSubrouter(t *testing.T) {
 	})
 
 	rw := httptest.NewRecorder()
-	te.module.ServeHTTP(rw, httptest.NewRequest("GET", "/not-a-path", nil))
+	te.module.Middleware.ServeHTTP(rw, httptest.NewRequest("GET", "/not-a-path", nil))
 	assert.Equal(t, 404, rw.Code)
 	assert.Equal(t, "404 page not found\n", rw.Body.String())
 
 	rw = httptest.NewRecorder()
-	te.module.ServeHTTP(rw, httptest.NewRequest("GET", "/test-path", nil))
+	te.module.Middleware.ServeHTTP(rw, httptest.NewRequest("GET", "/test-path", nil))
 	assert.Equal(t, 200, rw.Code)
 	assert.Equal(t, "good night", rw.Body.String())
 
 	rw = httptest.NewRecorder()
-	te.module.ServeHTTP(rw, httptest.NewRequest("GET", "/sub/path", nil))
+	te.module.Middleware.ServeHTTP(rw, httptest.NewRequest("GET", "/sub/path", nil))
 	assert.Equal(t, 200, rw.Code)
 	assert.Equal(t, "hello world", rw.Body.String())
 }
@@ -82,7 +83,7 @@ func TestProto(t *testing.T) {
 	user := &models.User{
 		Uuid: proto.String("1234"),
 	}
-	err := Proto(rw, user)
+	err := router.ProtoOK(rw, user)
 	if assert.NoError(t, err) {
 		assert.JSONEq(t, `{"uuid":"1234"}`, rw.Body.String())
 	}
@@ -105,7 +106,7 @@ func TestInternalError(t *testing.T) {
 	defer te.stop()
 
 	rw := httptest.NewRecorder()
-	te.module.InternalError(rw, ErrNotFound)
+	te.module.InternalError(rw, router.ErrNotFound)
 	assert.Equal(t, 404, rw.Code, "expected code 404 but got %v", rw.Code)
 	assert.Equal(t, 0, te.logger.Count())
 

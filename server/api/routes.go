@@ -6,12 +6,11 @@ import (
 	"strings"
 
 	"github.com/golang/protobuf/jsonpb"
-	"github.com/julienschmidt/httprouter"
+	"github.com/octavore/nagax/router"
 
 	"github.com/ketchuphq/ketchup/db"
 	"github.com/ketchuphq/ketchup/proto/ketchup/api"
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
-	"github.com/ketchuphq/ketchup/server/router"
 	"github.com/ketchuphq/ketchup/util/errors"
 )
 
@@ -38,7 +37,7 @@ func formatRoute(r *models.Route) *models.Route {
 }
 
 // ListRoutes returns all routes.
-func (m *Module) ListRoutes(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+func (m *Module) ListRoutes(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	opts := &api.ListRouteRequest{}
 	err := req.ParseForm()
 	if err != nil {
@@ -52,13 +51,13 @@ func (m *Module) ListRoutes(rw http.ResponseWriter, req *http.Request, par httpr
 	if err != nil {
 		return err
 	}
-	return router.Proto(rw, &api.ListRouteResponse{
+	return router.ProtoOK(rw, &api.ListRouteResponse{
 		Routes: db.SortRoutesByPath(routes),
 	})
 }
 
 // ListRoutesByPage returns all routes for a given page, identified by uuid in the parameter.
-func (m *Module) ListRoutesByPage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+func (m *Module) ListRoutesByPage(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	pageUUID := par.ByName("uuid")
 	routes, err := m.DB.ListRoutes(&api.ListRouteRequest{
 		Options: &api.ListRouteRequest_ListRouteOptions{
@@ -68,14 +67,14 @@ func (m *Module) ListRoutesByPage(rw http.ResponseWriter, req *http.Request, par
 	if err != nil {
 		return err
 	}
-	return router.Proto(rw, &api.ListRouteResponse{
+	return router.ProtoOK(rw, &api.ListRouteResponse{
 		Routes: db.SortRoutesByPath(routes),
 	})
 }
 
 // UpdateRoute updates the given route. The path is sanitized, and the content router is
 // reloaded after the route is saved.
-func (m *Module) UpdateRoute(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+func (m *Module) UpdateRoute(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	route := &models.Route{}
 	err := jsonpb.Unmarshal(req.Body, route)
 	if err != nil {
@@ -89,11 +88,11 @@ func (m *Module) UpdateRoute(rw http.ResponseWriter, req *http.Request, par http
 	if err != nil {
 		return nil
 	}
-	return router.Proto(rw, route)
+	return router.ProtoOK(rw, route)
 }
 
 // DeleteRoute deletes the given route.
-func (m *Module) DeleteRoute(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+func (m *Module) DeleteRoute(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	routeUUID := par.ByName("uuid")
 	r, err := m.DB.GetRoute(routeUUID)
 	if err != nil {
@@ -104,7 +103,7 @@ func (m *Module) DeleteRoute(rw http.ResponseWriter, req *http.Request, par http
 
 // UpdateRoutesByPage takes a list of routes and sets it for the given page, deleting
 // any existing routes that aren't in the new list.
-func (m *Module) UpdateRoutesByPage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+func (m *Module) UpdateRoutesByPage(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	pageUUID := par.ByName("uuid")
 	pb := &api.UpdatePageRoutesRequest{}
 	err := jsonpb.Unmarshal(req.Body, pb)

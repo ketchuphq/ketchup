@@ -5,17 +5,16 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/jsonpb"
-	"github.com/julienschmidt/httprouter"
+	"github.com/octavore/nagax/router"
 
 	"github.com/ketchuphq/ketchup/db"
 	"github.com/ketchuphq/ketchup/db/bolt"
 	"github.com/ketchuphq/ketchup/proto/ketchup/api"
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 	"github.com/ketchuphq/ketchup/proto/structpb"
-	"github.com/ketchuphq/ketchup/server/router"
 )
 
-func (m *Module) getPage(par httprouter.Params, fn func(*models.Page) error) (*models.Page, error) {
+func (m *Module) getPage(par router.Params, fn func(*models.Page) error) (*models.Page, error) {
 	uuid := par.ByName("uuid")
 	if uuid == "" {
 		return nil, router.ErrNotFound
@@ -36,15 +35,15 @@ func (m *Module) getPage(par httprouter.Params, fn func(*models.Page) error) (*m
 
 // GetPage gets a page by UUID.
 // todo: nest response?
-func (m *Module) GetPage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+func (m *Module) GetPage(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	page, err := m.getPage(par, func(*models.Page) error { return nil })
 	if err != nil {
 		return err
 	}
-	return router.Proto(rw, page)
+	return router.ProtoOK(rw, page)
 }
 
-func (m *Module) GetRenderedPage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+func (m *Module) GetRenderedPage(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	opts := &api.GetRenderedPageRequest{}
 	err := req.ParseForm()
 	if err != nil {
@@ -76,13 +75,13 @@ func (m *Module) GetRenderedPage(rw http.ResponseWriter, req *http.Request, par 
 		}
 	}
 
-	return m.Router.JSON(rw, http.StatusOK, contents)
+	return router.JSON(rw, http.StatusOK, contents)
 }
 
 // ListPages returns all pages, sorted by updated at.
 // todo: pagination, filtering
 // todo: error handling?
-func (m *Module) ListPages(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+func (m *Module) ListPages(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	opts := &api.ListPageRequest{}
 	err := req.ParseForm()
 	if err != nil {
@@ -97,14 +96,14 @@ func (m *Module) ListPages(rw http.ResponseWriter, req *http.Request, par httpro
 		return err
 	}
 	db.SortPagesByUpdatedAt(pages, false)
-	return router.Proto(rw, &api.ListPageResponse{
+	return router.ProtoOK(rw, &api.ListPageResponse{
 		Pages: pages,
 	})
 }
 
 // UpdatePage saves the given page to the DB.
 // todo: nest response?
-func (m *Module) UpdatePage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+func (m *Module) UpdatePage(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	page := &models.Page{}
 	// use jsonpb.unmarshal to correct unmarshal int64 e.g. PublishedAt
 	err := jsonpb.Unmarshal(req.Body, page)
@@ -119,11 +118,11 @@ func (m *Module) UpdatePage(rw http.ResponseWriter, req *http.Request, par httpr
 	if err != nil {
 		return err
 	}
-	return router.Proto(rw, page)
+	return router.ProtoOK(rw, page)
 }
 
 // PublishPage sets the published time on a page to the current time.
-func (m *Module) PublishPage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+func (m *Module) PublishPage(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	page, err := m.getPage(par, func(page *models.Page) error {
 		// already published
 		if page.PublishedAt != nil {
@@ -142,11 +141,11 @@ func (m *Module) PublishPage(rw http.ResponseWriter, req *http.Request, par http
 	if err != nil {
 		return err
 	}
-	return router.Proto(rw, page)
+	return router.ProtoOK(rw, page)
 }
 
 // UnpublishPage sets published at to null, effectively unpublishing the page.
-func (m *Module) UnpublishPage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+func (m *Module) UnpublishPage(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	page, err := m.getPage(par, func(page *models.Page) error {
 		page.PublishedAt = nil
 		err := m.DB.UpdatePage(page)
@@ -158,11 +157,11 @@ func (m *Module) UnpublishPage(rw http.ResponseWriter, req *http.Request, par ht
 	if err != nil {
 		return err
 	}
-	return router.Proto(rw, page)
+	return router.ProtoOK(rw, page)
 }
 
 // DeletePage deletes the given page.
-func (m *Module) DeletePage(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+func (m *Module) DeletePage(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	uuid := par.ByName("uuid")
 	page, err := m.DB.GetPage(uuid)
 	if _, ok := err.(bolt.ErrNoKey); ok {

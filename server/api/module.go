@@ -5,9 +5,9 @@ import (
 	"reflect"
 
 	"github.com/gorilla/schema"
-	"github.com/julienschmidt/httprouter"
 	"github.com/octavore/naga/service"
 	"github.com/octavore/nagax/logger"
+	router2 "github.com/octavore/nagax/router"
 
 	"github.com/ketchuphq/ketchup/db"
 	"github.com/ketchuphq/ketchup/proto/ketchup/api"
@@ -50,11 +50,10 @@ func (m *Module) Init(c *service.Config) {
 				v := api.ListPageRequest_ListPageFilter_value[val]
 				return reflect.ValueOf(v)
 			})
-
-		r := m.Router.Subrouter("/api/v1/")
+		auth := m.Auth.Auth.MustWithAuth
 		routes := []struct {
 			path, method string
-			handle       users.Handle
+			handle       router2.Handle
 		}{
 			{"/api/v1/pages/:uuid", methodGet, m.GetPage},
 			{"/api/v1/pages/:uuid/contents", methodGet, m.GetRenderedPage},
@@ -62,53 +61,44 @@ func (m *Module) Init(c *service.Config) {
 			{"/api/v1/data/:key", methodGet, m.GetData},
 			{"/api/v1/pages", methodGet, m.ListPages},
 			{"/api/v1/routes", methodGet, m.ListRoutes},
-			{"/api/v1/data", methodGet, m.Auth.MustWithAuth(m.ListData)},
+			{"/api/v1/data", methodGet, auth(m.ListData)},
 
-			{"/api/v1/user", methodGet, m.Auth.MustWithAuth(m.GetUser)},
-			{"/api/v1/settings/info", methodGet, m.Auth.MustWithAuth(m.GetInfo)},
-			{"/api/v1/settings/tls", methodGet, m.Auth.MustWithAuth(m.GetTLS)},
-			{"/api/v1/settings/tls", methodPost, m.Auth.MustWithAuth(m.EnableTLS)},
+			{"/api/v1/user", methodGet, auth(m.GetUser)},
+			{"/api/v1/settings/info", methodGet, auth(m.GetInfo)},
+			{"/api/v1/settings/tls", methodGet, auth(m.GetTLS)},
+			{"/api/v1/settings/tls", methodPost, auth(m.EnableTLS)},
 
-			{"/api/v1/themes", methodGet, m.Auth.MustWithAuth(m.ListThemes)},
-			{"/api/v1/themes/:name", methodGet, m.Auth.MustWithAuth(m.GetTheme)},
-			{"/api/v1/themes/:name/updates", methodGet, m.Auth.MustWithAuth(m.CheckThemeForUpdate)},
-			{"/api/v1/themes/:name/update", methodPost, m.Auth.MustWithAuth(m.UpdateTheme)},
-			{"/api/v1/themes/:name/templates/:template", methodGet, m.Auth.MustWithAuth(m.GetTemplate)},
-			{"/api/v1/theme-registry", methodGet, m.Auth.MustWithAuth(m.ThemeRegistry)},
-			{"/api/v1/theme-install", methodPost, m.Auth.MustWithAuth(m.InstallTheme)},
+			{"/api/v1/themes", methodGet, auth(m.ListThemes)},
+			{"/api/v1/themes/:name", methodGet, auth(m.GetTheme)},
+			{"/api/v1/themes/:name/updates", methodGet, auth(m.CheckThemeForUpdate)},
+			{"/api/v1/themes/:name/update", methodPost, auth(m.UpdateTheme)},
+			{"/api/v1/themes/:name/templates/:template", methodGet, auth(m.GetTemplate)},
+			{"/api/v1/theme-registry", methodGet, auth(m.ThemeRegistry)},
+			{"/api/v1/theme-install", methodPost, auth(m.InstallTheme)},
 
-			{"/api/v1/pages", methodPost, m.Auth.MustWithAuth(m.UpdatePage)},
-			{"/api/v1/pages/:uuid", methodDelete, m.Auth.MustWithAuth(m.DeletePage)},
-			{"/api/v1/pages/:uuid/routes", methodPost, m.Auth.MustWithAuth(m.UpdateRoutesByPage)},
-			{"/api/v1/pages/:uuid/publish", methodPost, m.Auth.MustWithAuth(m.PublishPage)},
-			{"/api/v1/pages/:uuid/unpublish", methodPost, m.Auth.MustWithAuth(m.UnpublishPage)},
+			{"/api/v1/pages", methodPost, auth(m.UpdatePage)},
+			{"/api/v1/pages/:uuid", methodDelete, auth(m.DeletePage)},
+			{"/api/v1/pages/:uuid/routes", methodPost, auth(m.UpdateRoutesByPage)},
+			{"/api/v1/pages/:uuid/publish", methodPost, auth(m.PublishPage)},
+			{"/api/v1/pages/:uuid/unpublish", methodPost, auth(m.UnpublishPage)},
 
-			{"/api/v1/routes", methodPost, m.Auth.MustWithAuth(m.UpdateRoute)},
-			{"/api/v1/routes/:uuid", methodDelete, m.Auth.MustWithAuth(m.DeleteRoute)},
+			{"/api/v1/routes", methodPost, auth(m.UpdateRoute)},
+			{"/api/v1/routes/:uuid", methodDelete, auth(m.DeleteRoute)},
 
-			{"/api/v1/data", methodPost, m.Auth.MustWithAuth(m.UpdateData)},
-			{"/api/v1/data/:key", methodDelete, m.Auth.MustWithAuth(m.DeleteData)},
+			{"/api/v1/data", methodPost, auth(m.UpdateData)},
+			{"/api/v1/data/:key", methodDelete, auth(m.DeleteData)},
 
-			{"/api/v1/download-backup", methodGet, m.Auth.MustWithAuth(m.GetBackup)},
-			{"/api/v1/debug", methodGet, m.Auth.MustWithAuth(m.Debug)},
-			{"/api/v1/logout", methodGet, m.Auth.MustWithAuth(m.Logout)},
+			{"/api/v1/download-backup", methodGet, auth(m.GetBackup)},
+			{"/api/v1/debug", methodGet, auth(m.Debug)},
+			{"/api/v1/logout", methodGet, auth(m.Logout)},
 		}
 		for _, route := range routes {
-			r.Handle(route.method, route.path, m.wrap(route.handle))
+			m.Router.WrappedHandle(route.method, route.path, route.handle)
 		}
 		return nil
 	}
 }
 
-func (m *Module) wrap(h users.Handle) httprouter.Handle {
-	return func(rw http.ResponseWriter, req *http.Request, par httprouter.Params) {
-		err := h(rw, req, par)
-		if err != nil {
-			m.Router.InternalError(rw, err)
-		}
-	}
-}
-
-func (m *Module) Debug(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+func (m *Module) Debug(rw http.ResponseWriter, req *http.Request, par router2.Params) error {
 	return m.DB.Debug(rw)
 }

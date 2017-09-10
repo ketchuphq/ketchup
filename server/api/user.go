@@ -5,16 +5,15 @@ import (
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
-	"github.com/julienschmidt/httprouter"
+	"github.com/octavore/nagax/router"
 	"github.com/octavore/nagax/users"
 
 	"github.com/ketchuphq/ketchup/proto/ketchup/api"
-	"github.com/ketchuphq/ketchup/server/router"
 	"github.com/ketchuphq/ketchup/server/tls"
 	"github.com/ketchuphq/ketchup/util/errors"
 )
 
-func (m *Module) GetUser(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+func (m *Module) GetUser(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	userUUID, ok := req.Context().Value(users.UserTokenKey{}).(string)
 	if !ok {
 		m.Router.EmptyJSON(rw, http.StatusNotFound)
@@ -26,10 +25,10 @@ func (m *Module) GetUser(rw http.ResponseWriter, req *http.Request, par httprout
 	}
 	user.HashedPassword = nil
 	user.Token = nil
-	return router.Proto(rw, user)
+	return router.ProtoOK(rw, user)
 }
 
-func (m *Module) GetTLS(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+func (m *Module) GetTLS(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	domains, err := m.TLS.GetAllRegisteredDomains()
 	if err != nil {
 		return err
@@ -57,10 +56,10 @@ func (m *Module) GetTLS(rw http.ResponseWriter, req *http.Request, par httproute
 		TermsOfService: &tosURL,
 		HasCertificate: proto.Bool(crt != nil),
 	}
-	return m.Router.Proto(rw, http.StatusOK, res)
+	return router.ProtoOK(rw, res)
 }
 
-func (m *Module) EnableTLS(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+func (m *Module) EnableTLS(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	rpb := &api.EnableTLSRequest{}
 	err := jsonpb.Unmarshal(req.Body, rpb)
 	if err != nil {
@@ -89,10 +88,10 @@ func (m *Module) EnableTLS(rw http.ResponseWriter, req *http.Request, par httpro
 		AgreedOn:       &r.AgreedOn,
 		TermsOfService: &tosURL,
 	}
-	return m.Router.Proto(rw, http.StatusOK, res)
+	return router.ProtoOK(rw, res)
 }
 
-func (m *Module) Logout(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) error {
+func (m *Module) Logout(rw http.ResponseWriter, req *http.Request, _ router.Params) error {
 	m.Auth.Auth.Logout(rw, req)
 	return nil
 }

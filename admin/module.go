@@ -25,7 +25,7 @@ type Module struct {
 
 func (m *Module) Init(c *service.Config) {
 	c.Setup = func() error {
-		m.Router.Handle(basePath, m)
+		m.Router.Root.Handle(basePath, m)
 		return nil
 	}
 }

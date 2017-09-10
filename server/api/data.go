@@ -6,12 +6,11 @@ import (
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
-	"github.com/julienschmidt/httprouter"
+	"github.com/octavore/nagax/router"
 
 	"github.com/ketchuphq/ketchup/db/bolt"
 	"github.com/ketchuphq/ketchup/proto/ketchup/api"
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
-	"github.com/ketchuphq/ketchup/server/router"
 	"github.com/ketchuphq/ketchup/util/errors"
 )
 
@@ -55,7 +54,7 @@ func (m *Module) addAllPlaceholders(data []*models.Data) ([]*models.Data, error)
 	return data, nil
 }
 
-func (m *Module) ListData(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+func (m *Module) ListData(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	data, err := m.DB.ListData()
 	if err != nil {
 		return err
@@ -64,12 +63,12 @@ func (m *Module) ListData(rw http.ResponseWriter, req *http.Request, par httprou
 	if err != nil {
 		return err
 	}
-	return router.Proto(rw, &api.ListDataResponse{
+	return router.ProtoOK(rw, &api.ListDataResponse{
 		Data: data,
 	})
 }
 
-func (m *Module) GetData(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+func (m *Module) GetData(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	key := par.ByName("key")
 	if key == "" {
 		return router.ErrNotFound
@@ -81,10 +80,10 @@ func (m *Module) GetData(rw http.ResponseWriter, req *http.Request, par httprout
 	if err != nil {
 		return err
 	}
-	return router.Proto(rw, data)
+	return router.ProtoOK(rw, data)
 }
 
-func (m *Module) DeleteData(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+func (m *Module) DeleteData(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	key := par.ByName("key")
 	if key == "" {
 		return router.ErrNotFound
@@ -92,7 +91,7 @@ func (m *Module) DeleteData(rw http.ResponseWriter, req *http.Request, par httpr
 	return m.DB.DeleteData(&models.Data{Key: &key})
 }
 
-func (m *Module) UpdateData(rw http.ResponseWriter, req *http.Request, par httprouter.Params) error {
+func (m *Module) UpdateData(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	rpb := &api.UpdateDataRequest{}
 	err := jsonpb.Unmarshal(req.Body, rpb)
 	if err != nil {

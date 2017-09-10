@@ -73,7 +73,7 @@ Required params: domain to provision a cert for; contact email for Let's Encrypt
 		if os.IsNotExist(err) {
 			err = os.MkdirAll(dir, 0700)
 		}
-		m.Router.Handle(challengeBasePath, m)
+		m.Router.Handle("GET", challengeBasePath, m.ServeHTTP)
 		return err
 	}
 	c.Start = func() {

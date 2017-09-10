@@ -8,10 +8,10 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/julienschmidt/httprouter"
+	"github.com/octavore/nagax/router"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
-	"github.com/ketchuphq/ketchup/server/router"
 )
 
 func TestGetData(t *testing.T) {

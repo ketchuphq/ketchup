@@ -1,14 +1,11 @@
 package router
 
 import (
-	"fmt"
 	"net/http"
 	"path"
 
 	"github.com/go-errors/errors"
-	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
-	"github.com/julienschmidt/httprouter"
 	"github.com/octavore/naga/service"
 	"github.com/octavore/nagax/logger"
 	"github.com/octavore/nagax/router"
@@ -18,14 +15,6 @@ import (
 	logger2 "github.com/ketchuphq/ketchup/server/router/middleware/logger"
 )
 
-var (
-	ErrNotFound = fmt.Errorf("not found")
-	JSON        = &jsonpb.Marshaler{
-		EnumsAsInts: false,
-		Indent:      "  ",
-	}
-)
-
 type Module struct {
 	*router.Module
 	Logger *logger.Module
@@ -33,6 +22,8 @@ type Module struct {
 
 func (m *Module) Init(c *service.Config) {
 	c.Setup = func() error {
+		m.Module.ErrorHandler = m.errorHandler
+
 		m.Module.Middleware.Set(
 			logger2.New(m.Logger.Infof),
 			gzip.Default,
@@ -41,27 +32,12 @@ func (m *Module) Init(c *service.Config) {
 	}
 }
 
-func (m *Module) Subrouter(path string) *httprouter.Router {
-	r := httprouter.New()
-	m.Handle(path, r)
-	return r
-}
-
-func (m *Module) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	m.Middleware.ServeHTTP(rw, req)
-}
-
-func Proto(rw http.ResponseWriter, pb proto.Message) error {
-	rw.Header().Set("Content-Type", "application/json")
-	err := JSON.Marshal(rw, pb)
-	if err != nil {
-		return fmt.Errorf("router: %v", err)
-	}
-	return nil
+func (m *Module) errorHandler(rw http.ResponseWriter, req *http.Request, err error) {
+	m.InternalError(rw, err)
 }
 
 func (m *Module) InternalError(rw http.ResponseWriter, err error) {
-	if err == ErrNotFound {
+	if err == router.ErrNotFound {
 		m.NotFound(rw)
 		return
 	}
@@ -74,8 +50,7 @@ func (m *Module) InternalError(rw http.ResponseWriter, err error) {
 	default:
 		m.Logger.Errorf("router: internal error %v", e)
 	}
-	rw.WriteHeader(http.StatusInternalServerError)
-	err = Proto(rw, &api.Error{
+	err = router.Proto(rw, http.StatusInternalServerError, &api.Error{
 		Code:   api.ErrorCode_INTERNAL_SERVER_ERROR.Enum(),
 		Detail: proto.String("Internal server error."),
 	})
@@ -86,7 +61,7 @@ func (m *Module) InternalError(rw http.ResponseWriter, err error) {
 
 func (m *Module) NotFound(rw http.ResponseWriter) {
 	rw.WriteHeader(http.StatusNotFound)
-	err := Proto(rw, &api.Error{
+	err := router.Proto(rw, http.StatusNotFound, &api.Error{
 		Code:   api.ErrorCode_NOT_FOUND.Enum(),
 		Detail: proto.String("Not found."),
 	})

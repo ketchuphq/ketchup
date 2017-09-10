@@ -33,7 +33,7 @@ func (m *Module) Init(c *service.Config) {
 		if err != nil {
 			panic(err)
 		}
-		m.Router.Handle("/", m)
+		m.Router.HTTPRouter.NotFound = m
 	}
 }
 

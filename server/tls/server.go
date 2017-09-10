@@ -66,7 +66,7 @@ func (m *Module) StartTLSProxy() error {
 	server := &http.Server{
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 30 * time.Second,
-		Handler:      m.Router,
+		Handler:      m.Router.Root,
 		TLSConfig:    tlsConfig, // needed for http/2
 	}
 
