@@ -1,6 +1,6 @@
 {
 	"comment": "",
-	"ignore": "test",
+	"ignore": "test appengine",
 	"package": [
 		{
 			"checksumSHA1": "7Ncpz6uCsQgFIrDCADflnyXqmYI=",
@@ -399,18 +399,6 @@
 			"revisionTime": "2016-05-02T21:53:29Z"
 		},
 		{
-			"checksumSHA1": "VhN9qC4BDEuRNDkrrYpvXWd5cAU=",
-			"path": "gopkg.in/src-d/go-billy.v2",
-			"revision": "52497601f113730d14baa00453674376fca22f22",
-			"revisionTime": "2017-05-17T08:25:08Z"
-		},
-		{
-			"checksumSHA1": "2K8DCd3BVwAInV8cSrmCF5vdpbo=",
-			"path": "gopkg.in/src-d/go-billy.v2/osfs",
-			"revision": "52497601f113730d14baa00453674376fca22f22",
-			"revisionTime": "2017-05-17T08:25:08Z"
-		},
-		{
 			"checksumSHA1": "OMS7bwaAYpmocTLflRC8ctukGo8=",
 			"path": "gopkg.in/src-d/go-billy.v3",
 			"revision": "c329b7bc7b9d24905d2bc1b85bfa29f7ae266314",
@@ -685,18 +673,6 @@
 			"path": "gopkg.in/warnings.v0",
 			"revision": "8a331561fe74dadba6edfc59f3be66c22c3b065d",
 			"revisionTime": "2016-08-15T18:11:09Z"
-		},
-		{
-			"checksumSHA1": "aEsO29szjBtc/visNSB6s0DnUfw=",
-			"path": "srcd.works/go-billy.v1",
-			"revision": "6ca1fd6ba86f5929a23633719f5fd413a0046998",
-			"revisionTime": "2016-12-15T10:38:17Z"
-		},
-		{
-			"checksumSHA1": "IXVaBwPljfDtkcvtf4I7wNR0380=",
-			"path": "srcd.works/go-billy.v1/os",
-			"revision": "6ca1fd6ba86f5929a23633719f5fd413a0046998",
-			"revisionTime": "2016-12-15T10:38:17Z"
 		}
 	],
 	"rootPath": "github.com/ketchuphq/ketchup"
