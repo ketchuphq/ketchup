@@ -111,76 +111,76 @@
 			"revisionTime": "2017-07-29T05:58:18Z"
 		},
 		{
-			"checksumSHA1": "6IQIEdv6QHOLstGWORHT1XpwBmA=",
+			"checksumSHA1": "GgplACYBGNktjuaI4mv4mwb9Ql8=",
 			"path": "github.com/octavore/nagax/config",
-			"revision": "310552f0c436a54bdcc71dda363eb15ba8695671",
-			"revisionTime": "2017-09-10T06:43:21Z"
+			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
+			"revisionTime": "2017-12-03T17:22:35Z"
 		},
 		{
 			"checksumSHA1": "y8F29tbOOg4ONGxSNj8izRh7jqc=",
 			"path": "github.com/octavore/nagax/keystore",
-			"revision": "310552f0c436a54bdcc71dda363eb15ba8695671",
-			"revisionTime": "2017-09-10T06:43:21Z"
+			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
+			"revisionTime": "2017-12-03T17:22:35Z"
 		},
 		{
 			"checksumSHA1": "PKWLv22VdLiBXs6yt2bo/6ox2Dk=",
 			"path": "github.com/octavore/nagax/logger",
-			"revision": "310552f0c436a54bdcc71dda363eb15ba8695671",
-			"revisionTime": "2017-09-10T06:43:21Z"
+			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
+			"revisionTime": "2017-12-03T17:22:35Z"
 		},
 		{
-			"checksumSHA1": "0FahT7naLEACNpJEP2+T0I9qbsU=",
+			"checksumSHA1": "l4VCCanXx9JSd+M5ukGnFCaNQNA=",
 			"path": "github.com/octavore/nagax/proto/nagax/router/api",
-			"revision": "310552f0c436a54bdcc71dda363eb15ba8695671",
-			"revisionTime": "2017-09-10T06:43:21Z"
+			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
+			"revisionTime": "2017-12-03T17:22:35Z"
 		},
 		{
-			"checksumSHA1": "Z6BaQ8F73gFc9gvMWC8mY9sEyPM=",
+			"checksumSHA1": "3nYE7J1Y3Lgf6MiFFzorK9WPbA0=",
 			"path": "github.com/octavore/nagax/router",
-			"revision": "310552f0c436a54bdcc71dda363eb15ba8695671",
-			"revisionTime": "2017-09-10T06:43:21Z"
+			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
+			"revisionTime": "2017-12-03T17:22:35Z"
 		},
 		{
-			"checksumSHA1": "6Yf3JzvfBRUCMG2YcXwYjqhOFrc=",
+			"checksumSHA1": "QNpbiwba3xVjqidAHSve5ARLbho=",
 			"path": "github.com/octavore/nagax/router/middleware",
-			"revision": "310552f0c436a54bdcc71dda363eb15ba8695671",
-			"revisionTime": "2017-09-10T06:43:21Z"
+			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
+			"revisionTime": "2017-12-03T17:22:35Z"
 		},
 		{
-			"checksumSHA1": "LbBN02Y2c5HaLzGQyB4GoFnAvvk=",
+			"checksumSHA1": "61pM8QMV/VT5cSA1nVYV4+Dlr60=",
 			"path": "github.com/octavore/nagax/users",
-			"revision": "310552f0c436a54bdcc71dda363eb15ba8695671",
-			"revisionTime": "2017-09-10T06:43:21Z"
+			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
+			"revisionTime": "2017-12-03T17:22:35Z"
 		},
 		{
 			"checksumSHA1": "iyJ/gwLZox9+kxN5BkwLEJENzmQ=",
 			"path": "github.com/octavore/nagax/users/databaseauth",
-			"revision": "310552f0c436a54bdcc71dda363eb15ba8695671",
-			"revisionTime": "2017-09-10T06:43:21Z"
+			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
+			"revisionTime": "2017-12-03T17:22:35Z"
 		},
 		{
 			"checksumSHA1": "OM9HoC9kgYgo4ix1kDPOpH/6xWw=",
 			"path": "github.com/octavore/nagax/users/session",
-			"revision": "310552f0c436a54bdcc71dda363eb15ba8695671",
-			"revisionTime": "2017-09-10T06:43:21Z"
+			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
+			"revisionTime": "2017-12-03T17:22:35Z"
 		},
 		{
-			"checksumSHA1": "cbMFGfrXASpo/HXRcYGerC/vdVg=",
+			"checksumSHA1": "877A3JWobCA8W3SChgs1l2Iv3zU=",
 			"path": "github.com/octavore/nagax/users/tokenauth",
-			"revision": "310552f0c436a54bdcc71dda363eb15ba8695671",
-			"revisionTime": "2017-09-10T06:43:21Z"
+			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
+			"revisionTime": "2017-12-03T17:22:35Z"
 		},
 		{
 			"checksumSHA1": "u6NQ8FODfj3rL3dBvfwirXFCbVM=",
 			"path": "github.com/octavore/nagax/util/errors",
-			"revision": "310552f0c436a54bdcc71dda363eb15ba8695671",
-			"revisionTime": "2017-09-10T06:43:21Z"
+			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
+			"revisionTime": "2017-12-03T17:22:35Z"
 		},
 		{
-			"checksumSHA1": "sQyhJKT3F3BNtASNMCslSAYqmkI=",
+			"checksumSHA1": "1S8sORNibTFMAC3dSaBGH2/bmMU=",
 			"path": "github.com/octavore/nagax/util/token",
-			"revision": "310552f0c436a54bdcc71dda363eb15ba8695671",
-			"revisionTime": "2017-09-10T06:43:21Z"
+			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
+			"revisionTime": "2017-12-03T17:22:35Z"
 		},
 		{
 			"checksumSHA1": "1R1x14YgUOFMbpS6aLg7IVF2Tds=",

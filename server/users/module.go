@@ -1,8 +1,6 @@
 package users
 
 import (
-	"net/http"
-
 	"github.com/octavore/naga/service"
 	"github.com/octavore/nagax/logger"
 	"github.com/octavore/nagax/router"
@@ -44,7 +42,6 @@ func (m *Module) Init(c *service.Config) {
 		m.Sessions.KeyFile = m.Config.DataPath("session.key", "session.key")
 		// todo: allow to be set in a config file
 		m.Sessions.CookieDomain = ""
-		m.Auth.ErrorHandler = m.ErrorHandler
 		m.Auth.RegisterAuthenticator(m.Sessions)
 
 		m.TokenAuth.Configure(
@@ -53,10 +50,4 @@ func (m *Module) Init(c *service.Config) {
 		m.Auth.RegisterAuthenticator(m.TokenAuth)
 		return nil
 	}
-}
-
-// ErrorHandler to handle auth errors.
-// todo: return more fine-grained error codes.
-func (m *Module) ErrorHandler(rw http.ResponseWriter, req *http.Request, err error) {
-	m.Router.SimpleError(rw, http.StatusInternalServerError, err)
 }

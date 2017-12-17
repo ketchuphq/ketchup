@@ -69,7 +69,7 @@ func (m *Module) EnableTLS(rw http.ResponseWriter, req *http.Request, par router
 	err = m.TLS.ObtainCert(rpb.GetTlsEmail(), rpb.GetTlsDomain())
 	if err != nil {
 		if errors.IsType(err, tls.LetsEncryptError{}) {
-			return m.Router.SimpleError(rw, http.StatusBadRequest, err)
+			return router.NewRequestError(req, http.StatusBadRequest, err.Error())
 		}
 		return errors.Wrap(err)
 	}
