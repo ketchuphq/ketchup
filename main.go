@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/octavore/naga/service"
 
 	"github.com/ketchuphq/ketchup/admin"
@@ -26,7 +28,16 @@ type App struct {
 	Bolt *bolt.Module
 }
 
-func (p *App) Init(c *service.Config) {}
+func (p *App) Init(c *service.Config) {
+	c.AddCommand(&service.Command{
+		Keyword:    "version",
+		ShortUsage: "Print version",
+		Usage:      "Print version",
+		Run: func(_ *service.CommandContext) {
+			fmt.Printf("version: %s\n", version)
+		},
+	})
+}
 
 func main() {
 	ketchup_version.Set(version)
