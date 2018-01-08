@@ -22,7 +22,7 @@ build-%:
 release: goreleaser.yml
 	goreleaser
 release-nr: goreleaser.yml
-	goreleaser -nr
+	goreleaser --skip-publish
 goreleaser.yml:
 	@cat ./goreleaser.yml.tmpl \
 		| sed -e "s,{GOPATH},$$GOPATH,g" \
