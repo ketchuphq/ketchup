@@ -107,8 +107,7 @@ func (m *Module) renewExpiredCerts() error {
 	for _, cert := range tlsConfig.Certificates {
 		x509Cert, err := x509.ParseCertificate(cert.Certificate[0])
 		if err != nil {
-			m.Logger.Error(err)
-			continue
+			return errors.Wrap(err)
 		}
 
 		expiration := x509Cert.NotAfter
@@ -118,12 +117,30 @@ func (m *Module) renewExpiredCerts() error {
 			m.Logger.Infof("expired cert: renewing cert for %s", domain)
 			r, err := m.GetRegistration(domain, false)
 			if err != nil {
-				return err
+				return errors.Wrap(err)
 			}
-			err = m.obtainCert(r)
+
+			cert, err := m.LoadCertResource(domain)
 			if err != nil {
-				return err
+				return errors.Wrap(err)
 			}
+			keyFile := path.Join(tlsDir, domain+".key")
+			keyBytes, _, err := m.keystore.LoadPrivateKey(keyFile)
+			if err != nil {
+				return errors.Wrap(err)
+			}
+			cert.PrivateKey = keyBytes
+			c, err := newAcmeClient(r, m)
+			if err != nil {
+				return errors.Wrap(err)
+			}
+
+			newCert, err := c.RenewCertificate(*cert, true, false)
+			if err != nil {
+				return errors.Wrap(err)
+			}
+			err = m.saveCert(newCert)
+			return errors.Wrap(err)
 		}
 	}
 	return nil

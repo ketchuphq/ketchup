@@ -27,27 +27,40 @@ func TestObtainCert(t *testing.T) {
 
 	cr, err := module.LoadCertResource("example.com")
 	assert.NoError(t, err)
-	assert.Equal(t, &acme.CertificateResource{Domain: "example.com"}, cr)
+	// CertURL is a hack only in tests
+	assert.Equal(t, &acme.CertificateResource{Domain: "example.com", CertURL: "x"}, cr)
 }
 
 func TestRenew(t *testing.T) {
+	domain := "example.com"
 	module, _ := setup(t)
-	err := module.ObtainCert("test@example.com", "example.com")
+
+	err := module.ObtainCert("test@example.com", domain)
 	assert.NoError(t, err)
-
-	registrationPath, _ := module.getCurrentRegistrationPath("example.com")
+	registrationPath, _ := module.getCurrentRegistrationPath(domain)
 	assert.Equal(t, "example.com-2017-01-01-v000.json", path.Base(registrationPath))
+	cert, err := module.LoadCertResource(domain)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(cert.CertURL))
 
+	// test noop renew
 	err = module.renewExpiredCerts()
-	registrationPath, _ = module.getCurrentRegistrationPath("example.com")
 	assert.NoError(t, err)
+	registrationPath, _ = module.getCurrentRegistrationPath(domain)
 	assert.Equal(t, "example.com-2017-01-01-v000.json", path.Base(registrationPath))
+	cert, err = module.LoadCertResource(domain)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(cert.CertURL))
 
+	// test valid renew
 	module.renewWithinInterval = time.Hour * 24 * 180
 	err = module.renewExpiredCerts()
-	registrationPath, _ = module.getCurrentRegistrationPath("example.com")
 	assert.NoError(t, err)
-	assert.Equal(t, "example.com-2017-01-01-v001.json", path.Base(registrationPath))
+	registrationPath, _ = module.getCurrentRegistrationPath(domain)
+	assert.Equal(t, "example.com-2017-01-01-v000.json", path.Base(registrationPath))
+	cert, err = module.LoadCertResource(domain)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(cert.CertURL))
 
 }
 

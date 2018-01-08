@@ -47,7 +47,7 @@ func (c *testAcmeClient) AgreeToTOS() error {
 	return nil
 }
 
-func (c *testAcmeClient) ObtainCertificate(domains []string, bundle bool, privKey crypto.PrivateKey, mustStaple bool) (acme.CertificateResource, map[string]error) {
+func newCert(domain string, privKey crypto.PrivateKey, certURL string) (acme.CertificateResource, error) {
 	var pubKey interface{}
 	if k, ok := privKey.(*rsa.PrivateKey); ok {
 		pubKey = &k.PublicKey
@@ -59,10 +59,10 @@ func (c *testAcmeClient) ObtainCertificate(domains []string, bundle bool, privKe
 		SerialNumber: big.NewInt(1234),
 		Subject: pkix.Name{
 			Country:    []string{"US"},
-			CommonName: domains[0],
+			CommonName: domain,
 		},
 		NotBefore: now(),
-		NotAfter:  now().AddDate(0, 0, 90),
+		NotAfter:  now().AddDate(0, 0, 1),
 	}
 
 	certBytes, err := x509.CreateCertificate(rand.Reader, cert, cert, pubKey, privKey)
@@ -74,10 +74,25 @@ func (c *testAcmeClient) ObtainCertificate(domains []string, bundle bool, privKe
 	if err != nil {
 		panic(err)
 	}
+	// certURL is a hack to store some metadata that the test can check
 	return acme.CertificateResource{
-		Domain:      domains[0],
+		Domain:      domain,
+		CertURL:     certURL,
 		Certificate: buf.Bytes(),
 	}, nil
+}
+
+func (c *testAcmeClient) ObtainCertificate(domains []string, bundle bool, privKey crypto.PrivateKey, mustStaple bool) (acme.CertificateResource, map[string]error) {
+	cert, _ := newCert(domains[0], privKey, "x")
+	return cert, nil
+}
+
+func (c *testAcmeClient) RenewCertificate(cert acme.CertificateResource, bundle bool, mustStaple bool) (acme.CertificateResource, error) {
+	privKey, err := x509.ParsePKCS1PrivateKey(cert.PrivateKey)
+	if err != nil {
+		return acme.CertificateResource{}, err
+	}
+	return newCert(cert.Domain, privKey, cert.CertURL+"x")
 }
 
 func newTestAcmeClient(user acme.User, cp acme.ChallengeProvider) (acmeClient, error) {

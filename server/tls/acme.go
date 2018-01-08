@@ -11,6 +11,7 @@ type acmeClient interface {
 	Register() (*acme.RegistrationResource, error)
 	AgreeToTOS() error
 	ObtainCertificate([]string, bool, crypto.PrivateKey, bool) (acme.CertificateResource, map[string]error)
+	RenewCertificate(cert acme.CertificateResource, bundle, mustStaple bool) (acme.CertificateResource, error)
 }
 
 type legoAcme struct {
