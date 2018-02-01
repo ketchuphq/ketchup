@@ -113,74 +113,74 @@
 		{
 			"checksumSHA1": "GgplACYBGNktjuaI4mv4mwb9Ql8=",
 			"path": "github.com/octavore/nagax/config",
-			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
-			"revisionTime": "2017-12-03T17:22:35Z"
+			"revision": "29425b57852c0f97839a8f4c447c68e6cf27f5e3",
+			"revisionTime": "2018-01-23T13:51:37Z"
 		},
 		{
 			"checksumSHA1": "y8F29tbOOg4ONGxSNj8izRh7jqc=",
 			"path": "github.com/octavore/nagax/keystore",
-			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
-			"revisionTime": "2017-12-03T17:22:35Z"
+			"revision": "29425b57852c0f97839a8f4c447c68e6cf27f5e3",
+			"revisionTime": "2018-01-23T13:51:37Z"
 		},
 		{
 			"checksumSHA1": "PKWLv22VdLiBXs6yt2bo/6ox2Dk=",
 			"path": "github.com/octavore/nagax/logger",
-			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
-			"revisionTime": "2017-12-03T17:22:35Z"
+			"revision": "29425b57852c0f97839a8f4c447c68e6cf27f5e3",
+			"revisionTime": "2018-01-23T13:51:37Z"
 		},
 		{
 			"checksumSHA1": "l4VCCanXx9JSd+M5ukGnFCaNQNA=",
 			"path": "github.com/octavore/nagax/proto/nagax/router/api",
-			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
-			"revisionTime": "2017-12-03T17:22:35Z"
+			"revision": "29425b57852c0f97839a8f4c447c68e6cf27f5e3",
+			"revisionTime": "2018-01-23T13:51:37Z"
 		},
 		{
-			"checksumSHA1": "3nYE7J1Y3Lgf6MiFFzorK9WPbA0=",
+			"checksumSHA1": "f3d67YmCDfhhqMixcXF7cVoecAA=",
 			"path": "github.com/octavore/nagax/router",
-			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
-			"revisionTime": "2017-12-03T17:22:35Z"
+			"revision": "29425b57852c0f97839a8f4c447c68e6cf27f5e3",
+			"revisionTime": "2018-01-23T13:51:37Z"
 		},
 		{
 			"checksumSHA1": "QNpbiwba3xVjqidAHSve5ARLbho=",
 			"path": "github.com/octavore/nagax/router/middleware",
-			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
-			"revisionTime": "2017-12-03T17:22:35Z"
+			"revision": "29425b57852c0f97839a8f4c447c68e6cf27f5e3",
+			"revisionTime": "2018-01-23T13:51:37Z"
 		},
 		{
 			"checksumSHA1": "61pM8QMV/VT5cSA1nVYV4+Dlr60=",
 			"path": "github.com/octavore/nagax/users",
-			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
-			"revisionTime": "2017-12-03T17:22:35Z"
+			"revision": "29425b57852c0f97839a8f4c447c68e6cf27f5e3",
+			"revisionTime": "2018-01-23T13:51:37Z"
 		},
 		{
-			"checksumSHA1": "iyJ/gwLZox9+kxN5BkwLEJENzmQ=",
+			"checksumSHA1": "ahxWR7ggGB8bcP1Rh4SG0dNpoaM=",
 			"path": "github.com/octavore/nagax/users/databaseauth",
-			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
-			"revisionTime": "2017-12-03T17:22:35Z"
+			"revision": "29425b57852c0f97839a8f4c447c68e6cf27f5e3",
+			"revisionTime": "2018-01-23T13:51:37Z"
 		},
 		{
 			"checksumSHA1": "OM9HoC9kgYgo4ix1kDPOpH/6xWw=",
 			"path": "github.com/octavore/nagax/users/session",
-			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
-			"revisionTime": "2017-12-03T17:22:35Z"
+			"revision": "29425b57852c0f97839a8f4c447c68e6cf27f5e3",
+			"revisionTime": "2018-01-23T13:51:37Z"
 		},
 		{
 			"checksumSHA1": "877A3JWobCA8W3SChgs1l2Iv3zU=",
 			"path": "github.com/octavore/nagax/users/tokenauth",
-			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
-			"revisionTime": "2017-12-03T17:22:35Z"
+			"revision": "29425b57852c0f97839a8f4c447c68e6cf27f5e3",
+			"revisionTime": "2018-01-23T13:51:37Z"
 		},
 		{
 			"checksumSHA1": "u6NQ8FODfj3rL3dBvfwirXFCbVM=",
 			"path": "github.com/octavore/nagax/util/errors",
-			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
-			"revisionTime": "2017-12-03T17:22:35Z"
+			"revision": "29425b57852c0f97839a8f4c447c68e6cf27f5e3",
+			"revisionTime": "2018-01-23T13:51:37Z"
 		},
 		{
 			"checksumSHA1": "1S8sORNibTFMAC3dSaBGH2/bmMU=",
 			"path": "github.com/octavore/nagax/util/token",
-			"revision": "5c744939dbb814e08fc4cf4b0d498dd2988e577f",
-			"revisionTime": "2017-12-03T17:22:35Z"
+			"revision": "29425b57852c0f97839a8f4c447c68e6cf27f5e3",
+			"revisionTime": "2018-01-23T13:51:37Z"
 		},
 		{
 			"checksumSHA1": "1R1x14YgUOFMbpS6aLg7IVF2Tds=",
@@ -279,10 +279,10 @@
 			"revisionTime": "2015-12-15T15:34:51Z"
 		},
 		{
-			"checksumSHA1": "u3mwCL3xnON/afgsgpwFw5pCQ4g=",
+			"checksumSHA1": "YS5s+PeaOs5T+yjTeEpT4TM4Ip8=",
 			"path": "github.com/xenolf/lego/acme",
-			"revision": "ce8fb060cb8361a9ff8b5fb7c2347fa907b6fcac",
-			"revisionTime": "2016-12-26T23:46:13Z"
+			"revision": "6bddbfd17a6e1ab782617eeab2f2007c6550b160",
+			"revisionTime": "2018-01-25T16:10:08Z"
 		},
 		{
 			"checksumSHA1": "dEer2DdB/m11vRqBvBX6tPXp2n4=",
