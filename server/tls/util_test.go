@@ -88,7 +88,8 @@ func (c *testAcmeClient) ObtainCertificate(domains []string, bundle bool, privKe
 }
 
 func (c *testAcmeClient) RenewCertificate(cert acme.CertificateResource, bundle bool, mustStaple bool) (acme.CertificateResource, error) {
-	privKey, err := x509.ParsePKCS1PrivateKey(cert.PrivateKey)
+	pemBlock, _ := pem.Decode(cert.PrivateKey)
+	privKey, err := x509.ParsePKCS1PrivateKey(pemBlock.Bytes)
 	if err != nil {
 		return acme.CertificateResource{}, err
 	}

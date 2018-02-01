@@ -1,7 +1,9 @@
 package tls
 
 import (
+	"bytes"
 	"crypto/x509"
+	"encoding/pem"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -64,6 +66,19 @@ Required params: domain to provision a cert for; contact email for Let's Encrypt
 			fmt.Println("success!")
 		},
 	})
+
+	c.AddCommand(&service.Command{
+		Keyword:    "tls:renew",
+		ShortUsage: `Renew SSL certs`,
+		Usage:      `Renew installed SSL certs.`,
+		Run: func(ctx *service.CommandContext) {
+			err := m.renewExpiredCerts()
+			if err != nil {
+				fmt.Println("error:", err)
+			}
+			fmt.Println("success!")
+		},
+	})
 	c.Setup = func() error {
 		m.renewWithinInterval = defaultRenewWithinInterval
 		m.keystore = &keystore.KeyStore{Dir: m.Config.Config.DataDir}
@@ -115,27 +130,47 @@ func (m *Module) renewExpiredCerts() error {
 		if nowPlusDelta.After(expiration) {
 			domain := x509Cert.Subject.CommonName
 			m.Logger.Infof("expired cert: renewing cert for %s", domain)
-			r, err := m.GetRegistration(domain, false)
+			r, err := m.GetRegistration(domain, true)
 			if err != nil {
 				return errors.Wrap(err)
 			}
 
-			cert, err := m.LoadCertResource(domain)
+			err = r.Init(m.keystore)
 			if err != nil {
 				return errors.Wrap(err)
 			}
+
+			acmeCert, err := m.LoadCertResource(domain)
+			if err != nil {
+				return errors.Wrap(err)
+			}
+
+			// set Certificate
+			certBytes := &bytes.Buffer{}
+			err = pem.Encode(certBytes, &pem.Block{Type: "CERTIFICATE", Bytes: cert.Certificate[0]})
+			if err != nil {
+				return errors.Wrap(err)
+			}
+			acmeCert.Certificate = certBytes.Bytes()
+
+			// set private key
 			keyFile := path.Join(tlsDir, domain+".key")
 			keyBytes, _, err := m.keystore.LoadPrivateKey(keyFile)
 			if err != nil {
 				return errors.Wrap(err)
 			}
-			cert.PrivateKey = keyBytes
+			pkBytes := &bytes.Buffer{}
+			err = pem.Encode(pkBytes, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: keyBytes})
+			if err != nil {
+				return errors.Wrap(err)
+			}
+			acmeCert.PrivateKey = pkBytes.Bytes()
+
 			c, err := newAcmeClient(r, m)
 			if err != nil {
 				return errors.Wrap(err)
 			}
-
-			newCert, err := c.RenewCertificate(*cert, true, false)
+			newCert, err := c.RenewCertificate(*acmeCert, false, false)
 			if err != nil {
 				return errors.Wrap(err)
 			}
