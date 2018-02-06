@@ -2,7 +2,7 @@
 // http://www.jbrantly.com/es6-modules-with-typescript-and-webpack/
 // https://stackoverflow.com/questions/38168733/typescript-export-all-functions-in-a-namespace
 // reexport codemirror type from namespace
-import * as CM from 'CodeMirror';
+import * as CM from 'codemirror';
 declare global {
   var CodeMirror: typeof CM;
 }
