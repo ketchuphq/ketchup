@@ -2,7 +2,6 @@ import * as m from 'mithril';
 import msx from 'lib/msx';
 import * as API from 'lib/api';
 import { BaseComponent } from 'components/auth';
-import * as Quill from 'quill';
 
 interface QuillAttrs {
   readonly elementId?: string;
@@ -11,7 +10,7 @@ interface QuillAttrs {
 }
 
 export default class QuillComponent extends BaseComponent<QuillAttrs> {
-  quill: Quill.Quill;
+  quill: any; // figure out how to set this correctly
   content: API.Content;
   id: string;
   readonly short: boolean;
@@ -31,26 +30,21 @@ export default class QuillComponent extends BaseComponent<QuillAttrs> {
     return k;
   }
 
-  initializeQuill(element: HTMLElement) {
-    require.ensure(
-      ['quill'],
-      (require) => {
-        let q = require<typeof Quill>('quill')['default'];
-        this.quill = new q(`#${this.id}`, {
-          placeholder: 'start typing...',
-          theme: 'snow',
-          modules: {
-            toolbar: `#${this.id}-toolbar`
-          }
-        });
-        let updateContent = () => {
-          let editor = element.getElementsByClassName('ql-editor')[0];
-          this.content.value = editor.innerHTML;
-        };
-        this.quill.on('text-change', updateContent.bind(this));
+  async initializeQuill(element: HTMLElement) {
+    // todo: figure out how to type this correctly
+    const Quill: any = await import(/* webpackChunkName: "quill" */ 'quill');
+    this.quill = new Quill(`#${this.id}`, {
+      placeholder: 'start typing...',
+      theme: 'snow',
+      modules: {
+        toolbar: `#${this.id}-toolbar`,
       },
-      'quill'
-    );
+    });
+    let updateContent = () => {
+      let editor = element.getElementsByClassName('ql-editor')[0];
+      this.content.value = editor.innerHTML;
+    };
+    this.quill.on('text-change', updateContent.bind(this));
   }
 
   view() {
