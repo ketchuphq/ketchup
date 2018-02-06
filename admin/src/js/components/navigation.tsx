@@ -3,7 +3,7 @@ import msx from 'lib/msx';
 import * as m from 'mithril';
 import { AuthController } from 'components/auth';
 import Button from 'components/button';
-let store = require('store/dist/store.modern') as StoreJSStatic;
+let store = require('store/dist/store.modern') as StoreJsAPI;
 
 
 export default class NavigationComponent extends AuthController {

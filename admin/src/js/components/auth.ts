@@ -1,4 +1,4 @@
-let store = require('store/dist/store.modern') as StoreJSStatic;
+let store = require('store/dist/store.modern') as StoreJsAPI;
 import * as m from 'mithril';
 import * as Toaster from 'components/toaster';
 
@@ -80,7 +80,7 @@ export abstract class AuthController<A> {
   store: Storer;
 
   constructor(_?: m.CVnode<A>) {
-    this.store = store.disabled ? dummyStore : store;
+    this.store = store.enabled ? store : dummyStore;
     this.user = cachedUser;
     this._userPromise = getUser().then((user) => {
       this.user = user;
