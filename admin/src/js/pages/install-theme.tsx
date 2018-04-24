@@ -1,58 +1,64 @@
-import msx from 'lib/msx';
-import * as m from 'mithril';
+import {Loader} from 'components/loading';
+import {ModalComponent} from 'components/modal';
+import {LinkRow, Row} from 'components/table';
+import * as Toaster from 'components/toaster';
 import * as API from 'lib/api';
 import Theme from 'lib/theme';
-import { MustAuthController } from 'components/auth';
-import { LinkRow, Row } from 'components/table';
-import { ModalComponent } from 'components/modal';
-import { Loader } from 'components/loading';
-import * as Toaster from 'components/toaster';
+import * as React from 'react';
+import Layout from 'components/layout';
 
-export default class InstallThemePage extends MustAuthController {
-  installedThemes: { [key: string]: boolean };
-  themes: API.Registry;
-  installing: string;
+interface State {
+  installedThemes: {[key: string]: boolean};
+  themes?: API.Registry;
+  installing?: string;
+}
 
-  constructor() {
-    super();
-    this.installedThemes = {};
+export default class InstallThemePage extends React.Component<{}, State> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      installedThemes: {},
+    };
+  }
+
+  componentDidMount() {
+    Theme.getAll().then((registry: API.Registry) => this.setState({themes: registry}));
     this.loadThemes();
-    Theme.getAll().then((registry: API.Registry) => (this.themes = registry));
   }
 
   loadThemes() {
     Theme.list().then((themes) => {
-      let installed: { [key: string]: boolean } = {};
+      let installed: {[key: string]: boolean} = {};
       themes.forEach((theme) => {
         installed[theme.name] = true;
       });
-      this.installedThemes = installed;
-      m.redraw();
+      this.setState({installedThemes: installed});
     });
   }
 
   themeInstalled(name: string): boolean {
-    return !!this.installedThemes[name];
+    return !!this.state.installedThemes[name];
   }
 
   installTheme(p: API.Package) {
-    if (this.installing) {
+    if (this.state.installing) {
       return;
     }
-    this.installing = p.name;
+    this.setState({installing: p.name});
     Theme.install(p).then(() => {
-      Toaster.add(this.installing + ' theme installed.');
-      this.installing = null;
+      Toaster.add(this.state.installing + ' theme installed.');
+      this.setState({installing: null});
       return this.loadThemes();
     });
   }
 
-  view() {
-    let packages = this.themes && this.themes.packages ? this.themes.packages : [];
-    let themes = packages.map((p: API.Package) => {
+  render() {
+    const packages =
+      this.state.themes && this.state.themes.packages ? this.state.themes.packages : [];
+    const themes = packages.map((p: API.Package) => {
       if (this.themeInstalled(p.name)) {
         return (
-          <LinkRow href={`/admin/themes/${p.name}`} link>
+          <LinkRow key={p.name} href={`/themes/${p.name}`} link>
             <div>{p.name}</div>
             <div>{p.vcsUrl}</div>
             <div>installed</div>
@@ -60,14 +66,20 @@ export default class InstallThemePage extends MustAuthController {
         );
       }
 
+      let linkClasses = 'button button--small button--blue';
+      if (!!this.state.installing) {
+        linkClasses += ' button--disabled';
+      }
       return (
-        <Row center>
+        <Row key={p.name} center>
           <div>{p.name}</div>
           <div>{p.vcsUrl}</div>
           <a
-            class='button button--small button--blue'
-            disabled={!!this.installing}
-            onclick={() => this.installTheme(p)}
+            className={linkClasses}
+            onClick={(e) => {
+              e.preventDefault();
+              this.installTheme(p);
+            }}
           >
             install
           </a>
@@ -76,17 +88,17 @@ export default class InstallThemePage extends MustAuthController {
     });
 
     return (
-      <div>
+      <Layout className="install-theme">
         <h1>Theme Manager</h1>
-        <div class='table'>{themes}</div>
+        <div className="table">{themes}</div>
         <ModalComponent
-          title='Installing theme...'
-          visible={() => !!this.installing}
+          title="Installing theme..."
+          visible={!!this.state.installing}
           toggle={() => {}}
         >
           {Loader}
         </ModalComponent>
-      </div>
+      </Layout>
     );
   }
 }

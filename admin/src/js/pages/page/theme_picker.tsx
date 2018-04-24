@@ -1,104 +1,116 @@
-import * as m from 'mithril';
-import msx from 'lib/msx';
-import { loading } from 'components/loading';
+import * as React from 'react';
+import {Loader} from 'components/loading';
 import Theme from 'lib/theme';
-import { BaseComponent } from 'components/auth';
+import * as Page from 'lib/page';
 
-type ThemePickerCallback = (theme: string, template: string) => void;
-
-interface ThemePickerAttrs {
-  theme: string;
-  template: string;
-  callback: ThemePickerCallback;
+interface Props {
+  store: Page.Store;
 }
 
-export default class ThemePickerComponent extends BaseComponent<ThemePickerAttrs> {
-  callback: ThemePickerCallback;
+interface State {
   themes: Theme[];
   ready: boolean;
   templates: string[];
+
   selectedTheme: string;
   selectedTemplate: string;
+}
 
-  constructor(v: m.CVnode<ThemePickerAttrs>) {
-    super(v);
-    this.callback = v.attrs.callback;
-    this.themes = [];
-    this.templates = [];
-    this.ready = false;
+export default class ThemePickerComponent extends React.Component<Props, State> {
+  themeSelectRef: React.RefObject<HTMLSelectElement>;
+  templateSelectRef: React.RefObject<HTMLSelectElement>;
 
-    this.selectedTheme = v.attrs.theme;
-    this.selectedTemplate = v.attrs.template;
+  constructor(props: Props) {
+    super(props);
+    const store = props.store;
+    this.state = {
+      themes: [],
+      templates: [],
+      ready: false,
+      selectedTheme: store.page.theme,
+      selectedTemplate: store.page.template,
+    };
 
-    Theme.list()
-      .then((themes) => {
-        this.themes = themes;
-        return this.selectTheme(v.attrs.theme, true);
-      })
-      .then(() => this.selectedTemplate = v.attrs.template)
-      .then(() => this.ready = true)
-      .catch(() => this.ready = true);
+    this.themeSelectRef = React.createRef();
+    this.templateSelectRef = React.createRef();
   }
 
-  selectTheme(name: string, initial = false) {
-    this.selectedTheme = name;
-    return Theme.get(this.selectedTheme)
-      .then((t) => {
-        let templates = Object.keys(t.templates).sort();
-        this.templates = templates;
-        this.selectedTemplate = templates[0];
-        if (!initial) {
-          this.callback(this.selectedTheme, this.selectedTemplate);
-        }
+  componentDidMount() {
+    const store = this.props.store;
+    // get all the themes
+    Theme.list()
+      .then((themes) => {
+        this.setState({themes});
+        return this.selectTheme(store.page.theme, store.page.template);
+      })
+      .then(() => {
+        this.templateSelectRef.current.value = this.state.selectedTemplate;
+        this.themeSelectRef.current.value = this.state.selectedTheme;
+      })
+      .then(() => this.setState({ready: true}), () => this.setState({ready: true}));
+
+    // subscribe to page changes
+    store.subscribe('theme-picker', (page) => {
+      this.setState({
+        selectedTheme: page.theme,
+        selectedTemplate: page.template,
       });
+    });
+  }
+
+  selectTheme(name: string, template?: string) {
+    return Theme.get(name).then((theme) => {
+      let templates = Object.keys(theme.templates).sort();
+      this.setState({templates});
+      this.props.store.setThemeTemplate(theme, theme.getTemplate(template || templates[0]));
+    });
   }
 
   selectTemplate(template: string) {
-    this.selectedTemplate = template;
-    this.callback(this.selectedTheme, this.selectedTemplate);
+    this.state.themes.map((theme) => {
+      if (theme.name == this.state.selectedTheme) {
+        this.props.store.setThemeTemplate(theme, theme.getTemplate(template));
+      }
+    });
   }
 
-  view() {
-    if (!this.ready) {
-      return loading(true);
+  render() {
+    if (!this.state.ready) {
+      return <Loader show={true} />;
     }
-    return <div class='theme-picker'>
-      <div class='control'>
-        <div class='label'>Theme</div>
-        <select
-          oncreate={(v: m.VnodeDOM<any, any>) => {
-            (v.dom as HTMLSelectElement).value = this.selectedTheme;
-          }}
-          onchange={(e: Event) => {
-            let target = e.target as HTMLInputElement;
-            this.selectTheme(target.value);
-          }}
-        >
-          {this.themes.map((theme: Theme) =>
-          <option value={theme.name}>
-            {theme.name}
-          </option>)}
-        </select>
-      </div>
+    return (
+      <div className="theme-picker">
+        <div className="control">
+          <div className="label">Theme</div>
+          <select
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+              this.selectTheme(e.target.value);
+            }}
+          >
+            {this.state.themes.map((theme: Theme) => (
+              <option key={theme.name} value={theme.name}>
+                {theme.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      <div class='control'>
-        <div class='label'>Template</div>
-        <select
-          oncreate={(v: m.VnodeDOM<any, any>) => {
-            (v.dom as HTMLSelectElement).value = this.selectedTemplate;
-          }}
-          onchange={(e: Event) => {
-            let target = e.target as HTMLInputElement;
-            this.selectTemplate(target.value);
-          }}
-        >
-        {this.templates.map((template: string) =>
-          <option value={template} key={template}>
-            {template}
-          </option>)}
-        )}
-        </select>
+        <div className="control">
+          <div className="label">Template</div>
+          <select
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+              this.selectTemplate(e.target.value);
+            }}
+          >
+            {this.state.templates.map((template: string) => (
+              <option key={template} value={template}>
+                {template}
+              </option>
+            ))}
+            )}
+          </select>
+        </div>
       </div>
-    </div>;
+    );
   }
 }

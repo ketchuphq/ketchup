@@ -1,71 +1,58 @@
-import * as m from 'mithril';
-import msx from 'lib/msx';
+import * as React from 'react';
 import * as API from 'lib/api';
-import { BaseComponent } from '../auth';
 
-interface CodeMirrorAttrs {
+interface Props {
   readonly content: API.Content;
   readonly short?: boolean;
 }
 
-export default class CodeMirrorComponent extends BaseComponent<CodeMirrorAttrs> {
+export default class CodeMirrorComponent extends React.Component<Props> {
   codemirror: CodeMirror.Editor;
-  content: API.Content;
-  element: HTMLElement;
-  id: string;
-  short: boolean;
+  textInput: React.RefObject<HTMLTextAreaElement>;
+  constructor(props: Props) {
+    super(props);
+    this.textInput = React.createRef();
+  }
 
-  constructor(v: any) {
-    super(v);
-    this.content = v.attrs.content;
-    this.short = v.attrs.short;
-    this.id = `codemirror-${Math.random().toString().slice(2, 10)}`;
+  componentDidMount() {
+    this.initializeCodeMirror(this.textInput.current);
   }
 
   get klass(): string {
-    return [
-      'codemirror',
-      this.short ? 'codemirror-short' : 'codemirror-long'
-    ].join(' ');
+    return ['codemirror', this.props.short ? 'codemirror-short' : 'codemirror-long'].join(' ');
   }
 
-  initializeCodeMirror(element: HTMLTextAreaElement) {
-    require.ensure([
-      'codemirror/lib/codemirror',
-      'codemirror/mode/gfm/gfm',
-      'codemirror/mode/markdown/markdown',
-      'codemirror/addon/display/placeholder',
-      'codemirror/addon/mode/overlay'
-    ], (require) => {
-      let cm = require<typeof CodeMirror>('codemirror');
-      require('codemirror/mode/gfm/gfm');
-      require('codemirror/mode/markdown/markdown');
-      require('codemirror/addon/display/placeholder');
-      require('codemirror/addon/mode/overlay');
+  async initializeCodeMirror(element: HTMLTextAreaElement) {
+    const cmImports = await Promise.all([
+      import(/* webpackChunkName: "codemirror" */ 'codemirror'),
+      import(/* webpackChunkName: "codemirror" */ 'codemirror/mode/gfm/gfm'),
+      import(/* webpackChunkName: "codemirror" */ 'codemirror/mode/markdown/markdown'),
+      import(/* webpackChunkName: "codemirror" */ 'codemirror/addon/display/placeholder'),
+      import(/* webpackChunkName: "codemirror" */ 'codemirror/addon/mode/overlay'),
+    ]);
 
-      element.value = this.content.value || '';
-      this.codemirror = cm.fromTextArea(element, {
-        mode: 'gfm',
-        placeholder: 'start typing...',
-        lineNumbers: false,
-        theme: 'elegant',
-        lineWrapping: true,
-      });
-      // this.codemirror.setOption('fullscreen', 'true')
-      // this.codemirror.refresh()
-      this.codemirror.on('change', (instance) => {
-        this.content.value = instance.getValue();
-      });
-    }, 'codemirror');
+    let cm = cmImports[0];
+
+    element.value = this.props.content.value || '';
+    this.codemirror = cm.fromTextArea(element, {
+      mode: 'gfm',
+      placeholder: 'start typing...',
+      lineNumbers: false,
+      theme: 'elegant',
+      lineWrapping: true,
+    });
+    // this.codemirror.setOption('fullscreen', 'true')
+    // this.codemirror.refresh()
+    this.codemirror.on('change', (instance) => {
+      this.props.content.value = instance.getValue();
+    });
   }
 
-  view() {
-    return <div id={this.id} class={this.klass}>
-      <textarea
-        oncreate={(v: m.VnodeDOM<any, any>) => {
-          this.initializeCodeMirror(v.dom as HTMLTextAreaElement);
-        }}
-      />
-    </div>;
+  render() {
+    return (
+      <div key="codemirror" className={this.klass}>
+        <textarea ref={this.textInput} />
+      </div>
+    );
   }
 }

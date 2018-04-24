@@ -1,120 +1,121 @@
-import msx from 'lib/msx';
-import * as m from 'mithril';
-import * as API from 'lib/api';
-import { User, BaseComponent } from 'components/auth';
-import { ModalComponent } from 'components/modal';
-import { add } from 'components/toaster';
+import {User} from 'components/auth';
 import Button from 'components/button';
+import {ModalComponent} from 'components/modal';
+import * as API from 'lib/api';
+import {post} from 'lib/requests';
+import * as React from 'react';
 
 const leURL = 'https://acme-v01.api.letsencrypt.org/terms';
 const ipRegex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
 
-interface TLSNewComponentAttrs {
+interface Props {
   user: User;
   email: string;
   domain: string;
 }
 
-export default class TLSNewComponent extends BaseComponent<TLSNewComponentAttrs> {
+interface State {
   initialHost: string;
   tlsEmail: string;
   tlsDomain: string;
   showErrorModal: boolean;
-  errors: string;
+  errors?: string;
+}
 
-  constructor(v: m.CVnode<TLSNewComponentAttrs>) {
-    super(v);
-    this.tlsEmail = v.attrs.email || v.attrs.user.email;
-    this.initialHost = v.attrs.domain || window.location.hostname;
-    this.showErrorModal = false;
-    if (this.initialHost.match(ipRegex)) {
-      this.initialHost = '';
+export default class TLSNewComponent extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    let initialHost = props.domain || window.location.hostname;
+    if (initialHost.match(ipRegex)) {
+      initialHost = '';
     }
-    if (this.initialHost == 'localhost') {
-      this.initialHost = '';
+    if (initialHost == 'localhost') {
+      initialHost = '';
     }
-    this.tlsDomain = this.initialHost;
+    this.state = {
+      tlsEmail: props.email || props.user.email,
+      tlsDomain: initialHost,
+      initialHost: initialHost,
+      showErrorModal: false,
+    };
   }
 
   register() {
-    return m
-      .request({
-        url: '/api/v1/settings/tls',
-        method: 'POST',
-        data: {
-          tlsEmail: this.tlsEmail,
-          tlsDomain: this.tlsDomain,
-          agreed: true
-        } as API.EnableTLSRequest
-      })
-      .catch((res: API.ErrorResponse) => {
-        if (!res || !res.errors) {
-          add('Unknown error', 'error');
-          return;
+    return post('/api/v1/settings/tls', {
+      tlsEmail: this.state.tlsEmail,
+      tlsDomain: this.state.tlsDomain,
+      agreed: true,
+    } as API.EnableTLSRequest)
+      .then((res) => res.json())
+      .then((res: API.ErrorResponse) => {
+        if (res && res.errors) {
+          // todo: check res code
+          // add('Unknown error', 'error');
+          // return;
+          this.setState({
+            errors: res.errors[0].detail,
+            showErrorModal: true,
+          });
         }
-        this.errors = res.errors[0].detail;
-        this.showErrorModal = true;
-        m.redraw();
       });
   }
 
-  view() {
+  render() {
     let warning = null;
-    if (this.initialHost == '') {
+    if (this.state.initialHost == '') {
       warning = (
-        <div class='tr'>
+        <div className="tr">
           It looks like you're not using a domain; please ensure that you've set up your DNS records
           correctly.
         </div>
       );
     }
     return (
-      <div class='table'>
+      <div className="table">
         {warning}
-        <div class='tr tr--center'>
+        <div className="tr tr--center">
           <label>TLS Email</label>
           <input
-            class='large'
-            type='text'
-            value={this.tlsEmail}
-            onchange={m.withAttr('value', (e) => (this.tlsEmail = e))}
+            className="large"
+            type="text"
+            value={this.state.tlsEmail}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              this.setState({tlsEmail: e.target.value});
+            }}
           />
         </div>
-        <div class='tr tr--center'>
+        <div className="tr tr--center">
           <label>TLS Domain</label>
           <input
-            class='large'
-            type='text'
-            config={(el: HTMLInputElement, isInitialized: boolean) => {
-              if (!isInitialized) {
-                el.value = this.initialHost;
-              }
+            className="large"
+            type="text"
+            value={this.state.tlsDomain}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              this.setState({tlsDomain: e.target.value});
             }}
-            onchange={m.withAttr('value', (v) => (this.tlsDomain = v))}
           />
         </div>
-        <div class='tr tr--right tr--tos'>
-          <label for='tos'>
+        <div className="tr tr--right tr--tos">
+          <label htmlFor="tos">
             I agree to{' '}
-            <a href={leURL} target='_blank'>
+            <a href={leURL} target="_blank">
               Let's Encrypt's Terms of Service
             </a>
           </label>
         </div>
-        <div class='tr tr--right tr--no-border'>
-          <Button class='button--green button--small' handler={() => this.register()}>
+        <div className="tr tr--right tr--no-border">
+          <Button className="button--green button--small" handler={() => this.register()}>
             Enable TLS
           </Button>
           <ModalComponent
-            title='Error'
-            klass='modal--error'
-            visible={() => this.showErrorModal}
+            title="Error"
+            klass="modal--error"
+            visible={this.state.showErrorModal}
             toggle={() => {
-              this.showErrorModal = !this.showErrorModal;
-              m.redraw();
+              this.setState((prev) => ({showErrorModal: !prev.showErrorModal}));
             }}
           >
-            <p>{this.errors}</p>
+            <p>{this.state.errors}</p>
           </ModalComponent>
         </div>
       </div>

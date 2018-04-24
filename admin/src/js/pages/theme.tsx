@@ -1,98 +1,123 @@
-import msx from 'lib/msx';
-import * as m from 'mithril';
-import Theme from 'lib/theme';
-import { MustAuthController, BaseComponent } from 'components/auth';
 import Button from 'components/button';
-import { Package } from 'lib/api';
-import { Table, Row, LinkRow } from 'components/table';
-import { ConfirmModalComponent } from 'components/modal';
+import Layout from 'components/layout';
+import {Loader} from 'components/loading';
+import {ConfirmModalComponent} from 'components/modal';
+import {LinkRow, Row, Table} from 'components/table';
+import * as API from 'lib/api';
+import {Package} from 'lib/api';
+import Theme from 'lib/theme';
+import * as React from 'react';
+import {RouteComponentProps} from 'react-router';
+import {Link} from 'react-router-dom';
 
 interface ThemeProps {
-  theme: Theme;
+  theme: API.Theme;
+  ref?: string;
 }
 
-class VersionSection extends BaseComponent<ThemeProps> {
+interface VersionState {
   showUpdateModal: boolean;
   hasUpdate: boolean;
   latestRef?: string;
+}
 
-  constructor(v: any) {
+class VersionSection extends React.Component<ThemeProps, VersionState> {
+  constructor(v: ThemeProps) {
     super(v);
-    this.showUpdateModal = false;
+    this.state = {
+      showUpdateModal: false,
+      hasUpdate: false,
+    };
   }
 
   checkUpdates() {
-    return this.props.theme.checkForUpdates().then(({ currentRef }) => {
+    return Theme.checkForUpdates(this.props.theme.name).then(({currentRef}) => {
       if (!currentRef) {
-        this.latestRef = 'No updates found.';
-        this.hasUpdate = false;
+        this.setState({
+          latestRef: 'No updates found.',
+          hasUpdate: false,
+          showUpdateModal: true,
+        });
       } else {
-        this.latestRef = `Latest ref: ${currentRef.slice(0, 6)}`;
-        this.hasUpdate = true;
+        this.setState({
+          latestRef: `Latest ref: ${currentRef.slice(0, 6)}`,
+          hasUpdate: true,
+          showUpdateModal: true,
+        });
       }
-      this.showUpdateModal = true;
-      m.redraw();
     });
   }
 
-  updateTheme() {
-    return Promise.resolve();
-  }
-
-  view() {
-    if (!this.props.theme.ref) {
-      return;
+  render() {
+    if (!this.props.ref) {
+      return null;
     }
-    return [
-      <h2>Version</h2>,
-      <div class='table'>
-        <div class='tr tr--center'>
-          <code>{this.props.theme.ref}</code>
-          <Button class='button--green button--small' handler={() => this.checkUpdates()}>
-            Check for Updates
-          </Button>
+    return (
+      <div>
+        <h2>Version</h2>
+        <div className="table">
+          <div className="tr tr--center">
+            <code>{this.props.ref}</code>
+            <Button className="button--green button--small" handler={() => this.checkUpdates()}>
+              Check for Updates
+            </Button>
+          </div>
         </div>
-      </div>,
-      <ConfirmModalComponent
-        title='Updates'
-        visible={() => this.showUpdateModal}
-        toggle={() => {
-          this.showUpdateModal = !this.showUpdateModal;
-          m.redraw();
-        }}
-        confirmText={this.hasUpdate ? 'Update' : 'Okay'}
-        hideCancel={this.hasUpdate}
-        resolve={this.updateTheme.bind(this)}
-      >
-        <p>{this.latestRef}</p>
-      </ConfirmModalComponent>
-    ];
+        <ConfirmModalComponent
+          title="Updates"
+          visible={this.state.showUpdateModal}
+          toggle={() => {
+            this.setState((state) => ({showUpdateModal: !state.showUpdateModal}));
+          }}
+          confirmText={this.state.hasUpdate ? 'Update' : 'Okay'}
+          hideCancel={this.state.hasUpdate}
+        >
+          <p>{this.state.latestRef}</p>
+        </ConfirmModalComponent>
+      </div>
+    );
   }
 }
 
-class TemplatesSection extends BaseComponent<ThemeProps> {
-  view() {
+class TemplatesSection extends React.PureComponent<ThemeProps> {
+  render() {
     let theme = this.props.theme;
     let templateKeys = Object.keys(theme.templates);
-    let templates = templateKeys.sort().map((name) => theme.templates[name]).map((t) => (
-      <LinkRow href={`/admin/themes/${theme.name}/templates/${t.name}`} link>
-        <div>{t.name}</div>
-        <div>{t.engine}</div>
-      </LinkRow>
-    ));
+    let templates = templateKeys
+      .sort()
+      .map((name) => theme.templates[name])
+      .map((t) => (
+        <LinkRow key={t.name} href={`/themes/${theme.name}/templates/${t.name}`} link>
+          <div>{t.name}</div>
+          <div>{t.engine}</div>
+        </LinkRow>
+      ));
 
-    return [<h2>Templates</h2>, <div class='table'>{templates}</div>];
+    return (
+      <div>
+        <h2>Templates</h2> <div className="table">{templates}</div>
+      </div>
+    );
   }
 }
 
-class AssetsSection extends BaseComponent<ThemeProps> {
-  view() {
+class AssetsSection extends React.PureComponent<ThemeProps> {
+  render() {
     let assetKeys = Object.keys(this.props.theme.assets);
-    let assetsList: m.Children = <a class='tr'>no assets</a>;
+    let assetsList: React.ReactNode = <a className="tr">no assets</a>;
     if (assetKeys.length > 0) {
-      assetsList = assetKeys.sort().map((asset) => <LinkRow href={`/${asset}`}>{asset}</LinkRow>);
+      assetsList = assetKeys.sort().map((asset) => (
+        <LinkRow key={asset} href={`/${asset}`}>
+          {asset}
+        </LinkRow>
+      ));
     }
-    return [<h2>Assets</h2>, <Table>{assetsList}</Table>];
+    return (
+      <div>
+        <h2>Assets</h2>
+        <Table>{assetsList}</Table>
+      </div>
+    );
   }
 }
 
@@ -100,10 +125,10 @@ interface PackageProps {
   pkg: Package;
 }
 
-class PackageSection extends BaseComponent<PackageProps> {
-  view() {
+class PackageSection extends React.PureComponent<PackageProps> {
+  render() {
     if (!this.props.pkg) {
-      return;
+      return null;
     }
     let pkg = this.props.pkg;
     let fields = [];
@@ -142,49 +167,63 @@ class PackageSection extends BaseComponent<PackageProps> {
     }
 
     if (fields.length == 0) {
-      return;
+      return null;
     }
 
-    return [<h2>Package</h2>, <Table>{fields}</Table>];
+    return (
+      <div>
+        <h2>Package</h2>
+        <Table>{fields}</Table>
+      </div>
+    );
   }
 }
 
-export default class ThemePage extends MustAuthController {
-  theme: Theme;
+interface State {
+  theme?: API.Theme;
+}
 
-  constructor() {
-    super();
-    let themeName = m.route.param('name');
-    if (themeName) {
-      Theme.get(themeName).then((theme) => {
-        this.theme = theme;
-        m.redraw();
-      });
-    }
+export default class ThemePage extends React.Component<RouteComponentProps<{id: string}>, State> {
+  constructor(props: any) {
+    super(props);
+    this.state = {};
   }
 
-  view() {
-    if (!this.theme) {
-      return;
+  componentDidMount() {
+    Theme.get(this.props.match.params.id).then((theme) => {
+      this.setState({theme});
+    });
+  }
+
+  render() {
+    if (!this.state.theme) {
+      return (
+        <Layout className="theme">
+          <header>
+            <h1>
+              <Link to="/themes">Themes</Link> &rsaquo;{' '}
+            </h1>
+          </header>
+          <Loader show />;
+        </Layout>
+      );
     }
+
+    const theme = this.state.theme;
+
     return (
-      <div class='theme'>
+      <Layout className="theme">
         <header>
           <h1>
-            <a href='/admin/themes' oncreate={m.route.link}>
-              Themes
-            </a>
-            {m.trust(' &rsaquo; ')}
-            <span class='unbold'>{this.theme.name}</span>
+            <Link to="/themes">Themes</Link> &rsaquo; <span className="unbold">{theme.name}</span>
           </h1>
         </header>
-        <p class='txt-large'>{this.theme.description}</p>
-
-        <VersionSection theme={this.theme} />
-        <PackageSection pkg={this.theme.package} />
-        <TemplatesSection theme={this.theme} />
-        <AssetsSection theme={this.theme} />
-      </div>
+        <p className="txt-large">{theme.description}</p>
+        <VersionSection theme={theme} />
+        <PackageSection pkg={theme.package} />
+        <TemplatesSection theme={theme} />
+        <AssetsSection theme={theme} />
+      </Layout>
     );
   }
 }

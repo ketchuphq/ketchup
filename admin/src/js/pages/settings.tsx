@@ -1,76 +1,84 @@
-import msx from 'lib/msx';
-import * as m from 'mithril';
+import Layout from 'components/layout';
+import {Loader} from 'components/loading';
 import * as API from 'lib/api';
-import { MustAuthController } from 'components/auth';
-import TLSNewComponent from 'pages/settings/tls-new';
+import {get} from 'lib/requests';
 import TLSComponent from 'pages/settings/tls';
+import TLSNewComponent from 'pages/settings/tls-new';
+import * as React from 'react';
+import {PrivateRouteComponentProps} from 'components/auth';
 
 // add redirect
 // setup static upload
-export default class SettingsPage extends MustAuthController {
-  settings: API.TLSSettingsResponse;
-  version: string;
-  registryURL: string;
+interface State {
+  settings?: API.TLSSettingsResponse;
+  version?: string;
+  registryURL?: string;
+}
 
-  constructor() {
-    super();
-    m.request({
-      method: 'GET',
-      url: '/api/v1/settings/tls',
-    }).then((settings: API.TLSSettingsResponse) => {
-      this.settings = settings;
-      m.redraw();
-    });
-    m.request({
-      method: 'GET',
-      url: '/api/v1/settings/info',
-    }).then(({ version, registry_url }) => {
-      this.version = version;
-      this.registryURL = registry_url;
-      m.redraw();
-    });
+export default class SettingsPage extends React.Component<PrivateRouteComponentProps<any>, State> {
+  constructor(props: any) {
+    super(props);
+    this.state = {};
   }
 
-  view() {
-    let settings = this.settings;
+  componentDidMount() {
+    get('/api/v1/settings/tls')
+      .then((res) => res.json())
+      .then((settings: API.TLSSettingsResponse) => {
+        this.setState({settings});
+      });
+
+    get('/api/v1/settings/info')
+      .then((res) => res.json())
+      .then(({version, registry_url}) => {
+        this.setState({
+          version,
+          registryURL: registry_url,
+        });
+      });
+  }
+
+  render() {
+    const {settings} = this.state;
     let tlsSection;
     if (!settings) {
-      tlsSection = <div>loading...</div>;
+      tlsSection = <Loader show />;
     } else if (Object.keys(settings).length == 0 || !settings.hasCertificate) {
-      tlsSection = <TLSNewComponent
-        user={this.user}
-        email={settings.tlsEmail}
-        domain={settings.tlsDomain}
-      />;
+      tlsSection = (
+        <TLSNewComponent
+          user={this.props.user}
+          email={settings.tlsEmail}
+          domain={settings.tlsDomain}
+        />
+      );
     } else {
       tlsSection = <TLSComponent {...settings} />;
     }
-    return <div class='settings'>
-      <header>
-        <h1>Settings</h1>
-      </header>
-      <h2>Ketchup</h2>
-      <div class='table'>
-        <div class='tr tr--center'>
-          <label>Version</label>
-          <div>{this.version}</div>
+    return (
+      <Layout className="settings">
+        <header>
+          <h1>Settings</h1>
+        </header>
+        <h2>Ketchup</h2>
+        <div className="table">
+          <div className="tr tr--center">
+            <label>Version</label>
+            <div>{this.state.version}</div>
+          </div>
+          <div className="tr tr--center">
+            <label>Theme Registry</label>
+            <div>{this.state.registryURL}</div>
+          </div>
+          <div className="tr tr--center">
+            <label>Export your data as JSON</label>
+            <a className="button button--green button--small" href="/api/v1/download-backup">
+              Download backup
+            </a>
+          </div>
         </div>
-        <div class='tr tr--center'>
-          <label>Theme Registry</label>
-          <div>{this.registryURL}</div>
-        </div>
-        <div class='tr tr--center'>
-          <label>Export your data as JSON</label>
-          <a
-            class='button button--green button--small'
-            href='/api/v1/download-backup'
-          >
-            Download backup
-          </a>
-        </div>
-      </div>
-      <h2>TLS</h2>
-      {tlsSection}
-    </div>;
+        <h2>TLS</h2>
+        {tlsSection}
+      </Layout>
+    );
   }
 }

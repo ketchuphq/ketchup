@@ -9,7 +9,7 @@ module.exports = {
       'lodash-es/cloneDeep',
       'lodash-es/isEqual'
     ],
-    app: 'app.ts'
+    app: 'app.tsx'
   },
   output: {
     filename: '[name].js',
@@ -25,9 +25,6 @@ module.exports = {
       { test: /\.tsx?$/, loader: 'ts-loader' },
       { test: /\.css$/, loader: 'style-loader!css-loader' }
     ],
-  },
-  externals: {
-    'mithril': 'm',
   },
   plugins: [
     new webpack.optimize.CommonsChunkPlugin({

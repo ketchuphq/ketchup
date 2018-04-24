@@ -2,7 +2,6 @@
   "compilerOptions": {
     "module": "esnext",
     "jsx": "react",
-    "jsxFactory": "msx",
     "noImplicitAny": true,
     "noUnusedParameters": true,
     "lib": [

@@ -1,72 +1,71 @@
-import msx from 'lib/msx';
-import * as m from 'mithril';
+import * as API from 'lib/api';
 import Route from 'lib/route';
-import Page from 'lib/page';
-import { BaseComponent } from 'components/auth';
+import * as React from 'react';
 
-interface EditRoutesAttr {
-  page: Page;
+interface Props {
+  page: API.Page;
+  routes: API.Route[];
 }
 
-export default class EditRoutesComponent extends BaseComponent<EditRoutesAttr> {
+interface State {
   dirty: boolean;
-  page: Page;
+}
 
-  constructor(v: m.CVnode<EditRoutesAttr>) {
-    super(v);
-    this.page = v.attrs.page;
-    this.dirty = true;
-    if (this.page.routes.length == 0) {
-      this.page.routes.push(new Route());
-      this.dirty = false;
-    } else if (!this.page.routes[0].path) {
-      this.dirty = false;
+export default class EditRoutesComponent extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    let {routes} = props;
+    let dirty = true;
+    if (routes.length == 0) {
+      routes.push({});
+      dirty = false;
+    } else if (!routes[0].path) {
+      dirty = false;
     }
+    this.state = {dirty};
   }
 
   infer() {
-    if (this.dirty) {
+    let {page, routes} = this.props;
+    if (this.state.dirty) {
       return;
     }
-    if (this.page.routes.length < 1) {
+    if (routes.length < 1) {
       return;
     }
-    if (!!this.page.routes[0].path) {
+    if (!!routes[0].path) {
       return;
     }
-    if (!this.page.title || this.page.title.trim() == '') {
+    if (!page.title || page.title.trim() == '') {
       return;
     }
-    this.page.routes[0].path = Route.format(this.page.title);
+    routes[0].path = Route.format(page.title);
   }
 
-  routeEditor(route: Route, i: number) {
+  routeEditor = (route: API.Route, i: number) => {
     this.infer();
-    let r;
-    if (i > 0) {
-      r = <a onclick={() => this.page.routes.splice(i, 1)}>{m.trust('&times;')}</a>;
-    }
+    let key = route.uuid || route.path || 'new';
     return (
-      <div>
+      <div key={key}>
         <input
-          type='text'
-          placeholder='/path/to/page'
+          type="text"
+          placeholder="/path/to/page"
           value={Route.format(route.path)}
-          onchange={m.withAttr('value', (v) => {
-            this.dirty = true;
-            route.path = Route.format(v);
-          })}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            this.setState({dirty: true});
+            route.path = Route.format(e.target.value);
+          }}
         />
-        {r}
+        {i > 0 ? <a onClick={() => this.props.routes.splice(i, 1)}>&times;</a> : null}
       </div>
     );
-  }
+  };
 
-  view() {
+  render() {
     return (
-      <div class='edit-route control'>
-        <div class='label'>Permalink</div>
-        {this.page.routes.map(this.routeEditor.bind(this))}
+      <div className="edit-route control">
+        <div className="label">Permalink</div>
+        {this.props.routes.map(this.routeEditor)}
       </div>
     );
   }

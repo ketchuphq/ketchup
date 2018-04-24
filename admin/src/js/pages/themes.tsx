@@ -1,47 +1,55 @@
-import msx from 'lib/msx';
-import * as m from 'mithril';
+import {Loader} from 'components/loading';
 import Theme from 'lib/theme';
-import { MustAuthController } from 'components/auth';
-import { loading } from 'components/loading';
+import * as React from 'react';
+import {Link} from 'react-router-dom';
+import Layout from 'components/layout';
 
-export default class ThemesPage extends MustAuthController {
+interface State {
   themes: Theme[];
   loading: boolean;
+}
 
-  constructor() {
-    super();
-    this.themes = [];
-    this.loading = true;
+export default class ThemesPage extends React.Component<{}, State> {
+  constructor(props: any) {
+    super(props);
+
+    this.state = {
+      themes: [],
+      loading: true,
+    };
+  }
+
+  componentDidMount() {
     Theme.list().then((themes) => {
-      this.loading = false;
-      this.themes = themes;
+      this.setState({
+        loading: false,
+        themes: themes,
+      });
     });
   }
 
-  view() {
-    return <div class='themes'>
-      <header>
-        <a class='button button--green button--center'
-          href='/admin/themes-install'
-          oncreate={m.route.link}
-        >
-          Get More
-        </a>
-        <h1>Themes</h1>
-      </header>
+  render() {
+    return (
+      <Layout className="themes">
+        <header>
+          <Link className="button button--green button--center" to="/themes-install">
+            Get More
+          </Link>
+          <h1>Themes</h1>
+        </header>
 
-      <h2>Installed themes</h2>
-      <div class='table'>
-        {loading(this.loading)}
-        {this.themes.map((theme) => {
-          return <a class='tr'
-            href={`/admin/themes/${theme.name}`}
-            oncreate={m.route.link}
-          >
-            {theme.name || 'untitled'}
-          </a>;
-        })}
-      </div>
-    </div>;
+        <h2>Installed themes</h2>
+        <div className="table">
+          <Loader show={this.state.loading} />
+          {this.state.themes.map((theme) => {
+            return (
+              <Link key={theme.name} className="tr" to={`/themes/${theme.name}`}>
+                {theme.name || 'untitled'}
+              </Link>
+            );
+          })}
+        </div>
+      </Layout>
+    );
   }
 }

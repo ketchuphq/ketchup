@@ -1,102 +1,87 @@
-import * as m from 'mithril';
-import msx from 'lib/msx';
-import { BaseComponent } from 'components/auth';
+import * as React from 'react';
+import * as ReactModal from 'react-modal';
 
-export interface ModalAttrs {
+export interface ModalProps {
   title: string;
   klass?: string;
-  visible: () => boolean;
+  visible: boolean;
   toggle: () => void;
 }
 
-export class ModalComponent<A extends ModalAttrs = ModalAttrs> extends BaseComponent<A> {
-  protected controls: m.Children;
-
-  toggle(e?: Event) {
-    if (e && e.srcElement.className != 'overlay') {
-      return;
-    }
-    this.props.toggle();
+export class ModalComponent<A extends ModalProps = ModalProps> extends React.Component<A> {
+  constructor(props: any) {
+    super(props);
   }
 
-  view(v: m.CVnode<ModalAttrs>) {
-    if (!this.props.visible()) {
-      return <div />;
-    }
+  render() {
     return (
-      <div class='overlay' onclick={(e: Event) => this.toggle(e)}>
-        <div class='modal-pad' />
-        <div class={`modal ${this.props.klass || ''}`}>
-          <div class='modal__title'>{this.props.title}</div>
-          <div class='modal__content'>{v.children}</div>
-          {this.controls}
+      <ReactModal isOpen={this.props.visible}>
+        <div className={`modal ${this.props.klass || ''}`}>
+          <div className="modal__title">{this.props.title}</div>
+          <div className="modal__content">{this.props.children}</div>
         </div>
-      </div>
+      </ReactModal>
     );
   }
 }
 
 type ModalButtonColor = '' | 'modal-button--green' | 'modal-button--red';
 
-interface ConfirmModalAttrs extends ModalAttrs {
-  resolve?: () => Promise<any>;
-  reject?: () => Promise<any>;
+interface ConfirmModalProps extends ModalProps {
+  resolve?: () => void;
+  reject?: () => void;
   confirmText?: string;
   cancelText?: string;
   confirmColor?: ModalButtonColor;
   cancelColor?: ModalButtonColor;
   hideCancel?: boolean;
 }
-
-export class ConfirmModalComponent extends ModalComponent<ConfirmModalAttrs> {
-  confirmColor: ModalButtonColor;
-  cancelColor: ModalButtonColor;
-  constructor(v: m.CVnode<ConfirmModalAttrs>) {
-    super(v);
-    this.confirmColor = this.props.confirmColor || 'modal-button--green';
-    this.cancelColor = this.props.cancelColor || '';
+export class ConfirmModalComponent<
+  A extends ConfirmModalProps = ConfirmModalProps
+> extends React.Component<A> {
+  constructor(props: any) {
+    super(props);
   }
 
-  resolve() {
-    let promise = Promise.resolve();
+  resolve = (_: React.MouseEvent<HTMLElement>) => {
+    this.props.toggle();
     if (this.props.resolve) {
-      promise = this.props.resolve();
+      this.props.resolve();
     }
-    promise.then(() => {
-      this.toggle();
-    });
-  }
+  };
 
-  reject() {
-    let promise = Promise.resolve();
+  reject = (_: React.MouseEvent<HTMLElement>) => {
+    this.props.toggle();
     if (this.props.reject) {
-      promise = this.props.reject();
+      this.props.reject();
     }
-    promise.then(() => {
-      this.toggle();
-    });
-  }
+  };
 
-  view(v: m.CVnode<ConfirmModalAttrs>) {
-    let confirm = (
-      <div class={`modal-button ${this.confirmColor}`} onclick={() => this.resolve()}>
-        {v.attrs.confirmText || 'Yes'}
-      </div>
-    );
-    let cancel;
-    if (!v.attrs.hideCancel) {
-      cancel = (
-        <div class={`modal-button ${this.cancelColor}`} onclick={() => this.reject()}>
-          {v.attrs.cancelText || 'Cancel'}
+  render() {
+    let className = `modal ${this.props.klass || ''}`;
+    return (
+      <ReactModal
+        portalClassName="modal-portal"
+        overlayClassName="overlay"
+        className={className}
+        isOpen={this.props.visible}
+      >
+        <div className="modal__title">{this.props.title}</div>
+        <div className="modal__content">{this.props.children}</div>
+        <div className="modal__controls">
+          <div
+            className={`modal-button ${this.props.confirmColor || 'modal-button--green'}`}
+            onClick={this.resolve}
+          >
+            {this.props.confirmText || 'Yes'}
+          </div>{' '}
+          {!this.props.hideCancel ? (
+            <div className={`modal-button ${this.props.cancelColor}`} onClick={this.reject}>
+              {this.props.cancelText || 'Cancel'}
+            </div>
+          ) : null}
         </div>
-      );
-    }
-    this.controls = (
-      <div class='modal__controls'>
-        {confirm} {cancel}
-      </div>
+      </ReactModal>
     );
-
-    return super.view(v);
   }
 }

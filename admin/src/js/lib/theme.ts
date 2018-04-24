@@ -1,5 +1,5 @@
 import * as API from 'lib/api';
-import * as m from 'mithril';
+import {get, post} from 'lib/requests';
 
 export default class Theme extends API.Theme {
   ref: string;
@@ -16,59 +16,39 @@ export default class Theme extends API.Theme {
     return this.templates[name];
   }
 
-  checkForUpdates() {
-    return m.request<API.CheckThemeForUpdateResponse>({
-      method: 'GET',
-      url: `/api/v1/themes/${this.name}/updates`
-    });
+  static checkForUpdates(name: string): Promise<API.CheckThemeForUpdateResponse> {
+    return get(`/api/v1/themes/${name}/updates`).then((res) => res.json());
   }
 
   static get(name: string): Promise<Theme> {
-    return m
-      .request({
-        method: 'GET',
-        url: `/api/v1/themes/${name}`
-      })
+    return get(`/api/v1/themes/${name}`)
+      .then((res) => res.json())
       .then((data: API.GetThemeResponse) => {
         return new Theme(data.theme, data.ref);
       });
   }
 
   static getFullTemplate(name: string, template: string): Promise<API.ThemeTemplate> {
-    return m.request({
-      method: 'GET',
-      url: `/api/v1/themes/${name}/templates/${template}`
-    });
+    return get(`/api/v1/themes/${name}/templates/${template}`).then((res) => res.json());
   }
 
   static getAll(): Promise<API.Registry> {
-    return m.request({
-      method: 'GET',
-      url: '/api/v1/theme-registry'
-    });
+    return get('/api/v1/theme-registry').then((res) => res.json());
   }
 
   static install(p: API.Package): Promise<API.Registry> {
     let data: API.InstallThemeRequest = {
       name: p.name,
-      vcsUrl: p.vcsUrl
+      vcsUrl: p.vcsUrl,
     };
 
-    return m.request({
-      method: 'POST',
-      url: '/api/v1/theme-install',
-      background: true,
-      data: data
-    });
+    return post('/api/v1/theme-install', data).then((res) => res.json());
   }
 
   static list(): Promise<Theme[]> {
-    return m
-      .request({
-        method: 'GET',
-        url: '/api/v1/themes'
-      })
-      .then((data: { themes: API.ThemeTemplate[] }) => {
+    return get('/api/v1/themes')
+      .then((res) => res.json())
+      .then((data: {themes: API.ThemeTemplate[]}) => {
         if (!data.themes) {
           return [];
         }

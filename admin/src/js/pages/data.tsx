@@ -1,68 +1,76 @@
-import msx from 'lib/msx';
+import * as React from 'react';
 import Data from 'lib/data';
-import { MustAuthController } from 'components/auth';
-import { loading } from 'components/loading';
-import { renderEditor } from 'components/content';
+import {Loader} from 'components/loading';
+import {Editor} from 'components/content';
 import Button from 'components/button';
+import Layout from 'components/layout';
 
 let defaultData = ['title'];
 
-export default class DataPage extends MustAuthController {
+interface State {
   data: Data[];
   loading: boolean;
+}
 
-  constructor() {
-    super();
-    this.data = [];
-    this.loading = true;
-    Data.list().then((data) => {
-      let headMap: { [key: string]: Data } = {};
-      let head: Data[] = [];
-      let tail: Data[] = [];
-      data.map((d) => {
-        if (defaultData.indexOf(d.key) > -1) {
-          headMap[d.key] = d;
-        } else {
-          tail.push(d);
-        }
-      });
-      defaultData.map((k) => {
-        if (k in headMap) {
-          head.push(headMap[k]);
-        } else {
-          head.push({
-            key: k,
-            short: { type: 'text' }
-          });
-        }
-      });
+export default class DataPage extends React.Component<{}, State> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      data: [],
+      loading: true,
+    };
+  }
 
-      this.data = head.concat(tail);
-      this.loading = false;
+  async componentDidMount() {
+    let data = await Data.list();
+    let headMap: {[key: string]: Data} = {};
+    let head: Data[] = [];
+    let tail: Data[] = [];
+    data.map((d) => {
+      if (defaultData.indexOf(d.key) > -1) {
+        headMap[d.key] = d;
+      } else {
+        tail.push(d);
+      }
+    });
+    defaultData.map((k) => {
+      if (k in headMap) {
+        head.push(headMap[k]);
+      } else {
+        head.push({
+          key: k,
+          short: {type: 'text'},
+        });
+      }
+    });
+
+    this.setState({
+      data: head.concat(tail),
+      loading: false,
     });
   }
 
-  view() {
+  render() {
     return (
-      <div class='data'>
+      <Layout className="data">
         <header>
           <h1>Data</h1>
         </header>
-        <div class='table'>
-          {loading(this.loading)}
-          {this.data.map((data) => (
-            <div class='tr tr--center'>
+        <div className="table">
+          <Loader show={this.state.loading} />
+          {this.state.data.map((data) => (
+            <div key={data.key} className="tr tr--center">
               <label>{data.key}</label>
-              <div>{renderEditor(data, true)}</div>
+              <Editor content={data} hideLabel />
             </div>
           ))}
-          <div class='tr tr--right'>
-            <Button class='button--green' handler={() => Data.saveList(this.data)}>
+          <div className="tr tr--right">
+            <Button className="button--green" handler={() => Data.saveList(this.state.data)}>
               Save
             </Button>
           </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 }

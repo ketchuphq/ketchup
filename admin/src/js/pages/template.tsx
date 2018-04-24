@@ -1,86 +1,108 @@
-import msx from 'lib/msx';
-import * as m from 'mithril';
+import Layout from 'components/layout';
+import {Loader} from 'components/loading';
 import * as API from 'lib/api';
 import Theme from 'lib/theme';
-import { MustAuthController } from 'components/auth';
+import * as React from 'react';
+import {RouteComponentProps} from 'react-router';
+import {Link} from 'react-router-dom';
 
-export default class TemplatePage extends MustAuthController {
-  template: API.ThemeTemplate;
+type Props = RouteComponentProps<{name: string; template: string}>;
+interface State {
+  template?: API.ThemeTemplate;
+}
 
-  constructor() {
-    super();
-    this.template = {};
-    Theme.getFullTemplate(m.route.param('name'), m.route.param('template')).then((t) => {
-      this.template = t;
-      m.redraw();
+export default class TemplatePage extends React.Component<Props, State> {
+  preRef: React.RefObject<HTMLPreElement>;
+
+  constructor(props: any) {
+    super(props);
+    this.preRef = React.createRef();
+    this.state = {};
+  }
+
+  componentDidMount() {
+    let {name, template} = this.props.match.params;
+    Theme.getFullTemplate(name, template).then((template) => {
+      this.setState({template});
     });
-    // todo: catch
   }
 
-  colorize(el: HTMLElement) {
-    require.ensure(
-      ['highlight.js', 'highlight.js/lib/languages/xml', 'highlight.js/styles/rainbow.css'],
-      (require) => {
-        let hljs: any = require('highlight.js');
-        require('highlight.js/lib/languages/xml');
-        require('highlight.js/styles/rainbow.css');
-        hljs.highlightBlock(el);
-      },
-      'hljs'
-    );
+  componentDidUpdate(_: Props, prevState: State) {
+    if (!prevState.template || prevState.template.data != this.state.template.data) {
+      this.colorize(this.preRef.current);
+    }
   }
 
-  view() {
-    let name = m.route.param('name');
-    let lst: m.Vnode<any, any>[] = [];
-    let p = this.template.placeholders;
-    if (p && p.length > 0) {
-      p.forEach((placeholder) => {
-        if (placeholder.key == 'content') {
-          return;
-        }
-        lst.push(<div class='tr'>{placeholder.key}</div>);
-      });
-    }
-    if (!this.template.hideContent) {
-      lst.push(<div class='tr'>content</div>);
-    }
+  async colorize(el: HTMLElement) {
+    const hljsImports = await Promise.all([
+      import(/* webpackChunkName: "hljs" */ 'highlight.js'),
+      import(/* webpackChunkName: "hljs" */ 'highlight.js/lib/languages/xml'),
+      import(/* webpackChunkName: "hljs" */ 'highlight.js/styles/rainbow.css'),
+    ]);
+    let hljs = hljsImports[0];
+    hljs.highlightBlock(el);
+  }
 
-    let placeholders: m.Vnode<any, any>;
-    if (lst.length > 0) {
-      placeholders = (
-        <div>
-          <h2>Fields</h2>
-          <div class='table'>{lst}</div>
-        </div>
-      );
-    }
-
+  render() {
+    let {name, template} = this.props.match.params;
     return (
-      <div class='template'>
+      <Layout className="template">
         <header>
           <h1>
-            <a href='/admin/themes' oncreate={m.route.link}>
-              Themes
-            </a>
-            {m.trust(' &rsaquo; ')}
-            <a href={`/admin/themes/${name}`} class='unbold' oncreate={m.route.link}>
+            <Link to="/themes">Themes</Link> &rsaquo;{' '}
+            <Link to={`/themes/${name}`} className="unbold">
               {name}
-            </a>
-            {m.trust(' &rsaquo; ')}
-            <span class='unbold'>{m.route.param('template')}</span>
+            </Link>{' '}
+            &rsaquo; <span className="unbold">{template}</span>
           </h1>
         </header>
-        {placeholders}
+        {!!this.state.template ? (
+          <Placeholders
+            hideContent={this.state.template.hideContent}
+            placeholders={this.state.template.placeholders}
+          />
+        ) : (
+          <Loader show />
+        )}
+
         <h2>Template</h2>
-        <pre
-          onupdate={(v: m.VnodeDOM<any, any>) => {
-            this.colorize(v.dom as HTMLElement);
-          }}
-        >
-          {this.template.data}
-        </pre>
-      </div>
+        {!!this.state.template ? (
+          <pre ref={this.preRef}>{this.state.template.data}</pre>
+        ) : (
+          <Loader show />
+        )}
+      </Layout>
     );
   }
 }
+
+let Placeholders: React.SFC<{hideContent: boolean; placeholders: API.ThemePlaceholder[]}> = ({
+  hideContent,
+  placeholders,
+}) => {
+  let content = (placeholders || []).map((placeholder) => {
+    if (placeholder.key != 'content') {
+      return (
+        <div key={placeholder.key} className="tr">
+          {placeholder.key}
+        </div>
+      );
+    }
+  });
+  if (!hideContent) {
+    content.push(
+      <div key="content" className="tr">
+        content
+      </div>
+    );
+  }
+  if (content.length == 0) {
+    return null;
+  }
+  return (
+    <div>
+      <h2>Fields</h2>
+      <div className="table">{content}</div>
+    </div>
+  );
+};

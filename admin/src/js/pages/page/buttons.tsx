@@ -1,85 +1,80 @@
-import * as m from 'mithril';
-import msx from 'lib/msx';
-import Page from 'lib/page';
+import * as React from 'react';
+import * as Page from 'lib/page';
 import * as Toaster from 'components/toaster';
 import PageSaveButtonComponent from 'pages/page/save_button';
-import { BaseComponent } from '../../components/auth';
+import * as API from 'lib/api';
 
-interface PageButtonsAttrs {
-  page: Page;
-  onsave: (page: Page) => void;
+interface Props {
+  store: Page.Store;
+  routes: API.Route[];
 }
 
-export default class PageButtonsComponent extends BaseComponent<PageButtonsAttrs> {
-  constructor(v: m.CVnode<PageButtonsAttrs>) {
-    super(v);
+interface State {
+  isPublished: boolean;
+}
+
+export default class PageButtonsComponent extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      isPublished: Page.isPublished(props.store.page),
+    };
   }
 
-  publish() {
+  publish = (e: React.MouseEvent<any>) => {
+    e.preventDefault();
     // todo: handle case where not saved yet
-    this.props.page.publish().then(() => {
+    this.props.store.publish().then(() => {
+      this.setState({isPublished: true});
       Toaster.add('Page published');
-      m.redraw();
     });
-  }
+  };
 
-  unpublish() {
-    this.props.page.unpublish().then(() => {
+  unpublish = (e: React.MouseEvent<any>) => {
+    e.preventDefault();
+    this.props.store.unpublish().then(() => {
       Toaster.add('Page unpublished');
-      m.redraw();
+      this.setState({isPublished: false});
     });
-  }
+  };
 
-  delete() {
-    this.props.page.delete().then(() => {
-      Toaster.add('Page deleted', 'error');
-      m.route.set('/admin/pages');
+  delete = (e: React.MouseEvent<any>) => {
+    e.preventDefault();
+    Page.deletePage(this.props.store.page).then(() => {
+      // Toaster.add('Page deleted', 'error');
+      location.assign('/admin/pages');
     });
-  }
+  };
 
-  view() {
+  render() {
     let unpublishButton = (
-      <a
-        class='button button--small button--blue'
-        onclick={(e: Event) => {
-          e.stopPropagation();
-          this.unpublish();
-        }}
-      >
+      <a className="button button--small button--blue" onClick={this.unpublish}>
         Unpublish
       </a>
     );
 
     let deleteButton = (
-      <a
-        class='button button--small button--red'
-        onclick={(e: Event) => {
-          e.stopPropagation();
-          this.delete();
-        }}
-      >
+      <a className="button button--small button--red" onClick={this.delete}>
         Delete
       </a>
     );
 
     let publishButton = (
-      <a
-        class='button button--small button--blue'
-        onclick={(e: Event) => {
-          e.stopPropagation();
-          this.publish();
-        }}
-      >
+      <a className="button button--small button--blue" onClick={this.publish}>
         Publish
       </a>
     );
 
-    let page = this.props.page;
+    let page = this.props.store.page;
     return (
-      <div class='save-publish'>
-        <PageSaveButtonComponent page={page} classes='button--small' onsave={this.props.onsave} />
+      <div className="save-publish">
+        <PageSaveButtonComponent
+          store={this.props.store}
+          routes={this.props.routes}
+          classes="button--small"
+        />
         {!page.uuid ? '' : deleteButton}
-        {page.isPublished ? unpublishButton : publishButton}
+        {Page.isPublished(page) ? unpublishButton : publishButton}
       </div>
     );
   }
