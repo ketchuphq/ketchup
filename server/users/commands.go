@@ -33,6 +33,24 @@ func registerUserAdd(m *Module) *service.Command {
 	}
 }
 
+func registerListUsers(m *Module) *service.Command {
+	return &service.Command{
+		Keyword:    "users:list",
+		Usage:      "List users.",
+		ShortUsage: "List users",
+		Run: func(ctx *service.CommandContext) {
+			lst, err := m.DB.ListUsers()
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			for _, user := range lst {
+				fmt.Println(user.GetEmail(), user.GetHashedPassword())
+			}
+		},
+	}
+}
+
 func registerSetPassword(m *Module) *service.Command {
 	return &service.Command{
 		Keyword:    "users:password <email>",
