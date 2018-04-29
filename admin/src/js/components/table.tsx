@@ -1,39 +1,31 @@
-import * as m from 'mithril';
-import msx from 'lib/msx';
-import { BaseComponent } from 'components/auth';
+import * as React from 'react';
+import {Link} from 'react-router-dom';
 
-export class Table extends BaseComponent {
-  view(v: m.CVnode<any>) {
-    return <div class='table'>{v.children}</div>;
+export const Table: React.SFC = (props) => <div className="table">{props.children}</div>;
+
+export const Row: React.SFC<{center?: boolean}> = (props) => {
+  let k = 'tr';
+  if (props.center) {
+    k += ' tr--center';
   }
-}
+  return <div className={k}>{props.children}</div>;
+};
 
-interface RowProps {
-  center?: boolean;
-}
-
-export class Row extends BaseComponent<RowProps> {
-  view(v: m.CVnode<RowProps>) {
-    let k = 'tr';
-    if (v.attrs.center) {
-      k += ' tr--center';
-    }
-    return <div class={k}>{v.children}</div>;
-  }
-}
-
-interface LinkRowProps {
+export const LinkRow: React.SFC<{
   href: string;
   link?: boolean;
-}
-
-export class LinkRow extends BaseComponent<LinkRowProps> {
-  view(v: m.CVnode<LinkRowProps>) {
-    let oncreate = this.props.link ? m.route.link : () => {};
+}> = (props) => {
+  if (props.link) {
     return (
-      <a class='tr' href={this.props.href} oncreate={oncreate}>
-        {v.children}
-      </a>
+      <Link className="tr" to={props.href}>
+        {props.children}
+      </Link>
     );
   }
-}
+  return (
+    <a className="tr" href={props.href}>
+      {' '}
+      {props.children}{' '}
+    </a>
+  );
+};

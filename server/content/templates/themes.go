@@ -36,6 +36,9 @@ func (m *Module) GetTheme(name string) (*models.Theme, string, error) {
 	if err != nil {
 		return nil, "", errors.Wrap(err)
 	}
+	if theme == nil {
+		return nil, "", nil
+	}
 	ref, _ := theme.Ref()
 	return theme.Proto(), ref, nil
 }

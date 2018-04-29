@@ -1,5 +1,5 @@
-import * as m from 'mithril';
 import * as API from 'lib/api';
+import {post} from 'lib/requests';
 
 export default class Route implements API.Route {
   uuid: string;
@@ -17,19 +17,16 @@ export default class Route implements API.Route {
   }
 
   save(): Promise<any> {
-    return m.request({
-      method: 'POST',
-      url: '/api/v1/routes',
-      data: this as API.Route
-    });
+    return post('/api/v1/routes', this);
   }
 
   static format(s: string) {
     if (s == null) {
       return '';
     }
-    s = s.toLowerCase()
-      .replace(/[^a-zA-Z0-9\/]+/ig, '-')
+    s = s
+      .toLowerCase()
+      .replace(/[^a-zA-Z0-9\/]+/gi, '-')
       .replace(/^-+/, '')
       .replace(/-+$/, '')
       .replace(/\/\/+/, '/');
@@ -40,16 +37,29 @@ export default class Route implements API.Route {
   }
 
   static list(): Promise<Route[]> {
-    return m.request({
+    return fetch('/api/v1/routes', {
       method: 'GET',
-      url: '/api/v1/routes'
+      credentials: 'same-origin',
     })
-      .then((data: { routes: API.Route[] }) => {
+      .then((res) => res.json())
+      .then((data: {routes: API.Route[]}) => {
         if (!data.routes) {
           return [];
         }
         return data.routes.map((el) => new Route(el));
       });
+  }
+
+  static getRoutes(page: API.Page): Promise<Route[]> {
+    return fetch(`/api/v1/pages/${page.uuid}/routes`)
+      .then((res) => res.json())
+      .then((res: {routes: API.Route[]}) => {
+        return res.routes.map((r) => new Route(r));
+      });
+  }
+
+  static saveRoutes(page: API.Page, routes: API.Route[]) {
+    return post(`/api/v1/pages/${page.uuid}/routes`, {routes});
   }
 
   static saveList(routes: Route[], pageUUID: string) {

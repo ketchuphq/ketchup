@@ -1,42 +1,19 @@
-import * as Mithril from 'mithril';
-import { assert } from 'chai';
-import * as mq from 'mithril-query';
-import * as API from 'lib/api';
-import { renderEditor } from 'components/content';
+import {Editor, ShortTextEditorComponent} from 'components/content';
+import EditorComponent from 'components/editors/editor';
 import CodeMirrorComponent from 'components/editors/markdown';
 import TextEditorComponent from 'components/editors/text';
-import EditorComponent from 'components/editors/editor';
-import { IBaseComponent } from 'components/auth';
+import {shallow} from 'enzyme';
+import * as API from 'lib/api';
+import * as React from 'react';
 
-describe('renderEditor', function() {
-  function testEditor(content: API.Content, editorComponent: IBaseComponent<any>) {
-    let out = mq(renderEditor(content, false));
-    assert.containSubset(out.rootNode, {
-      tag: 'div',
-      attrs: { className: 'controls' },
-      children: [
-        {
-          attrs: { className: 'control control-full' },
-          children: [
-            {
-              attrs: { className: 'label' },
-              text: content.key
-            },
-            {
-              attrs: { content }
-            }
-          ]
-        }
-      ]
+describe('<Editor>', function() {
+  function testEditor(content: API.Content, editorComponent: any) {
+    const editor = shallow(<Editor content={content} hideLabel={false} />, {
+      disableLifecycleMethods: true,
     });
-
-    let children = out.find('.control-full')[0].children as Array<Mithril.Vnode<any, any>>;
-    let editor = children[1];
-    assert.equal(editor.tag, editorComponent);
-    assert.strictEqual(editor.attrs.content, content);
-
-    out = mq(renderEditor(content, true));
-    assert.equal(out.find('.label').length, 0);
+    expect(editor).toMatchSnapshot();
+    expect(editor.containsMatchingElement(editorComponent)).toBe(true);
+    expect(editor.find(editorComponent).dive()).toMatchSnapshot();
   }
 
   it('text:markdown -> LongMarkdownEditor', function() {
@@ -46,8 +23,8 @@ describe('renderEditor', function() {
         value: '*hello world*',
         text: {
           title: 'thetitle',
-          type: 'markdown'
-        }
+          type: 'markdown',
+        },
       },
       CodeMirrorComponent
     );
@@ -60,8 +37,8 @@ describe('renderEditor', function() {
         value: '*hello world*',
         text: {
           title: 'thetitle',
-          type: 'text'
-        }
+          type: 'text',
+        },
       },
       TextEditorComponent
     );
@@ -74,27 +51,24 @@ describe('renderEditor', function() {
         value: '*hello world*',
         text: {
           title: 'thetitle',
-          type: 'html'
-        }
+          type: 'html',
+        },
       },
       EditorComponent
     );
   });
 
   it('short:markdown -> ShortMarkdownEditor', function() {
-    let content: API.Content = {
-      key: 'akey',
-      value: '*hello world*',
-      short: {
-        title: 'thetitle',
-        type: 'markdown'
-      }
-    };
-    let out = mq(renderEditor(content, false));
-    let handler = out.find('input')[0].attrs.onchange;
-    assert.isFunction(handler);
-    let event = { target: { value: 'goodbye moon' } };
-    handler(event);
-    assert.equal(content.value, event.target.value);
+    testEditor(
+      {
+        key: 'akey',
+        value: '*hello world*',
+        short: {
+          title: 'thetitle',
+          type: 'markdown',
+        },
+      },
+      ShortTextEditorComponent
+    );
   });
 });

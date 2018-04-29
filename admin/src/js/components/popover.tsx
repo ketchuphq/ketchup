@@ -1,20 +1,18 @@
-import * as m from 'mithril';
-import msx from 'lib/msx';
-import { BaseComponent } from 'components/auth';
+import * as React from 'react';
 
-interface PopoverAttrs {
+interface Props {
   visible: boolean;
 }
 
-export default class Popover extends BaseComponent<PopoverAttrs> {
-  view(v: m.CVnode<PopoverAttrs>) {
+export default class Popover extends React.PureComponent<Props> {
+  render() {
     let klass = 'popover-outer';
-    if (!v.attrs.visible) {
+    if (!this.props.visible) {
       klass += ' popover-outer-hidden';
     }
     return (
-      <div class={klass}>
-        <div class='popover'>{v.children}</div>
+      <div className={klass}>
+        <div className="popover">{this.props.children}</div>
       </div>
     );
   }

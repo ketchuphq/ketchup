@@ -85,3 +85,24 @@ func (m *Module) UpdateUser(user *models.User) error {
 
 	return m.Update(USER_BUCKET, user)
 }
+
+func (m *Module) ListUsers() ([]*models.User, error) {
+	lst := []*models.User{}
+	err := m.Bolt.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(USER_BUCKET))
+		return b.ForEach(func(_, v []byte) error {
+			pb := &models.User{}
+			err := proto.Unmarshal(v, pb)
+			if err != nil {
+				return err
+			}
+			lst = append(lst, pb)
+			return nil
+		})
+	})
+	if err != nil {
+		return nil, err
+	}
+	return lst, nil
+
+}

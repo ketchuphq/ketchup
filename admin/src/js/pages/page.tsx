@@ -1,268 +1,198 @@
+import {PrivateRouteComponentProps} from 'components/auth';
+import {ConfirmModalComponent} from 'components/modal';
+import * as API from 'lib/api';
+import * as Page from 'lib/page';
+import Route from 'lib/route';
+import Theme from 'lib/theme';
 import cloneDeep from 'lodash-es/cloneDeep';
 import isEqual from 'lodash-es/isEqual';
-
-import msx from 'lib/msx';
-import * as m from 'mithril';
-import * as API from 'lib/api';
-import { defaultContent, default as Page } from 'lib/page';
-import Theme from 'lib/theme';
-import Popover from 'components/popover';
-import { MustAuthController } from 'components/auth';
-import { ConfirmModalComponent } from 'components/modal';
-
-import PageThemePickerComponent from 'pages/page/theme_picker';
-import PageEditRoutesComponent from 'pages/page/edit_route';
-import PageButtonsComponent from 'pages/page/buttons';
-import PageSaveButtonComponent from 'pages/page/save_button';
+import PageControls from 'pages/page/controls';
 import PageEditorsComponent from 'pages/page/editors';
+import * as React from 'react';
 
-export default class PagePage extends MustAuthController {
-  page: Page;
+interface State {
+  page: API.Page;
+  template: API.ThemeTemplate;
+  routes: Route[];
+  dirty: boolean;
   showSettings: boolean;
   showLeaveModal: boolean;
-  template: API.ThemeTemplate;
-  _nextRoute: string;
+  pageUUID: string;
+  nextRoute: boolean;
+}
+
+export default class PagePage extends React.Component<
+  PrivateRouteComponentProps<{id: string}>,
+  State
+> {
   _clickStart: DOMTokenList; // keep track of click location to prevent firing on drag
-  dirty: boolean;
 
+  pageStore: Page.Store;
   initialContent: API.Content[];
+  pageRef: React.RefObject<HTMLDivElement>;
 
-  constructor() {
-    super();
-    this.dirty = false;
-    this.showSettings = false;
-    this.showLeaveModal = false;
-    let pageUUID = m.route.param('id');
-    if (pageUUID) {
-      Page.get(pageUUID)
-        .then((page) => this.updatePage(page, true))
-        .then((page) => page.getRoutes());
-    } else {
-      this.updatePage(new Page(), true).then((page) => {
-        this._userPromise.then((user) => {
-          page.authors.push({ uuid: user.uuid });
-        });
-      });
-    }
-  }
+  constructor(props: PrivateRouteComponentProps<{id: string}>) {
+    super(props);
+    this.pageStore = new Page.Store();
+    this.state = {
+      page: null,
+      template: null,
+      routes: [],
+      dirty: false,
+      showSettings: false,
+      showLeaveModal: false,
+      pageUUID: props.match.params.id,
+      nextRoute: false,
+    };
+    this.pageRef = React.createRef();
 
-  toggleSettings() {
-    this.showSettings = !this.showSettings;
-  }
-
-  goToIndex() {
-    this._nextRoute = '/admin/pages';
-    return Promise.resolve();
-  }
-
-  updatePage(page: Page, initial = false) {
-    return this.updateThemeTemplate(page.theme, page.template)
-      .then(() => {
-        if (!this.page || initial) {
+    // when a page is updated, we need to make sure we process the new
+    // theme and template
+    let initial = true;
+    this.pageStore.subscribe('index', (page) => {
+      return this.fetchThemeTemplate(page.theme, page.template).then(() => {
+        if (!this.state.page || initial) {
           this.initialContent = cloneDeep(page.contents);
-          this.page = page;
         }
-      })
-      .then(() => this.updateContent(initial))
-      .then(() => m.redraw())
-      .then(() => page);
-  }
-
-  updateThemeTemplate(theme: string, template: string): Promise<void> {
-    if (this.page) {
-      this.page.theme = theme;
-      this.page.template = template;
-    }
-    return Theme.get(theme)
-      .then((t) => {
-        this.template = t.getTemplate(template);
-        m.redraw();
-      })
-      .catch(() => {
-        // catch deleted theme
-        this.updateThemeTemplate('none', 'html');
+        this.setState({page: page});
+        initial = false;
       });
+    });
   }
 
-  updateContent(initial = false) {
-    // todo: keep old content temporarily for 'undo'
-    let contentMap: { [key: string]: API.Content } = {};
-    let placeholderContents: API.Content[] = [];
-    let placeholderContentMap: { [key: string]: boolean } = {};
-    // cache existing content
-    (this.page.contents || []).forEach((c) => {
-      // on initial load copy all fields
-      if (c.uuid || c.value || initial) {
-        contentMap[c.key] = c;
+  componentDidMount() {
+    // handle animations
+    this.pageRef.current.addEventListener('mousedown', (e: any) => {
+      this._clickStart = e.target.classList;
+    });
+    this.pageRef.current.addEventListener('animationend', (e: AnimationEvent) => {
+      // old animation is removed, otherwise new animations won't fire.
+      if (e.animationName == 'fadeIn') {
+        this.pageRef.current.classList.add('animate-fade-in-complete');
+        this.pageRef.current.classList.remove('animate-fade-in');
+      }
+      // navigate away after zoomAway animation completes
+      if (e.animationName == 'zoomAway') {
+        this.props.history.push('/pages');
       }
     });
 
-    // load placeholders from templates
-    (this.template.placeholders || []).forEach((p) => {
-      if (contentMap[p.key]) {
-        Object.keys(p).forEach((k: keyof API.ThemePlaceholder) => {
-          if (p[k]) {
-            contentMap[p.key][k] = p[k];
-          }
-        });
-        placeholderContents.push(contentMap[p.key]);
-      } else {
-        placeholderContents.push(API.Content.copy(p, {}));
-      }
-      placeholderContentMap[p.key] = true;
-    });
-
-    // load placeholders from existing page contents
-    let pageContents: API.Content[] = [];
-    (this.page.contents || []).forEach((c) => {
-      if (c.key == 'content' && this.template.hideContent) {
-        return;
-      }
-      if (contentMap[c.key] && !placeholderContentMap[c.key]) {
-        pageContents.push(c);
-      }
-    });
-
-    // add default content editor
-    if (!contentMap['content'] && !placeholderContentMap['content'] && !this.template.hideContent) {
-      placeholderContents.push(API.Content.copy(defaultContent, {}));
+    // handle loading page
+    if (this.state.pageUUID) {
+      // load page
+      this.pageStore
+        .get(this.state.pageUUID)
+        .then((page) => Route.getRoutes(page))
+        .then((routes) => this.setState({routes}));
+    } else {
+      // new page
+      const page = Page.newPage();
+      page.authors = [{uuid: this.props.user.uuid}];
+      this.pageStore.set(page);
     }
-
-    this.page.contents = pageContents.concat(placeholderContents);
   }
 
-  confirmLeave() {
-    if (this.showSettings) {
+  toggleSettings = () => {
+    this.setState({showSettings: !this.state.showSettings});
+  };
+
+  // fetchThemeTemplate fetches the Theme from the backend
+  // Note: this gets called in the page update callback.
+  fetchThemeTemplate = (theme: string, template: string): Promise<Theme | void> => {
+    return Theme.get(theme).then(
+      (t) => {
+        this.setState({template: t.getTemplate(template)});
+        return t;
+      },
+      () => {
+        if (theme == 'none' && template == 'html') {
+          return;
+        }
+        // catch deleted theme
+        return Theme.get('none').then((t) => {
+          this.pageStore.setThemeTemplate(t, t.getTemplate('html'));
+          return t;
+        });
+      }
+    );
+  };
+
+  confirmLeave = () => {
+    if (this.state.showSettings) {
       this.toggleSettings();
       return;
     }
-    this.dirty = this.dirty || !isEqual(this.initialContent, this.page.contents);
-    if (this.dirty) {
-      this.showLeaveModal = true;
-      return;
-    }
-    this.goToIndex();
-  }
+    this.setState((prev) => {
+      let dirty = prev.dirty || !isEqual(this.initialContent, this.state.page.contents);
+      let showLeaveModal = dirty || prev.showLeaveModal;
+      return {dirty, showLeaveModal, nextRoute: !showLeaveModal};
+    });
+  };
 
-  renderSettings() {
-    return (
-      <div class='controlset'>
-        <div class='settings'>
-          <div class='controls'>
-            <div class='control'>
-              {this.page ? <PageEditRoutesComponent page={this.page} /> : null}
-            </div>
-          </div>
-          <div class='controls'>
-            <PageThemePickerComponent
-              theme={this.page.theme}
-              template={this.page.template}
-              callback={(theme, template) => {
-                this.updateThemeTemplate(theme, template).then(() => this.updateContent());
-              }}
-            />
-          </div>
-        </div>
-        <PageButtonsComponent
-          page={this.page}
-          onsave={(page: Page) => this.updatePage(page, true)}
-        />
-      </div>
-    );
-  }
-
-  view() {
-    if (!this.page) {
-      return;
+  render() {
+    if (!this.state.page) {
+      return <div ref={this.pageRef} />;
     }
-    let controls = (
-      <div class='page-max__controls'>
-        <PageSaveButtonComponent
-          page={this.page}
-          onsave={(page: Page) => this.updatePage(page, true)}
-        />
-        <span class='typcn typcn-cog' onclick={() => this.toggleSettings()} />
-        <Popover visible={this.showSettings}>{this.renderSettings()}</Popover>
-        <a
-          class='typcn typcn-times'
-          href='/admin/pages'
-          onclick={(e: MouseEvent) => {
-            e.preventDefault();
-            this.confirmLeave();
-          }}
-        />
-      </div>
-    );
 
     let pageMaxClasses = 'page-max animate-fade-in';
-    if (this._nextRoute) {
+    if (this.state.nextRoute) {
       pageMaxClasses = 'page-max animate-zoom-away animate-fill';
     }
 
     return (
       <div
-        class={pageMaxClasses}
-        onclick={(e: any) => {
+        className={pageMaxClasses}
+        onClick={(e: any) => {
           let validClick =
             e.target.classList.contains('page-max') &&
             this._clickStart &&
             this._clickStart.contains('page-max');
-          if (!validClick) {
-            return;
+          if (validClick) {
+            this.confirmLeave();
           }
-          this.confirmLeave();
         }}
-        oncreate={(v: m.VnodeDOM<any, any>) => {
-          v.dom.addEventListener('mousedown', (ev: any) => {
-            this._clickStart = ev.target.classList;
-          });
-          v.dom.addEventListener('animationend', (ev: AnimationEvent) => {
-            // old animation is removed, otherwise new animations won't fire.
-            if (ev.animationName == 'fadeIn') {
-              v.dom.classList.add('animate-fade-in-complete');
-              v.dom.classList.remove('animate-fade-in');
-            }
-            // navigate away after zoomAway animation completes
-            if (ev.animationName == 'zoomAway') {
-              m.route.set(this._nextRoute);
-            }
-          });
-        }}
+        ref={this.pageRef}
       >
+        <PageControls
+          store={this.pageStore}
+          routes={this.state.routes}
+          toggleSettings={this.toggleSettings}
+          showSettings={this.state.showSettings}
+          leave={this.confirmLeave}
+        />
+        <div className="page-editor">
+          <div className="controls">
+            <input
+              type="text"
+              className="large"
+              placeholder="title..."
+              value={this.state.page.title || ''}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                e.preventDefault();
+                this.pageStore.update((page) => {
+                  page.title = e.target.value;
+                });
+              }}
+            />
+          </div>
+          <PageEditorsComponent contents={this.state.page.contents} />
+        </div>
+
         <ConfirmModalComponent
-          title='You are about to leave this page'
-          visible={() => this.showLeaveModal}
+          title="You are about to leave this page"
+          visible={this.state.showLeaveModal}
           toggle={() => {
-            this.showLeaveModal = !this.showLeaveModal;
-            m.redraw();
+            this.setState((state) => ({
+              showLeaveModal: !state.showLeaveModal,
+            }));
           }}
-          confirmText='Stay'
-          cancelText='Leave'
-          cancelColor='modal-button--red'
-          reject={() => this.goToIndex()}
+          confirmText="Stay"
+          cancelText="Leave"
+          cancelColor="modal-button--red"
+          reject={() => this.setState({nextRoute: true})}
         >
           <p>You have unsaved changes. Are you sure you want to leave this page?</p>
         </ConfirmModalComponent>
-        {controls}
-        <div
-          class='page-editor'
-          oncreate={(v: m.VnodeDOM<any, any>) => {
-            v.dom.addEventListener('click', () => (this.showSettings = false));
-          }}
-        >
-          <div class='controls'>
-            <input
-              type='text'
-              class='large'
-              placeholder='title...'
-              value={this.page.title || ''}
-              onchange={m.withAttr('value', (v: string) => {
-                this.page.title = v;
-              })}
-            />
-          </div>
-          <PageEditorsComponent contents={this.page.contents} />
-        </div>
       </div>
     );
   }

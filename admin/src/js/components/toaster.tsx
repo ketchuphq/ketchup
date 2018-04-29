@@ -1,9 +1,60 @@
-import msx from 'lib/msx';
-import * as m from 'mithril';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import GenericStore from 'lib/store';
+
 const sweepInterval = 500;
-let toasts: Toast[] = [];
+let ToastStore = new GenericStore<Toast[]>((from, _?) => from.slice(), []);
 
 type ToastType = 'error' | 'green';
+
+export default class Toaster extends React.Component {
+  render() {
+    return ReactDOM.createPortal(<ToastList />, document.getElementById('react-root'));
+  }
+}
+
+class ToastList extends React.Component<{}, {toasts: Toast[]}> {
+  componentWillMount() {
+    ToastStore.subscribe('ToastList', (toasts) => {
+      this.setState({toasts});
+    });
+  }
+
+  componentWillUnmount() {
+    ToastStore.unsubscribe('ToastList');
+  }
+
+  render() {
+    let toasts = ToastStore.obj;
+    let klass = 'toast-wrapper';
+    if (toasts.length == 0) {
+      klass += ' toast-wrapper--hidden';
+    }
+    return (
+      <div
+        className={klass}
+        // config={(el: HTMLElement, isInitialized: boolean) => {
+        //   // prevents animation on route change
+        //   if (!isInitialized) {
+        //     for (var i = 0; i < el.children.length; i++) {
+        //       var element = el.children[i];
+        //       element.classList.add('toast--noanimate');
+        //     }
+        //   }
+        // }}
+      >
+        {toasts.map((t) => {
+          let k = ['toast', 'toast--enter', t.getClass(), t.expired() ? 'toast--expired' : ''];
+          return (
+            <div key={t.key} className={k.join(' ')}>
+              <div className="contents">{t.message}</div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+}
 
 class Toast {
   public readonly key: number;
@@ -26,6 +77,7 @@ class Toast {
 }
 
 setInterval(() => {
+  let toasts = ToastStore.obj;
   let now = new Date().getTime() - 2000;
   let prev = toasts.length;
   let hasChange = toasts.reduce((prev, cur) => {
@@ -33,39 +85,12 @@ setInterval(() => {
   }, false);
   toasts = toasts.filter((t) => !t.expired(now));
   if (prev != toasts.length || hasChange) {
-    m.redraw();
+    ToastStore.set(toasts);
   }
 }, sweepInterval);
 
 export function add(message: string, klass: ToastType = 'green') {
-  toasts.push(new Toast(message, 3000, klass));
-  m.redraw();
-}
-
-export function render() {
-  let klass = 'toast-wrapper';
-  if (toasts.length == 0) {
-    klass += ' toast-wrapper--hidden';
-  }
-  return <div
-    class={klass}
-    config={(el: HTMLElement, isInitialized: boolean) => {
-      // prevents animation on route change
-      if (!isInitialized) {
-        for (var i = 0; i < el.children.length; i++) {
-          var element = el.children[i];
-          element.classList.add('toast--noanimate');
-        }
-      }
-    }}
-  >
-    {toasts.map((t) =>
-      <div
-        key={t.key}
-        class={['toast toast--enter', t.getClass(), t.expired() ? 'toast--expired' : ''].join(' ')}
-      >
-        <div class='contents'>{t.message}</div>
-      </div>
-    )}
-  </div>;
+  ToastStore.update((toasts) => {
+    toasts.push(new Toast(message, 3000, klass));
+  });
 }

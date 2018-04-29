@@ -1,11 +1,10 @@
-import msx from 'lib/msx';
+import * as React from 'react';
 
-export const Loader = (
-  <div class='loader loader-large'>
-    <div class='loading0' />
-    <div class='loading1' />
-    <div class='loading2' />
-  </div>
-);
-
-export const loading = (show: boolean) => (!show ? null : Loader);
+export const Loader: React.SFC<{show: boolean}> = (props) =>
+  !props.show ? null : (
+    <div className="loader loader-large">
+      <div className="loading0" />
+      <div className="loading1" />
+      <div className="loading2" />
+    </div>
+  );

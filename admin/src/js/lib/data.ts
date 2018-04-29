@@ -1,5 +1,5 @@
-import * as m from 'mithril';
 import * as API from 'lib/api';
+import {get, post} from 'lib/requests';
 
 export default class Data extends API.Data {
   constructor(config?: API.Data) {
@@ -8,19 +8,12 @@ export default class Data extends API.Data {
   }
 
   static saveList(data: API.Data[]): Promise<API.Data> {
-    return m.request({
-      method: 'POST',
-      url: `/api/v1/data`,
-      data: { data }
-    });
+    return post(`/api/v1/data`, {data}).then((res) => res.json());
   }
 
   static list(): Promise<Data[]> {
-    return m
-      .request({
-        method: 'GET',
-        url: `/api/v1/data`
-      })
+    return get('/api/v1/data')
+      .then((res) => res.json())
       .then((res: API.ListDataResponse) => {
         return res.data.map((el) => new Data(el));
       });

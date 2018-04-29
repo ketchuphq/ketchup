@@ -25,6 +25,9 @@ type Backend interface {
 	// UpdateUser
 	UpdateUser(*models.User) error
 
+	// ListUsers lists all the existing users. May be unsorted.
+	ListUsers() ([]*models.User, error)
+
 	// GetPage looks up a page by uuid, and returns nil, nil if no page.
 	GetPage(uuid string) (*models.Page, error)
 

@@ -1,23 +1,9 @@
 {
   "rules": {
-    "quotemark": [
-      true,
-      "single",
-      "jsx-single"
-    ],
-    "semicolon": [
-      true,
-      "always"
-    ],
-    "no-console": [
-      true,
-      "log",
-      "warn"
-    ],
-    "trailing-comma": [
-      true,
-      "never"
-    ],
+    "quotemark": [true, "single", "jsx-double"],
+    "semicolon": [true, "always", "strict-bound-class-methods"],
+    "no-console": [true, "log", "warn"],
+    "trailing-comma": [true, "never"],
     "no-unused-variable": [
       true,
       {

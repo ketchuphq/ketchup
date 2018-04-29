@@ -8,6 +8,7 @@ import (
 
 	"github.com/octavore/naga/service"
 	"github.com/octavore/nagax/router"
+	"github.com/octavore/nagax/users"
 )
 
 const basePath = "/admin/"
@@ -21,11 +22,13 @@ var staticDirs = []string{
 
 type Module struct {
 	Router *router.Module
+	Auth   *users.Module
 }
 
 func (m *Module) Init(c *service.Config) {
 	c.Setup = func() error {
 		m.Router.Root.Handle(basePath, m)
+		m.Router.Root.HandleFunc("/admin/logout", m.handleLogout)
 		return nil
 	}
 }
@@ -57,4 +60,9 @@ func (m *Module) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	rw.Header().Add("Content-Type", mime.TypeByExtension(ext))
 	rw.Write(b)
+}
+
+func (m *Module) handleLogout(rw http.ResponseWriter, req *http.Request) {
+	m.Auth.Logout(rw, req)
+	http.Redirect(rw, req, "/admin", http.StatusTemporaryRedirect)
 }

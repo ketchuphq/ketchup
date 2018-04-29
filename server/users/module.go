@@ -3,7 +3,6 @@ package users
 import (
 	"github.com/octavore/naga/service"
 	"github.com/octavore/nagax/logger"
-	"github.com/octavore/nagax/router"
 	"github.com/octavore/nagax/users"
 	"github.com/octavore/nagax/users/databaseauth"
 	"github.com/octavore/nagax/users/session"
@@ -19,7 +18,6 @@ type Module struct {
 	Auth     *users.Module
 	Sessions *session.Module
 	Config   *config.Module
-	Router   *router.Module
 	DB       *db.Module
 	Logger   *logger.Module
 
@@ -33,6 +31,7 @@ func (m *Module) Init(c *service.Config) {
 	c.AddCommand(registerSetPassword(m))
 	c.AddCommand(registerUserAdd(m))
 	c.AddCommand(registerGenerateToken(m))
+	c.AddCommand(registerListUsers(m))
 
 	c.Setup = func() error {
 		m.DBAuth.Configure(

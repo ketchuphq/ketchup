@@ -1,5 +1,4 @@
-import * as m from 'mithril';
-import msx from 'lib/msx';
+import * as React from 'react';
 import * as API from 'lib/api';
 import EditorComponent from 'components/editors/editor';
 import QuillComponent from 'components/editors/html';
@@ -8,49 +7,57 @@ import CodeMirrorComponent from 'components/editors/markdown';
 
 interface ContentEditor {
   shouldRender(content: API.Content): boolean;
-  render(content: API.Content): m.Vnode<any, any>;
+  render(content: API.Content): React.ReactElement<any>;
 }
 
 let LongHTMLEditor: ContentEditor = {
-  shouldRender: (content: API.Content) =>
-    content.text != null && content.text.type == 'html',
-  render: (content: API.Content) =>
-    <EditorComponent content={content} />
+  shouldRender: (content: API.Content) => content.text != null && content.text.type == 'html',
+  render: (content: API.Content) => <EditorComponent content={content} />,
 };
 
 let LongMarkdownEditor: ContentEditor = {
-  shouldRender: (content: API.Content) =>
-    content.text != null && content.text.type == 'markdown',
-  render: (content: API.Content) =>
-    <CodeMirrorComponent content={content} />
+  shouldRender: (content: API.Content) => content.text != null && content.text.type == 'markdown',
+  render: (content: API.Content) => <CodeMirrorComponent content={content} />,
 };
 
 let LongTextEditor: ContentEditor = {
-  shouldRender: (content: API.Content) =>
-    content.text != null && content.text.type == 'text',
-  render: (content: API.Content) =>
-    <TextEditorComponent content={content} />
+  shouldRender: (content: API.Content) => content.text != null && content.text.type == 'text',
+  render: (content: API.Content) => <TextEditorComponent content={content} />,
 };
+
+// exported for test
+export class ShortTextEditorComponent extends React.PureComponent<{content: API.Content}> {
+  textInput: React.RefObject<HTMLInputElement>;
+  constructor(props: any) {
+    super(props);
+    this.textInput = React.createRef();
+  }
+  componentDidMount() {
+    this.textInput.current.value = this.props.content.value;
+  }
+
+  render() {
+    return (
+      <input
+        type="text"
+        ref={this.textInput}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+          this.props.content.value = e.target.value;
+        }}
+      />
+    );
+  }
+}
 
 let ShortTextEditor: ContentEditor = {
   shouldRender: (content: API.Content) =>
     content.short != null && (content.short.type == 'text' || content.short.type == 'markdown'),
-  render: (content: API.Content) =>
-    <input type='text'
-      oncreate={(v: m.VnodeDOM<any, any>) => {
-        (v.dom as HTMLTextAreaElement).value = content.value || '';
-      }}
-      onchange={(e: EventTarget) => {
-        content.value = (e as any).target.value;
-      }}
-    />
+  render: (content: API.Content) => <ShortTextEditorComponent content={content} />,
 };
 
 let ShortHTMLEditor: ContentEditor = {
-  shouldRender: (content: API.Content) =>
-    content.short != null && content.short.type == 'html',
-  render: (content: API.Content) =>
-    <QuillComponent content={content} />
+  shouldRender: (content: API.Content) => content.short != null && content.short.type == 'html',
+  render: (content: API.Content) => <QuillComponent content={content} />,
 };
 
 let editors: ContentEditor[] = [
@@ -61,18 +68,21 @@ let editors: ContentEditor[] = [
   ShortTextEditor,
 ];
 
-export function renderEditor(c: API.Content | API.Data, hideLabel: boolean): m.Vnode<any, any> {
+export let Editor: React.SFC<{
+  content: API.Content | API.Data;
+  hideLabel: boolean;
+}> = (props) => {
   for (var i = 0; i < editors.length; i++) {
     let editor = editors[i];
-    if (editor.shouldRender(c)) {
-      return <div class='controls'>
-        <div class='control control-full'>
-          {hideLabel ? '' : <div class='label'>{c.key}</div>}
-          {editor.render(c)}
+    if (editor.shouldRender(props.content)) {
+      return (
+        <div className="controls">
+          <div className="control control-full">
+            {props.hideLabel ? '' : <div className="label">{props.content.key}</div>}
+            {editor.render(props.content)}
+          </div>
         </div>
-      </div>;
+      );
     }
   }
-
-  console.log('no editor defined for object:', JSON.stringify(c));
-}
+};

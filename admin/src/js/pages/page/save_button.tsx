@@ -1,47 +1,47 @@
-import * as m from 'mithril';
-import msx from 'lib/msx';
+import * as React from 'react';
 import * as API from 'lib/api';
-import Page from 'lib/page';
+import * as Page from 'lib/page';
+import Route from 'lib/route';
 import * as Toaster from 'components/toaster';
-import { BaseComponent } from 'components/auth';
 
-interface PageSaveButtonAttrs {
-  page: Page;
-  onsave: (page: Page) => void;
+interface Props {
+  store: Page.Store;
+  routes: API.Route[];
   classes?: string;
 }
 
-export default class PageSaveButtonComponent extends BaseComponent<PageSaveButtonAttrs> {
-  constructor(v: m.CVnode<PageSaveButtonAttrs>) {
-    super(v);
+export default class PageSaveButtonComponent extends React.Component<Props> {
+  constructor(props: Props) {
+    super(props);
   }
 
-  save() {
-    let page = this.props.page;
-    page.save().then((p: API.Page) => {
-      page.uuid = p.uuid;
-      window.history.replaceState(null, page.title, `/admin/pages/${p.uuid}`);
-      return page.saveRoutes();
-    })
+  save = (e: React.MouseEvent<any>) => {
+    e.preventDefault();
+    const {store, routes} = this.props;
+    store
+      .save()
+      .then(() => {
+        window.history.replaceState(null, store.page.title, `/admin/pages/${store.page.uuid}`);
+        return Route.saveRoutes(store.page, routes);
+      })
       .then(() => {
         Toaster.add('Page successfully saved');
-        this.props.onsave(page);
       })
       .catch((err: any) => {
         if (err.detail) {
           Toaster.add(err.detail, 'error');
         } else {
           Toaster.add('Internal server error.', 'error');
+          console.log(err);
         }
       });
-  }
+  };
 
-  view() {
-    return <a
-      class={`button button--green ${this.props.classes || ''}`}
-      onclick={(e: Event) => { e.stopPropagation(); this.save(); }}
-    >
-      Save
-    </a>;
+  render() {
+    return (
+      <a className={`button button--green ${this.props.classes || ''}`} onClick={this.save}>
+        Save
+      </a>
+    );
   }
 }
