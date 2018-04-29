@@ -19,7 +19,7 @@ let bindata = () =>
       }))
 
 gulp.task('bindata', ['css', 'js', 'html', 'images'], bindata)
-gulp.task('bindata:partial', ['css', 'js:internal', 'js:lint', 'js:webpack', 'html', 'images'], bindata)
+gulp.task('bindata:partial', ['css', 'js:lint', 'js:webpack', 'html', 'images'], bindata)
 
 gulp.task('bindata:watch', ['bindata'], () =>
   gulp.watch('./src/**', ['bindata:partial'])
