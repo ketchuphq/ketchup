@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {Link} from 'react-router-dom';
+import {Loader} from 'components/loading';
 
 interface Props {
   handler?: () => Promise<any>;
@@ -40,26 +41,20 @@ export default class Button extends React.Component<Props, State> {
   render() {
     let className = `button ${this.props.className}`;
     if (this.state.loading) {
-      return (
-        <a className={`button--loading ${className}`}>
-          <div className="loader">
-            <div className="loading0" />
-            <div className="loading1" />
-            <div className="loading2" />
-          </div>
-        </a>
-      );
+      className += ' button--loading';
     }
     if (!this.props.href) {
       return (
         <a className={className} id={this.props.id} onClick={this.handler}>
           <div className="button__inner">{this.props.children}</div>
+          {this.state.loading && <Loader show small />}
         </a>
       );
     }
     return (
       <Link className={className} to={this.props.href} id={this.props.id} onClick={this.handler}>
         <div className="button__inner">{this.props.children}</div>
+        {this.state.loading && <Loader show small />}
       </Link>
     );
   }
