@@ -50,16 +50,26 @@ export default class Route implements API.Route {
       });
   }
 
-  static getRoutes(page: API.Page): Promise<Route[]> {
+  static getRoutes(page: API.Page): Promise<API.Route[]> {
     return fetch(`/api/v1/pages/${page.uuid}/routes`)
       .then((res) => res.json())
       .then((res: {routes: API.Route[]}) => {
-        return res.routes.map((r) => new Route(r));
+        return res.routes;
       });
   }
 
-  static saveRoutes(page: API.Page, routes: API.Route[]) {
-    return post(`/api/v1/pages/${page.uuid}/routes`, {routes});
+  static saveRoutes(page: API.Page, routes: API.Route[], isNewPage: boolean): Promise<API.Route[]> {
+    if (isNewPage && (routes.length == 0 || !routes[0].path) && infer(page)) {
+      routes = [
+        {
+          path: infer(page),
+        },
+      ];
+    }
+    routes.forEach((r) => (r.path = Route.format(r.path)));
+    return post(`/api/v1/pages/${page.uuid}/routes`, {routes})
+      .then((res) => res.json())
+      .then((res: API.ListRouteResponse) => res.routes);
   }
 
   static saveList(routes: Route[], pageUUID: string) {
@@ -73,4 +83,11 @@ export default class Route implements API.Route {
       }
     });
   }
+}
+
+function infer(page: API.Page) {
+  if (!page.title || page.title.trim() == '') {
+    return;
+  }
+  return Route.format(page.title);
 }

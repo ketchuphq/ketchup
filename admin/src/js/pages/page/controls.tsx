@@ -6,10 +6,11 @@ import PageSaveButtonComponent from 'pages/page/save_button';
 import PageThemePickerComponent from 'pages/page/theme_picker';
 import PageEditRoutesComponent from 'pages/page/edit_route';
 import * as React from 'react';
+import GenericStore, {Data} from 'lib/store';
 
 interface ControlsProps {
   store: Page.Store;
-  routes: API.Route[];
+  routesStore: GenericStore<Data<API.Route[]>>;
   toggleSettings: () => void;
   showSettings: boolean;
   leave: () => void;
@@ -17,28 +18,27 @@ interface ControlsProps {
 
 export default class PageControls extends React.Component<ControlsProps, {}> {
   render() {
+    const stores = {
+      store: this.props.store,
+      routesStore: this.props.routesStore,
+    };
     return (
       <div className="page-max__controls">
-        <PageSaveButtonComponent store={this.props.store} routes={this.props.routes} />
+        <PageSaveButtonComponent {...stores} />
         <span className="typcn typcn-cog" onClick={() => this.props.toggleSettings()} />
         <Popover visible={this.props.showSettings}>
           <div className="controlset">
             <div className="settings">
               <div className="controls">
                 <div className="control">
-                  {this.props.store.page ? (
-                    <PageEditRoutesComponent
-                      page={this.props.store.page}
-                      routes={this.props.routes}
-                    />
-                  ) : null}
+                  {this.props.store.page ? <PageEditRoutesComponent {...stores} /> : null}
                 </div>
               </div>
               <div className="controls">
                 <PageThemePickerComponent store={this.props.store} />
               </div>
             </div>
-            <PageButtonsComponent store={this.props.store} routes={this.props.routes} />
+            <PageButtonsComponent {...stores} />
           </div>
         </Popover>
         <a

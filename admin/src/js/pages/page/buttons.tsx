@@ -3,10 +3,11 @@ import * as Page from 'lib/page';
 import * as Toaster from 'components/toaster';
 import PageSaveButtonComponent from 'pages/page/save_button';
 import * as API from 'lib/api';
+import GenericStore, {Data} from 'lib/store';
 
 interface Props {
   store: Page.Store;
-  routes: API.Route[];
+  routesStore: GenericStore<Data<API.Route[]>>;
 }
 
 interface State {
@@ -68,11 +69,7 @@ export default class PageButtonsComponent extends React.Component<Props, State> 
     let page = this.props.store.page;
     return (
       <div className="save-publish">
-        <PageSaveButtonComponent
-          store={this.props.store}
-          routes={this.props.routes}
-          classes="button--small"
-        />
+        <PageSaveButtonComponent classes="button--small" {...this.props} />
         {!page.uuid ? '' : deleteButton}
         {Page.isPublished(page) ? unpublishButton : publishButton}
       </div>

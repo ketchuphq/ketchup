@@ -42,13 +42,13 @@ export class Store extends GenericStore<API.Page> {
       .then((page: API.Page) => this.set(page));
   }
 
-  save(): Promise<Response> {
-    return post(`/api/v1/pages`, API.Page.copy(this.page)).then((res) => {
-      if (res.status == 200) {
-        this.set(this.page);
-      }
-      return res;
-    });
+  save(): Promise<API.Page> {
+    return post(`/api/v1/pages`, API.Page.copy(this.page))
+      .then((res) => res.json())
+      .then((page: API.Page) => {
+        this.set(page);
+        return page;
+      });
   }
 
   // updateContent updates the page contents by iterating over page contents

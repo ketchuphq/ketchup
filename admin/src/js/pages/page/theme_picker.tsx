@@ -58,6 +58,10 @@ export default class ThemePickerComponent extends React.Component<Props, State> 
     });
   }
 
+  componentWillUnmount() {
+    this.props.store.unsubscribe('theme-picker');
+  }
+
   selectTheme(name: string, template?: string) {
     return Theme.get(name).then((theme) => {
       let templates = Object.keys(theme.templates).sort();

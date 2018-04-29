@@ -9,11 +9,12 @@ import isEqual from 'lodash-es/isEqual';
 import PageControls from 'pages/page/controls';
 import PageEditorsComponent from 'pages/page/editors';
 import * as React from 'react';
+import GenericStore, {Data} from 'lib/store';
 
 interface State {
   page: API.Page;
+  theme: string;
   template: API.ThemeTemplate;
-  routes: Route[];
   dirty: boolean;
   showSettings: boolean;
   showLeaveModal: boolean;
@@ -28,16 +29,24 @@ export default class PagePage extends React.Component<
   _clickStart: DOMTokenList; // keep track of click location to prevent firing on drag
 
   pageStore: Page.Store;
+  routesStore: GenericStore<Data<API.Route[]>>;
   initialContent: API.Content[];
   pageRef: React.RefObject<HTMLDivElement>;
 
   constructor(props: PrivateRouteComponentProps<{id: string}>) {
     super(props);
     this.pageStore = new Page.Store();
+    this.routesStore = new GenericStore<Data<API.Route[]>>(
+      (from, _?) => ({
+        initial: from.initial,
+        current: from.current.slice(),
+      }),
+      {}
+    );
     this.state = {
       page: null,
+      theme: null,
       template: null,
-      routes: [],
       dirty: false,
       showSettings: false,
       showLeaveModal: false,
@@ -83,12 +92,24 @@ export default class PagePage extends React.Component<
       this.pageStore
         .get(this.state.pageUUID)
         .then((page) => Route.getRoutes(page))
-        .then((routes) => this.setState({routes}));
+        .then((routes) => {
+          if (!routes || routes.length == 0) {
+            routes.push({});
+          }
+          this.routesStore.set({
+            initial: cloneDeep(routes),
+            current: routes,
+          });
+        });
     } else {
       // new page
       const page = Page.newPage();
       page.authors = [{uuid: this.props.user.uuid}];
       this.pageStore.set(page);
+      this.routesStore.set({
+        initial: [],
+        current: [{}],
+      });
     }
   }
 
@@ -98,11 +119,13 @@ export default class PagePage extends React.Component<
 
   // fetchThemeTemplate fetches the Theme from the backend
   // Note: this gets called in the page update callback.
-  fetchThemeTemplate = (theme: string, template: string): Promise<Theme | void> => {
+  fetchThemeTemplate = (theme: string, template: string): Promise<void> => {
+    if (theme == this.state.theme && template == this.state.template.name) {
+      return Promise.resolve();
+    }
     return Theme.get(theme).then(
       (t) => {
-        this.setState({template: t.getTemplate(template)});
-        return t;
+        this.setState({theme, template: t.getTemplate(template)});
       },
       () => {
         if (theme == 'none' && template == 'html') {
@@ -111,7 +134,6 @@ export default class PagePage extends React.Component<
         // catch deleted theme
         return Theme.get('none').then((t) => {
           this.pageStore.setThemeTemplate(t, t.getTemplate('html'));
-          return t;
         });
       }
     );
@@ -123,7 +145,10 @@ export default class PagePage extends React.Component<
       return;
     }
     this.setState((prev) => {
-      let dirty = prev.dirty || !isEqual(this.initialContent, this.state.page.contents);
+      let dirty =
+        prev.dirty ||
+        !isEqual(this.initialContent, this.state.page.contents) ||
+        !isEqual(this.routesStore.obj.initial, this.routesStore.obj.current);
       let showLeaveModal = dirty || prev.showLeaveModal;
       return {dirty, showLeaveModal, nextRoute: !showLeaveModal};
     });
@@ -155,7 +180,7 @@ export default class PagePage extends React.Component<
       >
         <PageControls
           store={this.pageStore}
-          routes={this.state.routes}
+          routesStore={this.routesStore}
           toggleSettings={this.toggleSettings}
           showSettings={this.state.showSettings}
           leave={this.confirmLeave}

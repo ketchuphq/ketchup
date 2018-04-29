@@ -1,71 +1,92 @@
 import * as API from 'lib/api';
-import Route from 'lib/route';
 import * as React from 'react';
+import GenericStore, {Data} from 'lib/store';
 
-interface Props {
-  page: API.Page;
-  routes: API.Route[];
+interface EditorProps {
+  index: number;
+  routesStore: GenericStore<Data<API.Route[]>>;
 }
 
-interface State {
-  dirty: boolean;
+interface EditorState {
+  path: string;
 }
 
-export default class EditRoutesComponent extends React.Component<Props, State> {
-  constructor(props: Props) {
+class RouteEditor extends React.Component<EditorProps, EditorState> {
+  readonly originalPath: string;
+  constructor(props: EditorProps) {
     super(props);
-    let {routes} = props;
-    let dirty = true;
-    if (routes.length == 0) {
-      routes.push({});
-      dirty = false;
-    } else if (!routes[0].path) {
-      dirty = false;
-    }
-    this.state = {dirty};
+    this.state = {
+      path: this.getRoute().path || '',
+    };
+    this.originalPath = this.state.path;
   }
 
-  infer() {
-    let {page, routes} = this.props;
-    if (this.state.dirty) {
-      return;
-    }
-    if (routes.length < 1) {
-      return;
-    }
-    if (!!routes[0].path) {
-      return;
-    }
-    if (!page.title || page.title.trim() == '') {
-      return;
-    }
-    routes[0].path = Route.format(page.title);
+  getRoute = () => this.props.routesStore.obj.current[this.props.index];
+
+  componentDidMount() {
+    this.props.routesStore.subscribe(this.originalPath, (data) => {
+      this.setState({
+        path: data.current[this.props.index].path || '',
+      });
+    });
   }
 
-  routeEditor = (route: API.Route, i: number) => {
-    this.infer();
-    let key = route.uuid || route.path || 'new';
+  componentWillUnmount() {
+    this.props.routesStore.unsubscribe(this.originalPath);
+  }
+
+  render() {
     return (
-      <div key={key}>
+      <div>
         <input
           type="text"
           placeholder="/path/to/page"
-          value={Route.format(route.path)}
+          value={this.state.path}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            this.setState({dirty: true});
-            route.path = Route.format(e.target.value);
+            this.props.routesStore.update((data) => {
+              data.current[this.props.index].path = e.target.value;
+            });
           }}
         />
-        {i > 0 ? <a onClick={() => this.props.routes.splice(i, 1)}>&times;</a> : null}
       </div>
     );
-  };
+  }
+}
+
+interface Props {
+  routesStore: GenericStore<Data<API.Route[]>>;
+}
+
+interface State {
+  routes: API.Route[];
+}
+
+export default class PageEditRoutesComponent extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = {routes: []};
+    this.props.routesStore.subscribe('edit_route', (data) => {
+      this.setState({routes: data.current});
+    });
+  }
+
+  componentWillMount() {
+    this.setState({
+      routes: this.props.routesStore.obj.current || [],
+    });
+  }
+
+  componentWillUnmount() {
+    this.props.routesStore.unsubscribe('edit_route');
+  }
 
   render() {
     return (
       <div className="edit-route control">
         <div className="label">Permalink</div>
-        {this.props.routes.map(this.routeEditor)}
+        {this.state.routes.map((r, i) => (
+          <RouteEditor key={r.uuid || 'new'} routesStore={this.props.routesStore} index={i} />
+        ))}
       </div>
     );
   }

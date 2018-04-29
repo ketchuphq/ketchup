@@ -1,3 +1,8 @@
+export interface Data<T> {
+  initial?: T;
+  current?: T;
+}
+
 export default class GenericStore<T> {
   obj: T;
   copy: (from: T, to?: T) => T;
