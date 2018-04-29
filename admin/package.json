@@ -3,6 +3,16 @@
   "scripts": {
     "fmt": "prettier --write 'src/js/**/*.ts?'"
   },
+  "jest": {
+    "roots": ["<rootDir>/src"],
+    "modulePaths": ["<rootDir>/src/js"],
+    "setupTestFrameworkScriptFile": "<rootDir>/src/test/setup.ts",
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
+    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
+  },
   "prettier": {
     "printWidth": 100,
     "singleQuote": true,
@@ -11,6 +21,13 @@
     "useTabs": false,
     "tabWidth": 2,
     "trailingComma": "es5"
+  },
+  "eslintConfig": {
+    "env": {"es6": true, "node": true},
+    "extends": "eslint:recommended",
+    "rules": {
+      "semi": "warn"
+    }
   },
   "devDependencies": {
     "@types/codemirror": "^0.0.56",
