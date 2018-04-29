@@ -155,5 +155,20 @@ func (m *Module) UpdateRoutesByPage(rw http.ResponseWriter, req *http.Request, p
 		}
 	}
 
-	return m.Content.ReloadRouter()
+	err = m.Content.ReloadRouter()
+	if err != nil {
+		return err
+	}
+
+	routes, err := m.DB.ListRoutes(&api.ListRouteRequest{
+		Options: &api.ListRouteRequest_ListRouteOptions{
+			PageUuid: &pageUUID,
+		},
+	})
+	if err != nil {
+		return err
+	}
+	return router.ProtoOK(rw, &api.ListRouteResponse{
+		Routes: db.SortRoutesByPath(routes),
+	})
 }

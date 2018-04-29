@@ -381,6 +381,15 @@ export abstract class ListDataResponse {
   }
 }
 
+export abstract class ListRouteResponse {
+  routes?: Route[];
+  static copy(from: ListRouteResponse, to?: ListRouteResponse): ListRouteResponse {
+    to = to || {};
+    to.routes = from.routes;
+    return to;
+  }
+}
+
 export abstract class UpdateDataRequest {
   data?: Data[];
   static copy(from: UpdateDataRequest, to?: UpdateDataRequest): UpdateDataRequest {
@@ -428,16 +437,14 @@ export abstract class CheckThemeForUpdateResponse {
 }
 
 export abstract class Error {
-  code?: string;
-  title?: string;
+  code?: number;
+  title?: ErrorCode;
   detail?: string;
-  field?: string;
   static copy(from: Error, to?: Error): Error {
     to = to || {};
     to.code = from.code;
     to.title = from.title;
     to.detail = from.detail;
-    to.field = from.field;
     return to;
   }
 }
@@ -453,5 +460,6 @@ export abstract class ErrorResponse {
 
 export type ContentMultiple_DropdownType = 'dropdown' | 'radio' | 'unknown';
 export type ContentTextType = 'html' | 'markdown' | 'text';
+export type ErrorCode = 'bad_request' | 'forbidden' | 'internal_server_error' | 'not_authorized' | 'not_found';
 export type ListPageRequest_ListPageFilter = 'all' | 'draft' | 'published';
 export type PackageType = 'plugin' | 'theme' | 'unknown';

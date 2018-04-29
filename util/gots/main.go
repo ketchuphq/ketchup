@@ -49,6 +49,7 @@ func main() {
 		api.ListPageResponse{},
 		api.ListOptions{},
 		api.ListDataResponse{},
+		api.ListRouteResponse{},
 		api.UpdateDataRequest{},
 		api.GetThemeResponse{},
 		api.InstallThemeRequest{},
