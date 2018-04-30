@@ -29,5 +29,7 @@ func newLegoAcmeClient(user acme.User, cp acme.ChallengeProvider) (acmeClient, e
 	if err != nil {
 		return nil, err
 	}
+	// only support http-01
+	c.ExcludeChallenges([]acme.Challenge{acme.TLSSNI01, acme.DNS01})
 	return legoAcme{c}, nil
 }
