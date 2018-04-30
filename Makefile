@@ -30,9 +30,9 @@ goreleaser.yml:
 
 include make/*.mk
 
+prepare: prepare-admin prepare-vendor
 prepare-admin:
 	make -C admin prepare
-
 prepare-vendor:
 	go get -u github.com/kardianos/govendor
 	govendor sync

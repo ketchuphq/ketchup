@@ -33,7 +33,7 @@ To get started, you’ll first need to install **Go** and **Node**. They are use
 Then, run the following to download frontend and backend dependencies:
 
 ```
-make prepare-admin prepare-vendor
+make prepare
 ```
 
 ### Compiling
