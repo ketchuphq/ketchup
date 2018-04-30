@@ -119,21 +119,23 @@ export default class PagePage extends React.Component<
 
   // fetchThemeTemplate fetches the Theme from the backend
   // Note: this gets called in the page update callback.
-  fetchThemeTemplate = (theme: string, template: string): Promise<void> => {
-    if (theme == this.state.theme && template == this.state.template.name) {
+  fetchThemeTemplate = (themeName: string, templateName: string): Promise<void> => {
+    if (themeName == this.state.theme && templateName == this.state.template.name) {
       return Promise.resolve();
     }
-    return Theme.get(theme).then(
-      (t) => {
-        this.setState({theme, template: t.getTemplate(template)});
+    return Theme.get(themeName).then(
+      ({theme}) => {
+        let template = Theme.getTemplate(theme, templateName);
+        this.setState({theme: themeName, template});
       },
       () => {
-        if (theme == 'none' && template == 'html') {
+        if (themeName == 'none' && templateName == 'html') {
           return;
         }
         // catch deleted theme
-        return Theme.get('none').then((t) => {
-          this.pageStore.setThemeTemplate(t, t.getTemplate('html'));
+        return Theme.get('none').then(({theme}) => {
+          let template = Theme.getTemplate(theme, templateName);
+          this.pageStore.setThemeTemplate(theme, template);
         });
       }
     );
