@@ -107,7 +107,7 @@ A brief run through of the things without which this project would not exist:
 - **Go**, powerful in its simplicity.
 - **Typescript**, types are great.
 - **SASS**, who even writes CSS.
-- **Mithril**, simple yet batteries-included.
+- **React**, you already know what this is.
 - **Protobufs**, autogenerating Go structs and Typescript interfaces for the API is kind of magical ([shameless plug](https://github.com/octavore/pbts)). Version 2 is used because it is nice to be able to differentiate between missing fields and set fields.
 - **BoltDB**, embeddable and needs no additional setup.
 
