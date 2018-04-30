@@ -425,6 +425,17 @@ export abstract class InstallThemeRequest {
   }
 }
 
+export abstract class UpdateThemeRequest {
+  name?: string;
+  ref?: string;
+  static copy(from: UpdateThemeRequest, to?: UpdateThemeRequest): UpdateThemeRequest {
+    to = to || {};
+    to.name = from.name;
+    to.ref = from.ref;
+    return to;
+  }
+}
+
 export abstract class CheckThemeForUpdateResponse {
   oldRef?: string;
   currentRef?: string;

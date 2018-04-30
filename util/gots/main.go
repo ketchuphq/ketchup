@@ -53,6 +53,7 @@ func main() {
 		api.UpdateDataRequest{},
 		api.GetThemeResponse{},
 		api.InstallThemeRequest{},
+		api.UpdateThemeRequest{},
 		api.CheckThemeForUpdateResponse{},
 
 		router_api.Error{},
