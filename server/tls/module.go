@@ -42,6 +42,7 @@ type Module struct {
 	challenge *acmeChallenge
 	keystore  *keystore.KeyStore
 
+	server              *http.Server
 	serverStarted       bool
 	renewWithinInterval time.Duration
 }
@@ -93,7 +94,7 @@ Required params: domain to provision a cert for; contact email for Let's Encrypt
 	}
 	c.Start = func() {
 		go func() {
-			err := m.StartTLSProxy()
+			err := m.startTLSProxy()
 			if err != nil {
 				m.Logger.Error(errors.Wrap(err))
 			}
@@ -175,7 +176,15 @@ func (m *Module) renewExpiredCerts() error {
 				return errors.Wrap(err)
 			}
 			err = m.saveCert(newCert)
-			return errors.Wrap(err)
+			if err != nil {
+				return errors.Wrap(err)
+			}
+			m.Logger.Infof("successfully renewed cert for %s; restarting server", domain)
+			err = m.restartTLSProxy()
+			if err != nil {
+				return errors.Wrap(err)
+			}
+			m.Logger.Info("server restarted")
 		}
 	}
 	return nil

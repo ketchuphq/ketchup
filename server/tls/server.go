@@ -1,6 +1,7 @@
 package tls
 
 import (
+	"context"
 	"crypto/tls"
 	"net/http"
 	"os"
@@ -9,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/octavore/nagax/util/errors"
 	"github.com/unrolled/secure"
 )
 
@@ -45,9 +47,9 @@ func (m *Module) loadTLSConfig() (*tls.Config, error) {
 	return tlsConfig, nil
 }
 
-// StartTLSProxy starts the tls proxy on port 443. SSL is terminated
+// startTLSProxy starts the tls proxy on port 443. SSL is terminated
 // and the connection in passed to the Router.
-func (m *Module) StartTLSProxy() error {
+func (m *Module) startTLSProxy() error {
 	if m.serverStarted {
 		return nil
 	}
@@ -63,7 +65,7 @@ func (m *Module) StartTLSProxy() error {
 	if err != nil {
 		return err
 	}
-	server := &http.Server{
+	m.server = &http.Server{
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 30 * time.Second,
 		Handler:      m.Router.Root,
@@ -75,5 +77,24 @@ func (m *Module) StartTLSProxy() error {
 	m.Router.Middleware.Prepend(https.HandlerFuncWithNext)
 
 	m.serverStarted = true
-	return server.Serve(l)
+	return m.server.Serve(l)
+}
+
+// restartTLSProxy restarts the TLS proxy by first shutting
+// down the old server and then starting a new one.
+func (m *Module) restartTLSProxy() error {
+	if m.serverStarted {
+		m.serverStarted = false
+		err := m.server.Shutdown(context.Background())
+		if err != nil {
+			return errors.Wrap(err)
+		}
+	}
+	go func() {
+		err := m.startTLSProxy()
+		if err != nil {
+			m.Logger.Error(errors.Wrap(err))
+		}
+	}()
+	return nil
 }
