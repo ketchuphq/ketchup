@@ -59,6 +59,14 @@ func (d *DummyDB) UpdateUser(u *models.User) error {
 	return nil
 }
 
+func (d *DummyDB) ListUsers() ([]*models.User, error) {
+	lst := []*models.User{}
+	for _, u := range d.Users {
+		lst = append(lst, u)
+	}
+	return lst, nil
+}
+
 func (d *DummyDB) GetPage(uuid string) (*models.Page, error) {
 	return d.Pages[uuid], nil
 }
