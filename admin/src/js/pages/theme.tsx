@@ -1,7 +1,7 @@
 import Button from 'components/button';
 import Layout from 'components/layout';
 import {Loader} from 'components/loading';
-import {ConfirmModalComponent} from 'components/modal';
+import {ConfirmModalComponent, ModalComponent} from 'components/modal';
 import {LinkRow, Row, Table} from 'components/table';
 import * as API from 'lib/api';
 import {Package} from 'lib/api';
@@ -12,13 +12,15 @@ import {Link} from 'react-router-dom';
 
 interface ThemeProps {
   theme: API.Theme;
-  ref?: string;
+  themeRef?: string;
 }
 
 interface VersionState {
   showUpdateModal: boolean;
   hasUpdate: boolean;
+  message?: string;
   latestRef?: string;
+  updating?: boolean;
 }
 
 class VersionSection extends React.Component<ThemeProps, VersionState> {
@@ -30,26 +32,46 @@ class VersionSection extends React.Component<ThemeProps, VersionState> {
     };
   }
 
-  checkUpdates() {
+  checkUpdates = () => {
     return Theme.checkForUpdates(this.props.theme.name).then(({currentRef}) => {
-      if (!currentRef) {
+      if (!currentRef || this.props.themeRef == currentRef) {
         this.setState({
-          latestRef: 'No updates found.',
+          message: 'No updates found.',
           hasUpdate: false,
           showUpdateModal: true,
         });
       } else {
         this.setState({
-          latestRef: `Latest ref: ${currentRef.slice(0, 6)}`,
+          message: `There is a newer version available: ${currentRef.slice(0, 6)}. Update?`,
+          latestRef: currentRef,
           hasUpdate: true,
           showUpdateModal: true,
         });
       }
     });
-  }
+  };
+
+  doUpdate = () => {
+    if (this.state.hasUpdate && this.state.latestRef) {
+      this.setState({updating: true});
+      Theme.updateToRelease(this.props.theme.name, this.state.latestRef).then(
+        () => {
+          location.reload();
+        },
+        () => {
+          this.setState({
+            message: 'Error updating theme.',
+            hasUpdate: false,
+            showUpdateModal: true,
+            updating: false,
+          });
+        }
+      );
+    }
+  };
 
   render() {
-    if (!this.props.ref) {
+    if (!this.props.themeRef) {
       return null;
     }
     return (
@@ -57,7 +79,7 @@ class VersionSection extends React.Component<ThemeProps, VersionState> {
         <h2>Version</h2>
         <div className="table">
           <div className="tr tr--center">
-            <code>{this.props.ref}</code>
+            <code>{this.props.themeRef}</code>
             <Button className="button--green button--small" handler={() => this.checkUpdates()}>
               Check for Updates
             </Button>
@@ -65,15 +87,17 @@ class VersionSection extends React.Component<ThemeProps, VersionState> {
         </div>
         <ConfirmModalComponent
           title="Updates"
-          visible={this.state.showUpdateModal}
+          visible={this.state.showUpdateModal && !this.state.updating}
+          resolve={this.doUpdate}
           toggle={() => {
             this.setState((state) => ({showUpdateModal: !state.showUpdateModal}));
           }}
           confirmText={this.state.hasUpdate ? 'Update' : 'Okay'}
           hideCancel={this.state.hasUpdate}
         >
-          <p>{this.state.latestRef}</p>
+          <p>{this.state.message}</p>
         </ConfirmModalComponent>
+        <ModalComponent title="Updating theme..." visible={this.state.updating} toggle={() => {}} />
       </div>
     );
   }
@@ -181,6 +205,7 @@ class PackageSection extends React.PureComponent<PackageProps> {
 
 interface State {
   theme?: API.Theme;
+  themeRef?: string;
 }
 
 export default class ThemePage extends React.Component<RouteComponentProps<{id: string}>, State> {
@@ -190,8 +215,8 @@ export default class ThemePage extends React.Component<RouteComponentProps<{id: 
   }
 
   componentDidMount() {
-    Theme.get(this.props.match.params.id).then((theme) => {
-      this.setState({theme});
+    Theme.get(this.props.match.params.id).then(({theme, ref}) => {
+      this.setState({theme, themeRef: ref});
     });
   }
 
@@ -219,7 +244,7 @@ export default class ThemePage extends React.Component<RouteComponentProps<{id: 
           </h1>
         </header>
         <p className="txt-large">{theme.description}</p>
-        <VersionSection theme={theme} />
+        <VersionSection theme={theme} themeRef={this.state.themeRef} />
         <PackageSection pkg={theme.package} />
         <TemplatesSection theme={theme} />
         <AssetsSection theme={theme} />

@@ -12,20 +12,21 @@ export default class Theme extends API.Theme {
     this.ref = ref;
   }
 
-  getTemplate(name: string): API.ThemeTemplate {
-    return this.templates[name];
+  static getTemplate(theme: API.Theme, name: string): API.ThemeTemplate {
+    return theme.templates[name];
   }
 
   static checkForUpdates(name: string): Promise<API.CheckThemeForUpdateResponse> {
     return get(`/api/v1/themes/${name}/updates`).then((res) => res.json());
   }
 
-  static get(name: string): Promise<Theme> {
-    return get(`/api/v1/themes/${name}`)
-      .then((res) => res.json())
-      .then((data: API.GetThemeResponse) => {
-        return new Theme(data.theme, data.ref);
-      });
+  static updateToRelease(name: string, ref: string): Promise<API.CheckThemeForUpdateResponse> {
+    let data: API.UpdateThemeRequest = {name, ref};
+    return post(`/api/v1/themes/${name}/update`, data).then((res) => res.json());
+  }
+
+  static get(name: string): Promise<API.GetThemeResponse> {
+    return get(`/api/v1/themes/${name}`).then((res) => res.json());
   }
 
   static getFullTemplate(name: string, template: string): Promise<API.ThemeTemplate> {

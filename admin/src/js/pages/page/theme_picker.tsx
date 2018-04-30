@@ -63,17 +63,17 @@ export default class ThemePickerComponent extends React.Component<Props, State> 
   }
 
   selectTheme(name: string, template?: string) {
-    return Theme.get(name).then((theme) => {
+    return Theme.get(name).then(({theme}) => {
       let templates = Object.keys(theme.templates).sort();
       this.setState({templates});
-      this.props.store.setThemeTemplate(theme, theme.getTemplate(template || templates[0]));
+      this.props.store.setThemeTemplate(theme, Theme.getTemplate(theme, template || templates[0]));
     });
   }
 
   selectTemplate(template: string) {
     this.state.themes.map((theme) => {
       if (theme.name == this.state.selectedTheme) {
-        this.props.store.setThemeTemplate(theme, theme.getTemplate(template));
+        this.props.store.setThemeTemplate(theme, Theme.getTemplate(theme, template));
       }
     });
   }
