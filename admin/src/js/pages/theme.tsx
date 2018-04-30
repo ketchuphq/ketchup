@@ -149,6 +149,18 @@ interface PackageProps {
   pkg: Package;
 }
 
+function formatAuthor(author: API.PackageAuthor) {
+  let authorID = author.name || author.email || author.github;
+  if (author.github) {
+    return (
+      <a key={authorID} href={`https://github.com/${author.github}`}>
+        {authorID}
+      </a>
+    );
+  }
+  return <span key={authorID}>{authorID}</span>;
+}
+
 class PackageSection extends React.PureComponent<PackageProps> {
   render() {
     if (!this.props.pkg) {
@@ -158,24 +170,26 @@ class PackageSection extends React.PureComponent<PackageProps> {
     let fields = [];
     if (pkg.authors && pkg.authors.length > 0) {
       fields.push(
-        <Row>
+        <Row key={'theme-authors'}>
           <div>Authors</div>
-          <div>{pkg.authors.join(', ')}</div>
+          <div>{pkg.authors.map(formatAuthor)}</div>
         </Row>
       );
     }
 
     if (pkg.homepage) {
       fields.push(
-        <Row>
+        <Row key={'theme-homepage'}>
           <div>Homepage</div>
-          <div>{pkg.homepage}</div>
+          <div>
+            <a href={pkg.homepage}>{pkg.homepage}</a>
+          </div>
         </Row>
       );
     }
     if (pkg.vcsUrl) {
       fields.push(
-        <Row>
+        <Row key={'theme-vcs'}>
           <div>Source</div>
           <div>{pkg.vcsUrl}</div>
         </Row>
@@ -183,7 +197,7 @@ class PackageSection extends React.PureComponent<PackageProps> {
     }
     if (pkg.tags && pkg.tags.length > 0) {
       fields.push(
-        <Row>
+        <Row key={'theme-tags'}>
           <div>Tags</div>
           <div>{pkg.tags.join(', ')}</div>
         </Row>
