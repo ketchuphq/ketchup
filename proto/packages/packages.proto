@@ -5,6 +5,7 @@ package ketchup.packages;
 message PackageAuthor {
   optional string name = 1;
   optional string email = 2;
+  optional string github = 3;
   // twitter, github, etc.
 }
 

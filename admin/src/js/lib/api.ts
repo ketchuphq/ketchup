@@ -281,10 +281,12 @@ export abstract class Package {
 export abstract class PackageAuthor {
   name?: string;
   email?: string;
+  github?: string;
   static copy(from: PackageAuthor, to?: PackageAuthor): PackageAuthor {
     to = to || {};
     to.name = from.name;
     to.email = from.email;
+    to.github = from.github;
     return to;
   }
 }
