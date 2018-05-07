@@ -65,5 +65,15 @@ type Backend interface {
 
 	ListData() ([]*models.Data, error)
 
+	GetFile(uuid string) (*models.File, error)
+
+	GetFileByName(name string) (*models.File, error)
+
+	UpdateFile(*models.File) error
+
+	DeleteFile(*models.File) error
+
+	ListFiles() ([]*models.File, error)
+
 	Debug(w io.Writer) error // print debug info
 }

@@ -16,6 +16,7 @@ type DummyDB struct {
 	Pages  map[string]*models.Page
 	Routes map[string]*models.Route
 	Data   map[string]*models.Data
+	Files  map[string]*models.File
 
 	counter int
 }
@@ -154,4 +155,35 @@ func (d *DummyDB) ListData() ([]*models.Data, error) {
 		data = append(data, d)
 	}
 	return data, nil
+}
+
+func (d *DummyDB) GetFile(uuid string) (*models.File, error) {
+	return d.Files[uuid], nil
+}
+
+func (d *DummyDB) GetFileByName(name string) (*models.File, error) {
+	for _, f := range d.Files {
+		if f.GetName() == name {
+			return f, nil
+		}
+	}
+	return nil, nil
+}
+
+func (d *DummyDB) UpdateFile(file *models.File) error {
+	d.Files[file.GetUuid()] = file
+	return nil
+}
+
+func (d *DummyDB) DeleteFile(file *models.File) error {
+	delete(d.Files, file.GetUuid())
+	return nil
+}
+
+func (d *DummyDB) ListFiles() ([]*models.File, error) {
+	files := []*models.File{}
+	for _, file := range d.Files {
+		files = append(files, file)
+	}
+	return files, nil
 }
