@@ -4,7 +4,7 @@ exports[`<Editor> short:markdown -> ShortMarkdownEditor 1`] = `
 ShallowWrapper {
   "length": 1,
   Symbol(enzyme.__root__): [Circular],
-  Symbol(enzyme.__unrendered__): <Unknown
+  Symbol(enzyme.__unrendered__): <Editor
     content={
       Object {
         "key": "akey",
@@ -107,7 +107,9 @@ ShallowWrapper {
               "value": "*hello world*",
             },
           },
-          "ref": null,
+          "ref": Object {
+            "current": null,
+          },
           "rendered": null,
           "type": [Function],
         },
@@ -200,7 +202,9 @@ ShallowWrapper {
                 "value": "*hello world*",
               },
             },
-            "ref": null,
+            "ref": Object {
+              "current": null,
+            },
             "rendered": null,
             "type": [Function],
           },
@@ -249,12 +253,11 @@ ShallowWrapper {
     "key": undefined,
     "nodeType": "host",
     "props": Object {
+      "defaultValue": "*hello world*",
       "onChange": [Function],
       "type": "text",
     },
-    "ref": Object {
-      "current": null,
-    },
+    "ref": null,
     "rendered": null,
     "type": "input",
   },
@@ -264,12 +267,11 @@ ShallowWrapper {
       "key": undefined,
       "nodeType": "host",
       "props": Object {
+        "defaultValue": "*hello world*",
         "onChange": [Function],
         "type": "text",
       },
-      "ref": Object {
-        "current": null,
-      },
+      "ref": null,
       "rendered": null,
       "type": "input",
     },
@@ -289,7 +291,7 @@ exports[`<Editor> text:html -> LongHTMLEditor 1`] = `
 ShallowWrapper {
   "length": 1,
   Symbol(enzyme.__root__): [Circular],
-  Symbol(enzyme.__unrendered__): <Unknown
+  Symbol(enzyme.__unrendered__): <Editor
     content={
       Object {
         "key": "akey",
@@ -392,7 +394,9 @@ ShallowWrapper {
               "value": "*hello world*",
             },
           },
-          "ref": null,
+          "ref": Object {
+            "current": null,
+          },
           "rendered": null,
           "type": [Function],
         },
@@ -485,7 +489,9 @@ ShallowWrapper {
                 "value": "*hello world*",
               },
             },
-            "ref": null,
+            "ref": Object {
+              "current": null,
+            },
             "rendered": null,
             "type": [Function],
           },
@@ -563,7 +569,9 @@ ShallowWrapper {
           "value": "*hello world*",
         },
       },
-      "ref": null,
+      "ref": Object {
+        "current": null,
+      },
       "rendered": null,
       "type": [Function],
     },
@@ -604,7 +612,9 @@ ShallowWrapper {
             "value": "*hello world*",
           },
         },
-        "ref": null,
+        "ref": Object {
+          "current": null,
+        },
         "rendered": null,
         "type": [Function],
       },
@@ -626,7 +636,7 @@ exports[`<Editor> text:markdown -> LongMarkdownEditor 1`] = `
 ShallowWrapper {
   "length": 1,
   Symbol(enzyme.__root__): [Circular],
-  Symbol(enzyme.__unrendered__): <Unknown
+  Symbol(enzyme.__unrendered__): <Editor
     content={
       Object {
         "key": "akey",
@@ -729,7 +739,9 @@ ShallowWrapper {
               "value": "*hello world*",
             },
           },
-          "ref": null,
+          "ref": Object {
+            "current": null,
+          },
           "rendered": null,
           "type": [Function],
         },
@@ -822,7 +834,9 @@ ShallowWrapper {
                 "value": "*hello world*",
               },
             },
-            "ref": null,
+            "ref": Object {
+              "current": null,
+            },
             "rendered": null,
             "type": [Function],
           },
@@ -927,7 +941,7 @@ exports[`<Editor> text:text -> LongTextEditor 1`] = `
 ShallowWrapper {
   "length": 1,
   Symbol(enzyme.__root__): [Circular],
-  Symbol(enzyme.__unrendered__): <Unknown
+  Symbol(enzyme.__unrendered__): <Editor
     content={
       Object {
         "key": "akey",
@@ -1030,7 +1044,9 @@ ShallowWrapper {
               "value": "*hello world*",
             },
           },
-          "ref": null,
+          "ref": Object {
+            "current": null,
+          },
           "rendered": null,
           "type": [Function],
         },
@@ -1123,7 +1139,9 @@ ShallowWrapper {
                 "value": "*hello world*",
               },
             },
-            "ref": null,
+            "ref": Object {
+              "current": null,
+            },
             "rendered": null,
             "type": [Function],
           },
@@ -1173,6 +1191,7 @@ ShallowWrapper {
     "nodeType": "host",
     "props": Object {
       "children": <textarea
+        defaultValue="*hello world*"
         onChange={[Function]}
       />,
       "className": ".text",
@@ -1183,11 +1202,10 @@ ShallowWrapper {
       "key": undefined,
       "nodeType": "host",
       "props": Object {
+        "defaultValue": "*hello world*",
         "onChange": [Function],
       },
-      "ref": Object {
-        "current": null,
-      },
+      "ref": null,
       "rendered": null,
       "type": "textarea",
     },
@@ -1200,6 +1218,7 @@ ShallowWrapper {
       "nodeType": "host",
       "props": Object {
         "children": <textarea
+          defaultValue="*hello world*"
           onChange={[Function]}
         />,
         "className": ".text",
@@ -1210,11 +1229,10 @@ ShallowWrapper {
         "key": undefined,
         "nodeType": "host",
         "props": Object {
+          "defaultValue": "*hello world*",
           "onChange": [Function],
         },
-        "ref": Object {
-          "current": null,
-        },
+        "ref": null,
         "rendered": null,
         "type": "textarea",
       },

@@ -18,6 +18,14 @@ export default class CodeMirrorComponent extends React.Component<Props> {
     this.initializeCodeMirror(this.textInput.current);
   }
 
+  insertImage(url: string, altText?: string) {
+    this.codemirror.getDoc().replaceSelection(`![${altText || ''}](${url})`);
+  }
+
+  insertLink(text: string, url: string) {
+    this.codemirror.getDoc().replaceSelection(`[${text}](${url})`);
+  }
+
   get klass(): string {
     return ['codemirror', this.props.short ? 'codemirror-short' : 'codemirror-long'].join(' ');
   }
@@ -41,8 +49,6 @@ export default class CodeMirrorComponent extends React.Component<Props> {
       theme: 'elegant',
       lineWrapping: true,
     });
-    // this.codemirror.setOption('fullscreen', 'true')
-    // this.codemirror.refresh()
     this.codemirror.on('change', (instance) => {
       this.props.content.value = instance.getValue();
     });

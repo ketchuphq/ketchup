@@ -1,6 +1,7 @@
-import {Editor, ShortTextEditorComponent} from 'components/content';
+import {Editor} from 'components/content';
 import EditorComponent from 'components/editors/editor';
 import CodeMirrorComponent from 'components/editors/markdown';
+import ShortTextEditorComponent from 'components/editors/short_text';
 import TextEditorComponent from 'components/editors/text';
 import {shallow} from 'enzyme';
 import * as API from 'lib/api';
