@@ -37,9 +37,9 @@ export default class PageSaveButtonComponent extends React.Component<Props> {
       })
       .catch((err: any) => {
         if (err.detail) {
-          Toaster.add(err.detail, 'error');
+          Toaster.error(err.detail);
         } else {
-          Toaster.add('Internal server error.', 'error');
+          Toaster.error('Internal server error.');
           console.error(err);
         }
       });
