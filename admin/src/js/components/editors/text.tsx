@@ -8,33 +8,15 @@ interface Props {
 }
 
 export default class TextEditorComponent extends React.Component<Props> {
-  textInput: React.RefObject<HTMLTextAreaElement>;
-
-  constructor(props: Props) {
-    super(props);
-    this.textInput = React.createRef();
-  }
-
-  componentDidMount() {
-    this.textInput.current.value = this.props.content.value;
-  }
-
-  get klass(): string {
-    let k = '.text';
-    if (this.props.short) {
-      return k + '.text-short';
-    }
-    return k;
-  }
-
   render() {
+    let k = this.props.short ? '.text .text-short' : '.text';
     return (
-      <div className={this.klass}>
+      <div className={k}>
         <textarea
           onChange={(el: React.ChangeEvent<HTMLTextAreaElement>) => {
             this.props.content.value = (el.target as any).value;
           }}
-          ref={this.textInput}
+          defaultValue={this.props.content.value}
         />
       </div>
     );
