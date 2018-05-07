@@ -42,7 +42,7 @@ export default class PageButtonsComponent extends React.Component<Props, State> 
   delete = (e: React.MouseEvent<any>) => {
     e.preventDefault();
     Page.deletePage(this.props.store.page).then(() => {
-      // Toaster.add('Page deleted', 'error');
+      Toaster.add('Page deleted');
       location.assign('/admin/pages');
     });
   };
