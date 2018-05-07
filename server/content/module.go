@@ -1,7 +1,11 @@
 package content
 
 import (
+	"fmt"
+	"io"
+	"mime"
 	"net/http"
+	"path"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/octavore/naga/service"
@@ -10,15 +14,17 @@ import (
 	"github.com/ketchuphq/ketchup/db"
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 	"github.com/ketchuphq/ketchup/server/content/templates"
+	"github.com/ketchuphq/ketchup/server/files"
 	"github.com/ketchuphq/ketchup/server/router"
 )
 
-// Module server is responsible for serving published content
+// Module server/content is responsible for serving published content
 type Module struct {
 	Router    *router.Module
 	DB        *db.Module
 	Logger    *logger.Module
 	Templates *templates.Module
+	Files     *files.Module
 
 	contentRouter http.Handler
 }
@@ -33,6 +39,7 @@ func (m *Module) Init(c *service.Config) {
 		if err != nil {
 			panic(err)
 		}
+		// this router handles all unmapped paths
 		m.Router.HTTPRouter.NotFound = m
 	}
 }
@@ -87,7 +94,11 @@ func (m *Module) buildRouter() (http.Handler, map[string]bool, error) {
 		return nil, nil, err
 	}
 	activeRoutes := map[string]bool{}
+
+	// content router will serve content from templates when no route matches
 	rt.NotFound = m.Templates
+
+	// register path matches
 	for _, route := range routes {
 		m.Logger.Info("found route:", route)
 		if route.GetPath() == "" {
@@ -115,6 +126,29 @@ func (m *Module) buildRouter() (http.Handler, map[string]bool, error) {
 			m.Logger.Errorf("unable to register %s", route.GetUuid())
 		}
 	}
+
+	// register handler for files
+	rt.GET(fmt.Sprintf("%s/*filepath", files.FileURLPrefix), m.handleFiles)
+
 	m.Logger.Info("done rebuilding router")
 	return rt, activeRoutes, nil
+}
+
+func (m *Module) handleFiles(rw http.ResponseWriter, req *http.Request, par httprouter.Params) {
+	filepath := par.ByName("filepath")
+	r, err := m.Files.GetWithTransform(filepath, req.FormValue("x"))
+	if err != nil {
+		m.Logger.Error(err)
+		m.Templates.NotFound(rw, req) // todo: should be 500
+		return
+	}
+	if r == nil {
+		m.Templates.NotFound(rw, req)
+		return
+	}
+
+	defer r.Close()
+	ext := path.Ext(filepath)
+	rw.Header().Add("Content-Type", mime.TypeByExtension(ext))
+	io.Copy(rw, r)
 }

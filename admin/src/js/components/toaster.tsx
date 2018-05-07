@@ -31,18 +31,7 @@ class ToastList extends React.Component<{}, {toasts: Toast[]}> {
       klass += ' toast-wrapper--hidden';
     }
     return (
-      <div
-        className={klass}
-        // config={(el: HTMLElement, isInitialized: boolean) => {
-        //   // prevents animation on route change
-        //   if (!isInitialized) {
-        //     for (var i = 0; i < el.children.length; i++) {
-        //       var element = el.children[i];
-        //       element.classList.add('toast--noanimate');
-        //     }
-        //   }
-        // }}
-      >
+      <div className={klass}>
         {toasts.map((t) => {
           let k = ['toast', 'toast--enter', t.getClass(), t.expired() ? 'toast--expired' : ''];
           return (
@@ -94,3 +83,5 @@ export function add(message: string, klass: ToastType = 'green') {
     toasts.push(new Toast(message, 3000, klass));
   });
 }
+
+export const error = (message: string) => add(message, 'error');

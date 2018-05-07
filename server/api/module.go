@@ -14,6 +14,7 @@ import (
 	"github.com/ketchuphq/ketchup/server/config"
 	"github.com/ketchuphq/ketchup/server/content"
 	"github.com/ketchuphq/ketchup/server/content/templates"
+	"github.com/ketchuphq/ketchup/server/files"
 	"github.com/ketchuphq/ketchup/server/router"
 	"github.com/ketchuphq/ketchup/server/tls"
 	"github.com/ketchuphq/ketchup/server/users"
@@ -28,6 +29,7 @@ type Module struct {
 	Config    *config.Module
 	TLS       *tls.Module
 	Logger    *logger.Module
+	Files     *files.Module
 
 	decoder *schema.Decoder
 	version string
@@ -87,6 +89,11 @@ func (m *Module) Init(c *service.Config) {
 
 			{"/api/v1/data", methodPost, auth(m.UpdateData)},
 			{"/api/v1/data/:key", methodDelete, auth(m.DeleteData)},
+
+			{"/api/v1/files", methodGet, auth(m.ListFiles)},
+			{"/api/v1/files", methodPost, auth(m.UploadFile)},
+			{"/api/v1/files/:uuid", methodGet, auth(m.GetFile)},
+			{"/api/v1/files/:uuid", methodDelete, auth(m.DeleteFile)},
 
 			{"/api/v1/download-backup", methodGet, auth(m.GetBackup)},
 			{"/api/v1/debug", methodGet, auth(m.Debug)},

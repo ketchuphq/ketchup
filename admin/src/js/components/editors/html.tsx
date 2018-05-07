@@ -23,6 +23,22 @@ export default class QuillComponent extends React.Component<Props> {
     return k;
   }
 
+  insertImage(url: string, _?: string) {
+    let {index, length} = this.quill.getSelection(false);
+    if (length > 0) {
+      this.quill.deleteText(index, length);
+    }
+    this.quill.insertEmbed(index, 'image', url);
+  }
+
+  insertText(text: string, url: string) {
+    let {index, length} = this.quill.getSelection(false);
+    if (length > 0) {
+      this.quill.deleteText(index, length);
+    }
+    this.quill.insertText(index, text, 'link', url);
+  }
+
   async initializeQuill(element: HTMLDivElement) {
     if (this.props.content.value) {
       element.innerHTML = this.props.content.value;

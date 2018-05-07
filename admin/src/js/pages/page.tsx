@@ -3,13 +3,13 @@ import {ConfirmModalComponent} from 'components/modal';
 import * as API from 'lib/api';
 import * as Page from 'lib/page';
 import Route from 'lib/route';
+import GenericStore, {Data} from 'lib/store';
 import Theme from 'lib/theme';
 import cloneDeep from 'lodash-es/cloneDeep';
 import isEqual from 'lodash-es/isEqual';
 import PageControls from 'pages/page/controls';
 import PageEditorsComponent from 'pages/page/editors';
 import * as React from 'react';
-import GenericStore, {Data} from 'lib/store';
 
 interface State {
   page: API.Page;
@@ -204,7 +204,6 @@ export default class PagePage extends React.Component<
           </div>
           <PageEditorsComponent contents={this.state.page.contents} />
         </div>
-
         <ConfirmModalComponent
           title="You are about to leave this page"
           visible={this.state.showLeaveModal}

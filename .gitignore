@@ -8,6 +8,7 @@ vendor/github.com/
 vendor/golang.org/
 vendor/gopkg.in/
 vendor/srcd.works/
+vendor/willnorris.com/
 
 *.db
 *.key

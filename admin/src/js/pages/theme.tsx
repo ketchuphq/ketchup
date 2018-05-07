@@ -243,7 +243,7 @@ export default class ThemePage extends React.Component<RouteComponentProps<{id: 
               <Link to="/themes">Themes</Link> &rsaquo;{' '}
             </h1>
           </header>
-          <Loader show />;
+          <Loader show />
         </Layout>
       );
     }

@@ -12,6 +12,8 @@ import ThemesPage from 'pages/themes';
 import TemplatePage from 'pages/template';
 import SettingsPage from 'pages/settings';
 import DataPage from 'pages/data';
+import FilesPage from 'pages/files';
+import FilePage from 'pages/file';
 import InstallThemePage from 'pages/install-theme';
 import * as WebFont from 'webfontloader';
 import {BrowserRouter as Router, Route as PublicRoute} from 'react-router-dom';
@@ -48,6 +50,8 @@ class App extends React.Component<{}, State> {
             <PublicRoute path="/login" component={LoginPage} />
             {/* <Route path="/routes" component={RoutesPage} /> */}
             <Route {...this.state} path="/pages" component={PagesPage} />
+            <Route exact {...this.state} path="/files" component={FilesPage} />
+            <Route {...this.state} path="/files/:id" component={FilePage} />
             <Route {...this.state} path="/pages/:id" component={PagePage} />
             <Route {...this.state} path="/compose" component={PagePage} />
             <Route {...this.state} exact path="/themes" component={ThemesPage} />

@@ -251,6 +251,23 @@ export abstract class Data {
   }
 }
 
+export abstract class File {
+  uuid?: string;
+  name?: string;
+  url?: string;
+  timestamps?: Timestamp;
+  static copy(from: File, to?: File): File {
+    to = to || {};
+    to.uuid = from.uuid;
+    to.name = from.name;
+    to.url = from.url;
+    if ('timestamps' in from) {
+      to.timestamps = Timestamp.copy(from.timestamps || {}, to.timestamps || {});
+    }
+    return to;
+  }
+}
+
 export abstract class Package {
   type?: PackageType;
   name?: string;
@@ -392,11 +409,31 @@ export abstract class ListRouteResponse {
   }
 }
 
+export abstract class ListFilesResponse {
+  files?: File[];
+  static copy(from: ListFilesResponse, to?: ListFilesResponse): ListFilesResponse {
+    to = to || {};
+    to.files = from.files;
+    return to;
+  }
+}
+
 export abstract class UpdateDataRequest {
   data?: Data[];
   static copy(from: UpdateDataRequest, to?: UpdateDataRequest): UpdateDataRequest {
     to = to || {};
     to.data = from.data;
+    return to;
+  }
+}
+
+export abstract class FileResponse {
+  file?: File;
+  static copy(from: FileResponse, to?: FileResponse): FileResponse {
+    to = to || {};
+    if ('file' in from) {
+      to.file = File.copy(from.file || {}, to.file || {});
+    }
     return to;
   }
 }
