@@ -91,6 +91,9 @@ export default class Navigation extends React.Component<{}, State> {
               <NavLink url="/data" icon="th-small">
                 Data
               </NavLink>
+              <NavLink url="/files" icon="document">
+                Files
+              </NavLink>
               <NavLink url="/settings" icon="spanner-outline">
                 Settings
               </NavLink>
