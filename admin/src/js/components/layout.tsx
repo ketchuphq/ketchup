@@ -8,17 +8,6 @@ interface Props {
 }
 
 export default class Layout extends React.PureComponent<Props> {
-  constructor(props: Props) {
-    super(props);
-    //     getUser().catch(() => {
-    //       if (requestedPath.match('^/admin/?$')) {
-    //         m.route.set('/admin/login'); // default path is admin
-    //       } else {
-    //         m.route.set(`/admin/login?next=${requestedPath}`);
-    //       }
-    //     });
-  }
-
   render() {
     return (
       <div className="container">
