@@ -21,7 +21,7 @@ type Metadata struct {
 func (m *Metadata) Reset()                    { *m = Metadata{} }
 func (m *Metadata) String() string            { return proto.CompactTextString(m) }
 func (*Metadata) ProtoMessage()               {}
-func (*Metadata) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{0} }
+func (*Metadata) Descriptor() ([]byte, []int) { return fileDescriptor5, []int{0} }
 
 func (m *Metadata) GetUuid() string {
 	if m != nil && m.Uuid != nil {
@@ -37,9 +37,9 @@ func (m *Metadata) SetUuid(v *string) {
 	m.Uuid = v
 }
 
-func init() { proto.RegisterFile("metadata.proto", fileDescriptor4) }
+func init() { proto.RegisterFile("metadata.proto", fileDescriptor5) }
 
-var fileDescriptor4 = []byte{
+var fileDescriptor5 = []byte{
 	// 80 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0xcb, 0x4d, 0x2d, 0x49,
 	0x4c, 0x49, 0x2c, 0x49, 0xd4, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0xcb, 0x4e, 0x2d, 0x49,

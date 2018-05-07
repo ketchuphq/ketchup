@@ -26,7 +26,7 @@ type Route struct {
 func (m *Route) Reset()                    { *m = Route{} }
 func (m *Route) String() string            { return proto.CompactTextString(m) }
 func (*Route) ProtoMessage()               {}
-func (*Route) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{0} }
+func (*Route) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{0} }
 
 type IsRoute_Target interface {
 	IsRoute_Target()
@@ -154,9 +154,9 @@ func (m *Route) SetPath(v *string) {
 	m.Path = v
 }
 
-func init() { proto.RegisterFile("route.proto", fileDescriptor6) }
+func init() { proto.RegisterFile("route.proto", fileDescriptor7) }
 
-var fileDescriptor6 = []byte{
+var fileDescriptor7 = []byte{
 	// 136 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2e, 0xca, 0x2f, 0x2d,
 	0x49, 0xd5, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0xcb, 0x4e, 0x2d, 0x49, 0xce, 0x28, 0x2d,

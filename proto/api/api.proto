@@ -5,6 +5,7 @@ import "route.proto";
 import "theme.proto";
 import "struct.proto";
 import "data.proto";
+import "file.proto";
 
 package ketchup.api;
 
@@ -97,6 +98,14 @@ message UpdateDataRequest {
 
 message ListDataResponse {
     repeated ketchup.models.Data data = 1;
+}
+
+message FileResponse {
+    optional ketchup.models.File file = 1;
+}
+
+message ListFilesResponse {
+    repeated ketchup.models.File files = 1;
 }
 
 message TLSSettingsResponse {
