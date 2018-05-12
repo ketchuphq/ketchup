@@ -4,14 +4,14 @@ import "github.com/ketchuphq/ketchup/proto/ketchup/models"
 
 type Theme struct {
 	*models.Theme
-	ref string
+	ThemeRef string
 }
 
 func (t *Theme) Ref() (string, bool) {
-	if t.ref == "" {
+	if t.ThemeRef == "" {
 		return "", false
 	}
-	return t.ref, true
+	return t.ThemeRef, true
 }
 
 func (t *Theme) Proto() *models.Theme {

@@ -36,6 +36,7 @@ func (m *Module) NotFound(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 	ext := path.Ext(req.URL.Path)
+	rw.WriteHeader(http.StatusNotFound)
 	rw.Header().Add("Content-Type", mime.TypeByExtension(ext))
 	rw.Write([]byte(asset.GetData()))
 }

@@ -36,7 +36,7 @@ type Module struct {
 
 	themeRegistry    *pkg.Registry
 	themeRegistryURL string
-	themeStore       *filestore.FileStore
+	themeStore       store.ThemeStore
 	internalStore    *filestore.FileStore
 	Stores           []store.ThemeStore
 
@@ -52,11 +52,14 @@ func (m *Module) Init(c *service.Config) {
 		}
 
 		m.config.Themes.Path = m.ConfigModule.DataPath(m.config.Themes.Path, themeDir)
+
+		// configure filestore for themes
 		m.themeStore, err = filestore.New(m.config.Themes.Path, time.Second*10, m.Logger.Error)
 		if err != nil {
 			return err
 		}
 
+		// configure filestore for internal (preset) themes
 		m.internalStore, err = filestore.New(
 			m.ConfigModule.DataPath(internalThemeDir, ""),
 			time.Second*10,
@@ -66,14 +69,20 @@ func (m *Module) Init(c *service.Config) {
 			return err
 		}
 
+		// configure list of all stores
 		m.Stores = []store.ThemeStore{
 			&defaultstore.DefaultStore{},
 			m.themeStore,
 			m.internalStore,
 		}
+
+		// configure registry
 		registryURL := defaultRegistryURL
 		if c.Env().IsDevelopment() {
 			registryURL = devRegistryURL
+		}
+		if m.config.Themes.RegistryURL != "" {
+			registryURL = m.config.Themes.RegistryURL
 		}
 		m.themeRegistryURL = registryURL
 		m.themeRegistry = m.Pkg.Registry(registryURL)
