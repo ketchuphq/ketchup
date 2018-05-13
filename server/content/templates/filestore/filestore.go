@@ -76,7 +76,8 @@ func (f *FileStore) updateThemeDirMap() error {
 		themeConfigPath := path.Join(f.baseDir, fi.Name(), configFileName)
 		c, err := readConfig(themeConfigPath)
 		if err != nil {
-			return nil
+			// todo: log error
+			return errors.Wrap(err)
 		}
 		if c.GetName() != "" && fi.Name() != c.GetName() {
 			m[c.GetName()] = fi.Name()
@@ -98,16 +99,22 @@ func (f *FileStore) getTemplate(theme *models.Theme, templateName string) (*mode
 	}
 	p := path.Join(f.baseDir, themeDir, fileStoreTemplateDir, templateName)
 	b, err := ioutil.ReadFile(p)
+	if os.IsNotExist(err) {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, errors.Wrap(err)
 	}
 	data := string(b)
-	ext := strings.TrimLeft(path.Ext(templateName), ".")
 	t := proto.Clone(theme.GetTemplates()[templateName]).(*models.ThemeTemplate)
 	t.Theme = theme.Name
 	t.Data = &data
 	t.Name = &templateName
-	t.Engine = &ext
+
+	if t.GetEngine() == "" {
+		ext := strings.TrimLeft(path.Ext(templateName), ".")
+		t.Engine = &ext
+	}
 	return t, nil
 }
 
@@ -166,12 +173,16 @@ func (f *FileStore) Get(themeName string) (store.Theme, error) {
 		if strings.HasPrefix(path.Base(p), ".") {
 			return nil
 		}
-		e := strings.TrimLeft(path.Ext(p), ".")
 		if t.Templates[p] == nil {
 			t.Templates[p] = &models.ThemeTemplate{}
 		}
 		t.Templates[p].Name = &p
-		t.Templates[p].Engine = &e
+
+		// infer engine if not specified
+		if t.Templates[p].GetEngine() == "" {
+			e := strings.TrimLeft(path.Ext(p), ".")
+			t.Templates[p].Engine = &e
+		}
 		return nil
 	})
 	if err != nil {
@@ -199,12 +210,19 @@ func (f *FileStore) Get(themeName string) (store.Theme, error) {
 		return nil, err
 	}
 
-	latestRef, err := getLatestRef(path.Join(f.baseDir, themeDir))
+	absThemeDir := path.Join(f.baseDir, themeDir)
+	ok, err := isVCS(absThemeDir)
 	if err != nil {
 		return nil, errors.Wrap(err)
+	} else if ok {
+		currentRef, err := getCurrentRef(absThemeDir)
+		if err != nil {
+			return nil, errors.Wrap(err)
+		}
+		return &Theme{Theme: t, store: f, ref: currentRef}, nil
 	}
 
-	return &Theme{Theme: t, store: f, ref: latestRef}, nil
+	return &Theme{Theme: t, store: f}, nil
 }
 
 // List all themes in the store
