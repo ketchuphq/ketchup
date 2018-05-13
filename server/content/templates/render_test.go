@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 	"github.com/ketchuphq/ketchup/server/content/context"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestRenderPage(t *testing.T) {

@@ -5,8 +5,9 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 )
 
 func TestServeHTTP(t *testing.T) {

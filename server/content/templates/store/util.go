@@ -2,6 +2,7 @@ package store
 
 import (
 	"github.com/golang/protobuf/proto"
+
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 )
 
