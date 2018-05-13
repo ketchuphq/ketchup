@@ -23,13 +23,17 @@ func (m *Module) GetUser(rw http.ResponseWriter, req *http.Request, par router.P
 	if err != nil {
 		return err
 	}
+	if user == nil {
+		m.Router.EmptyJSON(rw, http.StatusNotFound)
+		return nil
+	}
 	user.HashedPassword = nil
 	user.Token = nil
 	return router.ProtoOK(rw, user)
 }
 
 func (m *Module) GetTLS(rw http.ResponseWriter, req *http.Request, par router.Params) error {
-	domains, err := m.TLS.GetAllRegisteredDomains()
+	domains, err := m.tls.GetAllRegisteredDomains()
 	if err != nil {
 		return err
 	}
@@ -37,7 +41,7 @@ func (m *Module) GetTLS(rw http.ResponseWriter, req *http.Request, par router.Pa
 		return m.Router.EmptyJSON(rw, http.StatusOK)
 	}
 	domain := domains[0]
-	r, err := m.TLS.GetRegistration(domain, false)
+	r, err := m.tls.GetRegistration(domain, false)
 	if err != nil {
 		return err
 	}
@@ -45,7 +49,7 @@ func (m *Module) GetTLS(rw http.ResponseWriter, req *http.Request, par router.Pa
 	if r.Registration != nil {
 		tosURL = r.Registration.TosURL
 	}
-	crt, err := m.TLS.LoadCertResource(domain)
+	crt, err := m.tls.LoadCertResource(domain)
 	if err != nil {
 		m.Logger.Error(err)
 	}
@@ -66,7 +70,7 @@ func (m *Module) EnableTLS(rw http.ResponseWriter, req *http.Request, par router
 		return errors.Wrap(err)
 	}
 
-	err = m.TLS.ObtainCert(rpb.GetTlsEmail(), rpb.GetTlsDomain())
+	err = m.tls.ObtainCert(rpb.GetTlsEmail(), rpb.GetTlsDomain())
 	if err != nil {
 		if errors.IsType(err, tls.LetsEncryptError{}) {
 			return router.NewRequestError(req, http.StatusBadRequest, err.Error())
@@ -74,7 +78,7 @@ func (m *Module) EnableTLS(rw http.ResponseWriter, req *http.Request, par router
 		return errors.Wrap(err)
 	}
 
-	r, err := m.TLS.GetRegistration(rpb.GetTlsDomain(), false)
+	r, err := m.tls.GetRegistration(rpb.GetTlsDomain(), false)
 	if err != nil {
 		return err
 	}

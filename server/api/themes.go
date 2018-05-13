@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/octavore/nagax/router"
@@ -11,7 +12,7 @@ import (
 )
 
 func (m *Module) ListThemes(rw http.ResponseWriter, req *http.Request, _ router.Params) error {
-	themes, err := m.Templates.ListThemes()
+	themes, err := m.templates.ListThemes()
 	if err != nil {
 		return err
 	}
@@ -20,7 +21,7 @@ func (m *Module) ListThemes(rw http.ResponseWriter, req *http.Request, _ router.
 
 func (m *Module) GetTheme(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	name := par.ByName("name")
-	theme, ref, err := m.Templates.GetTheme(name)
+	theme, ref, err := m.templates.GetTheme(name)
 	if err != nil {
 		return err
 	}
@@ -28,29 +29,37 @@ func (m *Module) GetTheme(rw http.ResponseWriter, req *http.Request, par router.
 	if theme == nil {
 		return router.ErrNotFound
 	}
+	var refP *string
+	if ref != "" {
+		refP = &ref
+	}
 	return router.ProtoOK(rw, &api.GetThemeResponse{
 		Theme: theme,
-		Ref:   &ref,
+		Ref:   refP,
 	})
 }
 
 func (m *Module) GetTemplate(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	name := par.ByName("name")
-	template := par.ByName("template")
-	theme, err := m.Templates.GetTemplate(name, template)
+	templateName := par.ByName("template")
+	template, err := m.templates.GetTemplate(name, templateName)
 	if err != nil {
+		// todo: better errors from m.templates
+		if strings.Contains(err.Error(), "not found") {
+			return router.ErrNotFound
+		}
 		return err
 	}
-
-	// todo: fetch remote theme info if available
-	if theme == nil {
+	// todo: fetch remote template info if available
+	if template == nil {
 		return router.ErrNotFound
 	}
-	return router.ProtoOK(rw, theme)
+	// todo: wrap in {"template": ...}?
+	return router.ProtoOK(rw, template)
 }
 
 func (m *Module) ThemeRegistry(rw http.ResponseWriter, req *http.Request, par router.Params) error {
-	r, err := m.Templates.Registry()
+	r, err := m.templates.Registry()
 	if err != nil {
 		return err
 	}
@@ -70,24 +79,23 @@ func (m *Module) InstallTheme(rw http.ResponseWriter, req *http.Request, par rou
 	}
 
 	// search the registry for the theme package
-	p, err := m.Templates.SearchRegistry(r.GetName())
+	p, err := m.templates.SearchRegistry(r.GetName())
 	if err != nil {
 		return errors.New("error searching registry: %s", err)
 	}
 	if p == nil || p.GetVcsUrl() != r.GetVcsUrl() {
-		return errors.New("Theme %s not found %s, %s", r.GetName(),
-			p.GetVcsUrl(), r.GetVcsUrl())
+		return router.ErrNotFound
 	}
 
 	m.Logger.Infof("cloning package %s from %s", p.GetName(), p.GetVcsUrl())
 
 	// install the package
-	return m.Templates.InstallThemeFromPackage(p)
+	return m.templates.InstallThemeFromPackage(p)
 }
 
 func (m *Module) CheckThemeForUpdate(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	name := par.ByName("name")
-	_, oldRef, currentRef, err := m.Templates.CheckThemeForUpdate(name)
+	_, oldRef, currentRef, err := m.templates.CheckThemeForUpdate(name)
 	if err != nil {
 		return errors.Wrap(err)
 	}
@@ -108,5 +116,5 @@ func (m *Module) UpdateTheme(rw http.ResponseWriter, req *http.Request, par rout
 	if r.GetName() != "" && r.GetName() != themeName {
 		return errors.New("theme name mismatch")
 	}
-	return m.Templates.UpdateTheme(r.GetName(), r.GetRef())
+	return m.templates.UpdateTheme(r.GetName(), r.GetRef())
 }

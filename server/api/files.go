@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"sort"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/octavore/nagax/router"
@@ -24,8 +25,11 @@ func (m *Module) GetFile(rw http.ResponseWriter, req *http.Request, par router.P
 	if err != nil {
 		return err
 	}
-	file.Url = proto.String(m.Files.URLForFile(file))
+	if file == nil {
+		return router.ErrNotFound
+	}
 
+	file.Url = proto.String(m.Files.URLForFile(file))
 	return router.ProtoOK(rw, &api.FileResponse{File: file})
 }
 
@@ -42,11 +46,13 @@ func (m *Module) ListFiles(rw http.ResponseWriter, req *http.Request, par router
 	if err != nil {
 		return err
 	}
-
 	for _, file := range files {
 		file.Url = proto.String(m.Files.URLForFile(file))
 	}
-
+	// sort by name
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].GetName() < files[j].GetName()
+	})
 	return router.ProtoOK(rw, &api.ListFilesResponse{Files: files})
 }
 

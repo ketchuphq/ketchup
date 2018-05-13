@@ -37,7 +37,7 @@ func (m *Module) addAllPlaceholders(data []*models.Data) ([]*models.Data, error)
 		}
 	}
 
-	themes, err := m.Templates.ListThemes()
+	themes, err := m.templates.ListThemes()
 	if err != nil {
 		return nil, err
 	}
