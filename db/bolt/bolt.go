@@ -91,6 +91,7 @@ func (m *Module) Init(c *service.Config) {
 	}
 }
 
+// ErrNoKey is a helper to create key not found errors.
 type ErrNoKey string
 
 func (e ErrNoKey) Error() string {
@@ -110,6 +111,7 @@ func (m *Module) init() error {
 	})
 }
 
+// Get is a generic method of getting a proto from the bolt database.
 func (m *Module) Get(bucket, key string, pb proto.Message) error {
 	return m.Bolt.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucket))
@@ -135,6 +137,7 @@ func (m *Module) updateTimestampedProto(tsp db.TimestampedProto) {
 	tsp.SetTimestamps(ts)
 }
 
+// Update is a generic way of updating AddressableProto data in the bolt database.
 func (m *Module) Update(bucket string, pb db.AddressableProto) error {
 	if tsp, ok := pb.(db.TimestampedProto); ok {
 		m.updateTimestampedProto(tsp)
@@ -160,6 +163,7 @@ func (m *Module) delete(bucket string, pb db.AddressableProto) error {
 	})
 }
 
+// BackupToFile writes the entire database to the file at path.
 func (m *Module) BackupToFile(path string) error {
 	f, err := os.Create(path)
 	if err != nil {
@@ -169,6 +173,7 @@ func (m *Module) BackupToFile(path string) error {
 	return m.Backup(f)
 }
 
+// Backup writes the entire database to w.
 func (m *Module) Backup(w io.Writer) error {
 	return m.Bolt.View(func(tx *bolt.Tx) error {
 		_, err := tx.WriteTo(w)
@@ -176,6 +181,7 @@ func (m *Module) Backup(w io.Writer) error {
 	})
 }
 
+// Debug prints out all data in the database. Does not deserialize saved protos.
 func (m *Module) Debug(w io.Writer) error {
 	return m.Bolt.View(func(tx *bolt.Tx) error {
 		return tx.ForEach(func(name []byte, bucket *bolt.Bucket) error {

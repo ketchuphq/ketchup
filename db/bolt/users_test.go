@@ -5,6 +5,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/octavore/naga/service"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 )
@@ -19,16 +20,24 @@ func TestUser(t *testing.T) {
 	}
 	b := &models.User{
 		Email:          proto.String("b@example.com"),
+		Token:          proto.String("aToken"),
 		HashedPassword: proto.String("defghi"),
 	}
-	err := app.UpdateUser(a)
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = app.UpdateUser(b)
-	if err != nil {
-		t.Fatal(err)
-	}
+
+	assert.NoError(t, app.UpdateUser(a))
+	assert.NoError(t, app.UpdateUser(b))
+	assert.EqualError(t, app.UpdateUser(&models.User{
+		Email:          proto.String("b@example.com"),
+		HashedPassword: proto.String("defghi"),
+	}), "user already exists")
+	assert.EqualError(t, app.UpdateUser(&models.User{
+		Uuid:           proto.String("fake"),
+		Email:          proto.String("b@example.com"),
+		HashedPassword: proto.String("defghi"),
+	}), "user already exists")
+
+	assert.NotNil(t, a.GetUuid())
+	assert.NotNil(t, b.GetUuid())
 
 	tests := []struct {
 		email          string
@@ -41,17 +50,27 @@ func TestUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		user, err := app.GetUserByEmail(tt.email)
-		if err != nil {
-			t.Fatal(err)
+		assert.NoError(t, err)
+		if !tt.valid {
+			assert.Nil(t, user)
+			continue
 		}
-		if !tt.valid && user != nil {
-			t.Error("unexpected user:", user)
-		}
-		if tt.valid && user.GetEmail() != tt.email {
-			t.Errorf("unexpected email %s; wanted %s", user.GetEmail(), tt.email)
-		}
-		if tt.valid && user.GetHashedPassword() != tt.hashedPassword {
-			t.Errorf("unexpected pwd %s; wanted %s", user.GetHashedPassword(), tt.hashedPassword)
-		}
+		assert.Equal(t, tt.email, user.GetEmail())
+		assert.Equal(t, tt.hashedPassword, user.GetHashedPassword())
+		sameUser, err := app.GetUser(user.GetUuid())
+		assert.NoError(t, err)
+		assert.Equal(t, user, sameUser)
 	}
+
+	user, err := app.GetUserByToken("aToken")
+	assert.NoError(t, err)
+	assert.Equal(t, b, user)
+
+	user, err = app.GetUserByToken("notToken")
+	assert.NoError(t, err)
+	assert.Nil(t, user)
+
+	users, err := app.ListUsers()
+	assert.NoError(t, err)
+	assert.ElementsMatch(t, []*models.User{a, b}, users)
 }
