@@ -53,10 +53,12 @@ var noneTheme = &models.Theme{
 	Assets: map[string]*models.ThemeAsset{},
 }
 
+var noneThemeNoData = store.StripData(noneTheme)
+
 type DefaultStore struct{}
 
 func (d *DefaultStore) List() ([]*models.Theme, error) {
-	return []*models.Theme{noneTheme}, nil
+	return []*models.Theme{noneThemeNoData}, nil
 }
 
 func (d *DefaultStore) Add(*models.Theme) error {

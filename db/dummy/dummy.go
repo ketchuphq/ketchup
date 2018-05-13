@@ -29,6 +29,7 @@ func New() *DummyDB {
 		Pages:  map[string]*models.Page{},
 		Routes: map[string]*models.Route{},
 		Data:   map[string]*models.Data{},
+		Files:  map[string]*models.File{},
 	}
 }
 
