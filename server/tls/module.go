@@ -78,6 +78,13 @@ func (m *Module) Init(c *service.Config) {
 			}
 		}()
 	}
+
+	c.Stop = func() {
+		err := m.stopTLSProxy()
+		if err != nil {
+			m.Logger.Error(err)
+		}
+	}
 }
 
 func (m *Module) tlsDirPath(file string) string {

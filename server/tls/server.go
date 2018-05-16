@@ -83,18 +83,25 @@ func (m *Module) startTLSProxy() error {
 // restartTLSProxy restarts the TLS proxy by first shutting
 // down the old server and then starting a new one.
 func (m *Module) restartTLSProxy() error {
-	if m.serverStarted {
-		m.serverStarted = false
-		err := m.server.Shutdown(context.Background())
-		if err != nil {
-			return errors.Wrap(err)
-		}
+	err := m.stopTLSProxy()
+	if err != nil {
+		return errors.Wrap(err)
 	}
-	go func() {
-		err := m.startTLSProxy()
-		if err != nil {
-			m.Logger.Error(errors.Wrap(err))
-		}
-	}()
+	err = m.startTLSProxy()
+	if err != nil {
+		return errors.Wrap(err)
+	}
+	return nil
+}
+
+func (m *Module) stopTLSProxy() error {
+	if !m.serverStarted {
+		return nil
+	}
+	err := m.server.Shutdown(context.Background())
+	if err != nil {
+		return errors.Wrap(err)
+	}
+	m.serverStarted = false
 	return nil
 }
