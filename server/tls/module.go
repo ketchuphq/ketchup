@@ -257,6 +257,7 @@ func (m *Module) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		m.challenge = nil
 	} else {
 		m.Logger.Warningf("Invalid acme challenge for %s", req.Host)
+		m.Router.NotFound(rw)
 	}
 }
 

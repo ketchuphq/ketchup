@@ -8,19 +8,12 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
-	"io/ioutil"
 	"math/big"
-	"os"
-	"path"
 	"testing"
 	"time"
 
-	"github.com/octavore/nagax/keystore"
-	"github.com/octavore/nagax/logger"
+	"github.com/octavore/naga/service"
 	"github.com/xenolf/lego/acme"
-
-	"github.com/ketchuphq/ketchup/server/config"
-	"github.com/ketchuphq/ketchup/util/testutil/memlogger"
 )
 
 const testDomain = "example.com"
@@ -30,8 +23,10 @@ const testPath = testDomain + "-2017-01-01-v000.json"
 func init() {
 	newAcmeClient = newTestAcmeClient
 	now = testNow
+	tlsPort = "localhost:9443"
 }
 
+// testAcmeClient replaces the actual acme client for tests
 type testAcmeClient struct {
 }
 
@@ -105,25 +100,9 @@ func testNow() time.Time {
 	return t
 }
 
-func setup(t *testing.T) (*Module, string) {
-	dir, err := ioutil.TempDir("", "")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = os.Mkdir(path.Join(dir, tlsDir), os.ModePerm)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return &Module{
-		Logger: &logger.Module{
-			Logger: &memlogger.MemoryLogger{},
-		},
-		keystore: &keystore.KeyStore{Dir: dir},
-		Config: &config.Module{
-			Config: config.Config{
-				DataDir: dir,
-			},
-		},
-	}, dir
+func setup(t *testing.T) (*Module, func()) {
+	m := &Module{}
+	svc := service.New(m)
+	stop := svc.StartForTest()
+	return m, stop
 }

@@ -9,14 +9,15 @@ import (
 )
 
 func TestGetAll(t *testing.T) {
-	m, dir := setup(t)
-
+	m, stop := setup(t)
+	defer stop()
 	for _, t := range []string{
 		"example2.com-2017-01-01-v000.json",
 		"example.com-2017-01-01-v000.json",
 		"example.com-2017-01-01-v001.json",
 	} {
-		_ = ioutil.WriteFile(path.Join(dir, tlsDir, t), []byte{}, os.ModePerm)
+		p := path.Join(m.Config.DataPath(tlsDir, ""), t)
+		_ = ioutil.WriteFile(p, []byte{}, os.ModePerm)
 	}
 
 	matches, err := m.GetAllRegisteredDomains()
@@ -29,7 +30,8 @@ func TestGetAll(t *testing.T) {
 }
 
 func TestCurrentTLSPath(t *testing.T) {
-	m, dir := setup(t)
+	m, stop := setup(t)
+	defer stop()
 	s, err := m.getCurrentRegistrationPath(testDomain)
 	if err != nil {
 		t.Errorf("unexpected error %v", err)
@@ -38,7 +40,8 @@ func TestCurrentTLSPath(t *testing.T) {
 		t.Errorf("unexpected string %s", s)
 	}
 
-	err = ioutil.WriteFile(path.Join(dir, tlsDir, testPath), []byte{}, os.ModePerm)
+	p1 := path.Join(m.Config.DataPath(tlsDir, ""), testPath)
+	err = ioutil.WriteFile(p1, []byte{}, os.ModePerm)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,8 +54,8 @@ func TestCurrentTLSPath(t *testing.T) {
 	}
 
 	// should ignore this
-	p := testDomain + ".json"
-	err = ioutil.WriteFile(path.Join(dir, tlsDir, p), []byte{}, os.ModePerm)
+	p2 := path.Join(m.Config.DataPath(tlsDir, ""), testDomain+".json")
+	err = ioutil.WriteFile(p2, []byte{}, os.ModePerm)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -68,7 +71,8 @@ func TestCurrentTLSPath(t *testing.T) {
 func TestNextTLSPath(t *testing.T) {
 	e1 := "example.com-2017-01-01-v000.json"
 	e2 := "example.com-2017-01-01-v001.json"
-	m, _ := setup(t)
+	m, stop := setup(t)
+	defer stop()
 	s, err := m.getNextRegistrationPath(testDomain)
 	if err != nil {
 		t.Fatal(err)
