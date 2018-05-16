@@ -46,16 +46,7 @@ func (m *Module) Init(c *service.Config) {
 			return
 		}
 		m.config.Bolt.Path = m.ConfigModule.DataPath(m.config.Bolt.Path, "default.db")
-		m.Bolt, err = bolt.Open(m.config.Bolt.Path, os.ModePerm, &bolt.Options{
-			Timeout: 5 * time.Second,
-		})
-		if err != nil {
-			if err == bolt.ErrTimeout {
-				m.Logger.Error("bolt: timeout while connecting; it may be that the database is already in use by another process.")
-			}
-			return errors.Wrap(err)
-		}
-		return m.init()
+		return m.connectBolt(m.config.Bolt.Path)
 	}
 	var testDB string
 	c.SetupTest = func() {
@@ -65,13 +56,7 @@ func (m *Module) Init(c *service.Config) {
 		if err != nil {
 			panic(err)
 		}
-		m.Bolt, err = bolt.Open(testDB, os.ModePerm, &bolt.Options{
-			Timeout: 30 * time.Second,
-		})
-		if err != nil {
-			panic(err)
-		}
-		err = m.init()
+		err = m.connectBolt(testDB)
 		if err != nil {
 			panic(err)
 		}
@@ -98,7 +83,17 @@ func (e ErrNoKey) Error() string {
 	return fmt.Sprintf("boltdb: key not found: %s", string(e))
 }
 
-func (m *Module) init() error {
+func (m *Module) connectBolt(path string) error {
+	var err error
+	m.Bolt, err = bolt.Open(path, os.ModePerm, &bolt.Options{
+		Timeout: 5 * time.Second,
+	})
+	if err != nil {
+		if err == bolt.ErrTimeout {
+			m.Logger.Error("bolt: timeout while connecting; it may be that the database is already in use by another process.")
+		}
+		return errors.Wrap(err)
+	}
 	return m.Bolt.Update(func(tx *bolt.Tx) error {
 		buckets := []string{PAGE_BUCKET, ROUTE_BUCKET, USER_BUCKET, DATA_BUCKET, FILES_BUCKET}
 		for _, bucket := range buckets {
