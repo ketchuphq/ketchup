@@ -62,12 +62,10 @@ func (m *Module) Init(c *service.Config) {
 		return err
 	}
 	c.Start = func() {
-		go func() {
-			err := m.startTLSProxy()
-			if err != nil {
-				m.Logger.Error(errors.Wrap(err))
-			}
-		}()
+		err := m.startTLSProxy()
+		if err != nil {
+			m.Logger.Error(errors.Wrap(err))
+		}
 
 		go func() {
 			for range time.Tick(2 * time.Hour) {
