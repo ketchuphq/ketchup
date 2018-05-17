@@ -123,6 +123,9 @@ func (d *DummyDB) ListRoutes(req *api.ListRouteRequest) ([]*models.Route, error)
 		}
 		routes = append(routes, r)
 	}
+	sort.Slice(routes, func(i, j int) bool {
+		return routes[i].GetPath() < routes[j].GetPath()
+	})
 	return routes, nil
 }
 
