@@ -45,7 +45,7 @@ test:
 
 cover:
 	@go get -u github.com/go-playground/overalls
-	overalls -project github.com/ketchuphq/ketchup
+	overalls -project github.com/ketchuphq/ketchup -- -tags integration
 	@find . -name 'profile.coverprofile' | xargs rm
 
 circle-cover: cover
