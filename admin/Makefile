@@ -10,4 +10,4 @@ production:
 
 prepare:
 	go get -u github.com/jteeuwen/go-bindata/...
-	npm install
+	yarn install

@@ -1,6 +1,6 @@
 # shell is set so new path is picked up
 SHELL := /bin/bash
-export PATH := $(GOPATH)/bin:$(PATH)
+export PATH := $(shell go env GOPATH)/bin:$(PATH)
 
 GO_DIRS := $(shell find . -name "*.go" -exec dirname {} \; | grep -v vendor | grep -v proto | sort -u)
 

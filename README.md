@@ -25,12 +25,16 @@ This readme will focus on how to build and develop Ketchup.
 
 ## Development
 
-### Getting started
+### 1. Getting started
 
 These instructions assume you're using OS X, but they should work on Linux as well. The only exception to this is that Homebrew is used to install `protoc` on OS X. You won't need `protoc` unless you're planning to modify the API (see the Protobuf section below).
 
+To get started, you’ll first need to install the following dependencies, which are used to compile the backend and frontend respectively.
 
-To get started, you’ll first need to install **Go** and **Node**. They are used to compile the backend and frontend respectively.
+- **Go >=1.9**
+- **Node >= 8**
+  - [NPM](https://www.npmjs.com)
+  - [Yarn](https://yarnpkg.com/)
 
 Then, run the following to download frontend and backend dependencies:
 
@@ -38,7 +42,7 @@ Then, run the following to download frontend and backend dependencies:
 make prepare
 ```
 
-### Compiling
+### 2. Compiling
 
 Now you should be able to compile the `ketchup` binary:
 
@@ -51,13 +55,13 @@ This will first run the frontend compilation (a Gulp task), then embed the front
 
 If you want to modify the API, see below for instructions for how to update the proto files and regenerate the corresponding Go structs and Typescript classes.
 
-### Development
+### 3. Development
 
 For ongoing development, it can be a hassle to keep recompiling. There's a `gulp watch` task which you can run in the `admin` folder to recompile Typescript and SASS and output `bindata.go` on changes to frontend code.
 
 For backend code, there's `./scripts/dev-watch.sh`, which will start a Ketchup server and recompile/restart it on changes to `.go` files.
 
-### Releasing new versions
+### 4. Releasing new versions
 
 This section is for completeness; you probably won't have to do this.
 
