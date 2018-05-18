@@ -1,12 +1,11 @@
 package pkg
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"regexp"
 	"sync"
 
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/octavore/nagax/util/errors"
 
@@ -36,12 +35,8 @@ func (r *Registry) Sync() error {
 	if res.StatusCode > 299 {
 		return errors.New("unexpected status code from %s: %d", r.URL, res.StatusCode)
 	}
-	b, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return errors.Wrap(err)
-	}
 	repo := &packages.Registry{}
-	err = json.Unmarshal(b, &repo)
+	err = jsonpb.Unmarshal(res.Body, repo)
 	if err != nil {
 		return errors.Wrap(err)
 	}
@@ -88,13 +83,4 @@ func (r *Registry) Match(re *regexp.Regexp) ([]*packages.Package, error) {
 // Registry creates and returns a new registry for the given url
 func (m *Module) Registry(registryURL string) *Registry {
 	return &Registry{URL: registryURL}
-}
-
-// press registry daemon should periodically scrape
-func getGithubTags(p *packages.Package) {
-	// paginate should cache
-}
-
-func getBitbucketTags(p *packages.Package) {
-	// paginate should cache
 }

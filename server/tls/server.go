@@ -14,6 +14,8 @@ import (
 	"github.com/unrolled/secure"
 )
 
+var tlsPort = ":443"
+
 func (m *Module) loadTLSConfig() (*tls.Config, error) {
 	tlsConfig := &tls.Config{
 		NextProtos: []string{"h2"}, // http/2
@@ -61,7 +63,7 @@ func (m *Module) startTLSProxy() error {
 	if tlsConfig == nil {
 		return nil
 	}
-	l, err := tls.Listen("tcp", ":443", tlsConfig)
+	l, err := tls.Listen("tcp", tlsPort, tlsConfig)
 	if err != nil {
 		return err
 	}
@@ -76,25 +78,34 @@ func (m *Module) startTLSProxy() error {
 	https := secure.New(secure.Options{SSLRedirect: true})
 	m.Router.Middleware.Prepend(https.HandlerFuncWithNext)
 
+	m.Logger.Info("listening on ", tlsPort)
 	m.serverStarted = true
-	return m.server.Serve(l)
+	go m.server.Serve(l)
+	return nil
 }
 
 // restartTLSProxy restarts the TLS proxy by first shutting
 // down the old server and then starting a new one.
 func (m *Module) restartTLSProxy() error {
-	if m.serverStarted {
-		m.serverStarted = false
-		err := m.server.Shutdown(context.Background())
-		if err != nil {
-			return errors.Wrap(err)
-		}
+	err := m.stopTLSProxy()
+	if err != nil {
+		return errors.Wrap(err)
 	}
-	go func() {
-		err := m.startTLSProxy()
-		if err != nil {
-			m.Logger.Error(errors.Wrap(err))
-		}
-	}()
+	err = m.startTLSProxy()
+	if err != nil {
+		return errors.Wrap(err)
+	}
+	return nil
+}
+
+func (m *Module) stopTLSProxy() error {
+	if !m.serverStarted {
+		return nil
+	}
+	err := m.server.Shutdown(context.Background())
+	if err != nil {
+		return errors.Wrap(err)
+	}
+	m.serverStarted = false
 	return nil
 }

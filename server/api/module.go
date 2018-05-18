@@ -8,9 +8,12 @@ import (
 	"github.com/octavore/naga/service"
 	"github.com/octavore/nagax/logger"
 	router2 "github.com/octavore/nagax/router"
+	"github.com/xenolf/lego/acme"
 
 	"github.com/ketchuphq/ketchup/db"
 	"github.com/ketchuphq/ketchup/proto/ketchup/api"
+	"github.com/ketchuphq/ketchup/proto/ketchup/models"
+	"github.com/ketchuphq/ketchup/proto/ketchup/packages"
 	"github.com/ketchuphq/ketchup/server/config"
 	"github.com/ketchuphq/ketchup/server/content"
 	"github.com/ketchuphq/ketchup/server/content/templates"
@@ -19,6 +22,29 @@ import (
 	"github.com/ketchuphq/ketchup/server/tls"
 	"github.com/ketchuphq/ketchup/server/users"
 )
+
+type mockableTemplateModule interface {
+	CheckThemeForUpdate(name string) (bool, string, string, error)
+	GetTemplate(theme, template string) (*models.ThemeTemplate, error)
+	GetTheme(name string) (*models.Theme, string, error)
+	InstallThemeFromPackage(p *packages.Package) error
+	ListThemes() ([]*models.Theme, error)
+	Registry() (*packages.Registry, error)
+	SearchRegistry(themeName string) (*packages.Package, error)
+	UpdateTheme(name, ref string) error
+	GetRegistryURL() string
+}
+
+type mockableTLSModule interface {
+	// CleanUp(domain, token, keyAuth string) error
+	GetAllRegisteredDomains() ([]string, error)
+	GetRegistration(domain string, withPrivateKey bool) (*tls.Registration, error)
+	LoadCertResource(domain string) (*acme.CertificateResource, error)
+	ObtainCert(email, domain string) error
+	// Present(domain, token, keyAuth string) error
+	// SaveRegistration(r *Registration) error
+	// ServeHTTP(rw http.ResponseWriter, req *http.Request)
+}
 
 type Module struct {
 	Router    *router.Module
@@ -33,6 +59,10 @@ type Module struct {
 
 	decoder *schema.Decoder
 	version string
+
+	// for tests
+	templates mockableTemplateModule
+	tls       mockableTLSModule
 }
 
 const (
@@ -43,6 +73,8 @@ const (
 
 func (m *Module) Init(c *service.Config) {
 	c.Setup = func() error {
+		m.templates = m.Templates
+		m.tls = m.TLS
 		m.decoder = schema.NewDecoder()
 		m.decoder.SetAliasTag("json")
 		m.decoder.IgnoreUnknownKeys(true)

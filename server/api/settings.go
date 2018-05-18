@@ -11,6 +11,6 @@ import (
 func (m *Module) GetInfo(rw http.ResponseWriter, req *http.Request, par router.Params) error {
 	return router.JSON(rw, http.StatusOK, map[string]string{
 		"version":      version.Get(),
-		"registry_url": m.Templates.GetRegistryURL(),
+		"registry_url": m.templates.GetRegistryURL(),
 	})
 }

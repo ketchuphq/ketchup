@@ -16,6 +16,7 @@ import (
 
 func TestGetData(t *testing.T) {
 	te := setup()
+	defer te.stop()
 	te.db.Data["test-key"] = &models.Data{
 		Key:   proto.String("test-key"),
 		Value: proto.String("test-value"),
@@ -38,6 +39,7 @@ func TestGetData(t *testing.T) {
 
 func TestGetData_NotFound(t *testing.T) {
 	te := setup()
+	defer te.stop()
 	rw := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/api/v1/data/test-key", nil)
 	err := te.module.GetData(rw, req, []httprouter.Param{
@@ -49,6 +51,7 @@ func TestGetData_NotFound(t *testing.T) {
 func TestSetData(t *testing.T) {
 	// new data
 	te := setup()
+	defer te.stop()
 	rw := httptest.NewRecorder()
 	req := httptest.NewRequest("POST", "/api/v1/data",
 		bytes.NewBufferString(`{
@@ -91,6 +94,7 @@ func TestSetData(t *testing.T) {
 
 func TestDeleteData(t *testing.T) {
 	te := setup()
+	defer te.stop()
 	te.db.Data["test-key"] = &models.Data{
 		Key:   proto.String("test-key"),
 		Value: proto.String("test-value"),
@@ -106,4 +110,41 @@ func TestDeleteData(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rw.Code)
 		assert.Nil(t, te.db.Data["test-key"])
 	}
+}
+
+func TestListData(t *testing.T) {
+	te := setup()
+	defer te.stop()
+	te.db.Data["test-key"] = &models.Data{
+		Key:   proto.String("test-key"),
+		Value: proto.String("test-value"),
+	}
+
+	tmplStore := te.module.Templates.Stores[1]
+	err := tmplStore.Add(testTheme)
+	if !assert.NoError(t, err) {
+		t.Fail()
+	}
+	rw := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/api/v1/data/", nil)
+	err = te.module.ListData(rw, req, nil)
+	assert.NoError(t, err)
+	expected := `{
+		"data": [{
+			"key": "test-key",
+			"value": "test-value"
+		}, {
+			"key": "title",
+			"short": {
+				"type": "text"
+			}
+		}, {
+			"key": "aPlaceholder",
+			"short": {
+				"title": "Theme Placeholder",
+				"type": "markdown"
+			}
+		}]
+	}`
+	assert.JSONEq(t, expected, rw.Body.String())
 }

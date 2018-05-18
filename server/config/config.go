@@ -1,6 +1,9 @@
 package config
 
 import (
+	"fmt"
+	"io/ioutil"
+	"os"
 	"path"
 
 	"github.com/octavore/naga/service"
@@ -29,6 +32,26 @@ func (m *Module) Init(c *service.Config) {
 		}
 		return nil
 	}
+
+	var tmpDir string
+	var err error
+	c.SetupTest = func() {
+		tmpDir, err = ioutil.TempDir("", "")
+		if err != nil {
+			panic(err)
+		}
+		m.Config.DataDir = tmpDir
+	}
+
+	c.Stop = func() {
+		if tmpDir != "" {
+			err = os.RemoveAll(tmpDir)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
+	}
+
 }
 
 func (m *Module) DataPath(p, backup string) string {

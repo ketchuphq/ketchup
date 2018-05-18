@@ -71,12 +71,18 @@ func (m *Module) GetAsset(name string) (*models.ThemeAsset, error) {
 	return nil, nil
 }
 
+// for mocking
+var getLatestRef = pkg.GetLatestRef
+
 // CheckThemeForUpdate checks the given theme for updates,
-// and if true, returns the current ref and the latest ref.
+// and if it has updates, returns true, and the current ref and the latest ref.
 func (m *Module) CheckThemeForUpdate(name string) (bool, string, string, error) {
 	theme, err := m.getTheme(name)
 	if err != nil {
 		return false, "", "", err
+	}
+	if theme == nil {
+		return false, "", "", errors.New("theme does not exist")
 	}
 	ref, ok := theme.Ref()
 	if !ok {
@@ -86,16 +92,23 @@ func (m *Module) CheckThemeForUpdate(name string) (bool, string, string, error) 
 	if vcsURL == "" {
 		return false, ref, "", nil
 	}
-	remoteRef, err := pkg.GetLatestRef(vcsURL)
+	remoteRef, err := getLatestRef(vcsURL)
 	if err != nil {
 		return false, ref, "", err
 	}
 	if remoteRef == "" {
 		return false, ref, "", nil
 	}
-	return remoteRef == ref, ref, remoteRef, nil
+	return remoteRef != ref, ref, remoteRef, nil
+}
+
+type updatable interface {
+	UpdateThemeToRef(name, ref string) error
 }
 
 func (m *Module) UpdateTheme(name, ref string) error {
-	return m.themeStore.UpdateThemeToRef(name, ref)
+	if ts, ok := m.themeStore.(updatable); ok {
+		return ts.UpdateThemeToRef(name, ref)
+	}
+	return errors.New("theme store is not updatable")
 }

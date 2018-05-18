@@ -8,11 +8,13 @@ import (
 
 type DummyTemplateStore struct {
 	Themes map[string]*models.Theme
+	Refs   map[string]string
 }
 
 func New() *DummyTemplateStore {
 	return &DummyTemplateStore{
 		Themes: map[string]*models.Theme{},
+		Refs:   map[string]string{},
 	}
 }
 
@@ -38,7 +40,7 @@ func (d *DummyTemplateStore) Get(themeName string) (store.Theme, error) {
 	if theme == nil {
 		return nil, nil
 	}
-	return &Theme{Theme: theme}, nil
+	return &Theme{Theme: theme, ThemeRef: d.Refs[themeName]}, nil
 }
 
 func (d *DummyTemplateStore) GetAsset(asset string) (*models.ThemeAsset, error) {

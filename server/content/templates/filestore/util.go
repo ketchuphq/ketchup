@@ -61,8 +61,19 @@ func themeIterator(theme *models.Theme, iterFn func(fn string, el themeFile) err
 	return nil
 }
 
-// getLatestRef returns the latest ref for repo at repoPath
-func getLatestRef(repoPath string) (string, error) {
+func isVCS(repoPath string) (bool, error) {
+	_, err := git.PlainOpen(repoPath)
+	if err == git.ErrRepositoryNotExists {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+// getCurrentRef returns the current ref for repo at repoPath
+func getCurrentRef(repoPath string) (string, error) {
 	repo, err := git.PlainOpen(repoPath)
 	if err != nil {
 		return "", errors.Wrap(err)

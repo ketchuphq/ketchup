@@ -1,6 +1,7 @@
 package db
 
 import (
+	"fmt"
 	"io"
 	"os"
 
@@ -20,28 +21,11 @@ func (m *Module) registerExportCommand(c *service.Config) {
 		Keyword:    "db:export <output file>",
 		ShortUsage: "export pages and routes to file (as json)",
 		Run: func(ctx *service.CommandContext) {
-			var wr io.WriteCloser = os.Stdout
+			var path string
 			if len(ctx.Args) > 0 {
-				_, err := os.Stat(ctx.Args[0])
-				if err == nil {
-					panic("file already eists")
-				}
-				if !os.IsNotExist(err) {
-					panic(err)
-				}
-				f, err := os.OpenFile(ctx.Args[0], os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0666)
-				if err != nil {
-					panic(err)
-				}
-				wr = f
+				path = ctx.Args[0]
 			}
-
-			defer wr.Close()
-			e, err := m.Export()
-			if err != nil {
-				panic(err)
-			}
-			err = marshaler.Marshal(wr, e)
+			err := m.ExportToJSON(path)
 			if err != nil {
 				panic(err)
 			}
@@ -55,21 +39,53 @@ func (m *Module) registerImportCommand(c *service.Config) {
 		ShortUsage: "import pages and routes from file",
 		Run: func(ctx *service.CommandContext) {
 			ctx.RequireExactlyNArgs(1)
-			f, err := os.Open(ctx.Args[0])
-			if err != nil {
-				panic(err)
-			}
-			e := &export.Export{}
-			err = jsonpb.Unmarshal(f, e)
-			if err != nil {
-				panic(err)
-			}
-			err = m.Import(e)
+			err := m.importFromJSON(ctx.Args[0])
 			if err != nil {
 				panic(err)
 			}
 		},
 	})
+}
+
+func (m *Module) ExportToJSON(path string) error {
+	var wr io.WriteCloser = os.Stdout
+	if path != "" {
+		_, err := os.Stat(path)
+		if err == nil {
+			return fmt.Errorf("file already eists")
+		}
+		if !os.IsNotExist(err) {
+			return err
+		}
+		f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0666)
+		if err != nil {
+			return err
+		}
+		wr = f
+	}
+	defer wr.Close()
+	e, err := m.Export()
+	if err != nil {
+		return err
+	}
+	err = marshaler.Marshal(wr, e)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Module) importFromJSON(path string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	e := &export.Export{}
+	err = jsonpb.Unmarshal(f, e)
+	if err != nil {
+		return err
+	}
+	return m.Import(e)
 }
 
 // Export generates a dump of routes and routes
@@ -96,6 +112,7 @@ func (m *Module) Export() (*export.Export, error) {
 	return export, nil
 }
 
+// Import pages and routes from an Export object.
 func (m *Module) Import(export *export.Export) error {
 	for _, page := range export.GetPages() {
 		err := m.UpdatePage(page)

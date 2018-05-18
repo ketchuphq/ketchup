@@ -29,9 +29,9 @@ type Theme interface {
 	// Proto returns the underlying theme proto
 	Proto() *models.Theme
 
-	// GetTemplate returns the given template
+	// GetTemplate returns the given template. Return nil, nil if template does not exist.
 	GetTemplate(templateName string) (*models.ThemeTemplate, error)
 
-	// GetAsset returns the given asset
+	// GetAsset returns the given asset. Return nil, nil if asset does not exist.
 	GetAsset(assetName string) (*models.ThemeAsset, error)
 }

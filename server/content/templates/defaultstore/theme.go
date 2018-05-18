@@ -10,7 +10,7 @@ func (t *Theme) Ref() (string, bool) {
 }
 
 func (t *Theme) Proto() *models.Theme {
-	return noneTheme
+	return noneThemeNoData
 }
 
 func (t *Theme) GetTemplate(templateName string) (*models.ThemeTemplate, error) {

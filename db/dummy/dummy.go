@@ -2,11 +2,11 @@ package dummy
 
 import (
 	"io"
+	"sort"
 	"strconv"
 
 	"github.com/golang/protobuf/proto"
 
-	"github.com/ketchuphq/ketchup/db"
 	"github.com/ketchuphq/ketchup/proto/ketchup/api"
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 )
@@ -21,14 +21,13 @@ type DummyDB struct {
 	counter int
 }
 
-var _ db.Backend = &DummyDB{}
-
 func New() *DummyDB {
 	return &DummyDB{
 		Users:  map[string]*models.User{},
 		Pages:  map[string]*models.Page{},
 		Routes: map[string]*models.Route{},
 		Data:   map[string]*models.Data{},
+		Files:  map[string]*models.File{},
 	}
 }
 
@@ -86,11 +85,14 @@ func (d *DummyDB) DeletePage(p *models.Page) error {
 	return nil
 }
 
-func (d *DummyDB) ListPages(_ *api.ListPageRequest) ([]*models.Page, error) {
+func (d *DummyDB) ListPages(req *api.ListPageRequest) ([]*models.Page, error) {
 	pages := []*models.Page{}
 	for _, p := range d.Pages {
 		pages = append(pages, p)
 	}
+	sort.Slice(pages, func(i, j int) bool {
+		return pages[i].GetTitle() < pages[j].GetTitle()
+	})
 	return pages, nil
 }
 
@@ -121,6 +123,9 @@ func (d *DummyDB) ListRoutes(req *api.ListRouteRequest) ([]*models.Route, error)
 		}
 		routes = append(routes, r)
 	}
+	sort.Slice(routes, func(i, j int) bool {
+		return routes[i].GetPath() < routes[j].GetPath()
+	})
 	return routes, nil
 }
 
@@ -154,6 +159,9 @@ func (d *DummyDB) ListData() ([]*models.Data, error) {
 	for _, d := range d.Data {
 		data = append(data, d)
 	}
+	sort.Slice(data, func(i, j int) bool {
+		return data[i].GetKey() < data[j].GetKey()
+	})
 	return data, nil
 }
 
@@ -185,5 +193,8 @@ func (d *DummyDB) ListFiles() ([]*models.File, error) {
 	for _, file := range d.Files {
 		files = append(files, file)
 	}
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].GetName() < files[j].GetName()
+	})
 	return files, nil
 }
