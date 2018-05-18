@@ -1,7 +1,9 @@
 # Ketchup
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/ketchuphq/ketchup)](https://goreportcard.com/report/github.com/ketchuphq/ketchup)
 [![CircleCI](https://circleci.com/gh/ketchuphq/ketchup.svg?style=svg)](https://circleci.com/gh/ketchuphq/ketchup)
 [![Coverage Status](https://coveralls.io/repos/github/ketchuphq/ketchup/badge.svg?branch=master)](https://coveralls.io/github/ketchuphq/ketchup?branch=master)
+
 
 [Ketchup](https://ketchuphq.com) is a CMS that aims to be...
 
