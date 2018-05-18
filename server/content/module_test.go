@@ -10,15 +10,11 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/octavore/naga/service"
-	"github.com/octavore/nagax/logger"
 
-	"github.com/ketchuphq/ketchup/db"
-	dummydb "github.com/ketchuphq/ketchup/db/dummy"
+	"github.com/ketchuphq/ketchup/db/dummy"
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
-	"github.com/ketchuphq/ketchup/server/content/templates"
 	dummytmpl "github.com/ketchuphq/ketchup/server/content/templates/dummystore"
 	"github.com/ketchuphq/ketchup/server/content/templates/store"
-	"github.com/ketchuphq/ketchup/server/router"
 )
 
 var page = &models.Page{
@@ -47,19 +43,12 @@ var pageRoute = &models.Route{
 }
 
 func testModule() (*Module, func()) {
-	r := &router.Module{}
-	svc := service.New(r)
+	m := &Module{}
+	svc := service.New(m)
+	m.DB.Register(dummy.New())
 	stopper := svc.StartForTest()
-	return &Module{
-		Router: r,
-		Logger: &logger.Module{Logger: &logger.DefaultLogger{}},
-		DB: &db.Module{
-			Backend: dummydb.New(),
-		},
-		Templates: &templates.Module{
-			Stores: []store.ThemeStore{dummytmpl.New()},
-		},
-	}, stopper
+	m.Templates.Stores = []store.ThemeStore{dummytmpl.New()}
+	return m, stopper
 }
 
 func TestNotFound(t *testing.T) {
