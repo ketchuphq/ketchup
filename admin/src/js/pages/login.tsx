@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {User, UserContext} from 'components/auth';
 import Toaster from 'components/toaster';
 
 interface State {

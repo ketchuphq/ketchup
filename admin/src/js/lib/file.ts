@@ -1,7 +1,6 @@
 import * as API from 'lib/api';
 import {get as getRequest, post} from 'lib/requests';
 import * as Toaster from 'components/toaster';
-import {FileResponse} from './api';
 
 export function create(data: any): Promise<API.File> {
   return post('/api/v1/files', data, false)
