@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/octavore/nagax/util/errors"
 	"github.com/xenolf/lego/acme"
 )
 
@@ -21,11 +22,11 @@ var now = time.Now
 func (m *Module) saveCert(cert acme.CertificateResource) error {
 	b, err := json.MarshalIndent(cert, "", "  ")
 	if err != nil {
-		return err
+		return errors.Wrap(err)
 	}
 	err = ioutil.WriteFile(m.tlsDirPath(cert.Domain+".json"), b, 0600)
 	if err != nil {
-		return err
+		return errors.Wrap(err)
 	}
 
 	// we generate our own private key, so no need to save cert.PrivateKey
@@ -40,18 +41,18 @@ func (m *Module) LoadCertResource(domain string) (*acme.CertificateResource, err
 		return nil, nil
 	}
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err)
 	}
 
 	b, err := ioutil.ReadFile(certPath)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err)
 	}
 
 	cert := &acme.CertificateResource{}
 	err = json.Unmarshal(b, cert)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err)
 	}
 	return cert, nil
 }
@@ -72,7 +73,7 @@ func (m *Module) getNextRegistrationPath(domain string) (string, error) {
 	// trim [prefix]...[.json] to extract number
 	i, err := strconv.Atoi(strings.TrimPrefix(cur, prefix)[0:3])
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err)
 	}
 	filename := fmt.Sprintf("%s%03d.json", prefix, i+1)
 	return path.Join(m.Config.Config.DataDir, tlsDir, filename), nil
@@ -83,7 +84,7 @@ func (m *Module) GetAllRegisteredDomains() ([]string, error) {
 	g := path.Join(m.Config.Config.DataDir, tlsDir, "*-*-*-*-v*.json")
 	matches, err := filepath.Glob(g)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err)
 	}
 	sort.Strings(matches)
 	o := []string{}
@@ -109,7 +110,7 @@ func (m *Module) getCurrentRegistrationPath(domain string) (string, error) {
 	g := path.Join(m.Config.Config.DataDir, tlsDir, domain+"-*"+".json")
 	matches, err := filepath.Glob(g)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err)
 	}
 	if len(matches) == 0 {
 		return "", nil
@@ -122,11 +123,11 @@ func (m *Module) getCurrentRegistrationPath(domain string) (string, error) {
 func (m *Module) SaveRegistration(r *Registration) error {
 	b, err := json.MarshalIndent(r, "", "  ")
 	if err != nil {
-		return err
+		return errors.Wrap(err)
 	}
 	p, err := m.getNextRegistrationPath(r.Domain)
 	if err != nil {
-		return err
+		return errors.Wrap(err)
 	}
 	return ioutil.WriteFile(p, b, 0600)
 }
@@ -138,7 +139,7 @@ func (m *Module) GetRegistration(domain string, withPrivateKey bool) (*Registrat
 
 	p, err := m.getCurrentRegistrationPath(domain)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err)
 	}
 
 	b, err := ioutil.ReadFile(p)
@@ -146,12 +147,12 @@ func (m *Module) GetRegistration(domain string, withPrivateKey bool) (*Registrat
 		return nil, nil
 	}
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err)
 	}
 
 	err = json.Unmarshal(b, r)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err)
 	}
 	if !withPrivateKey {
 		return r, nil
