@@ -49,7 +49,16 @@ export class PrivateRoute extends React.Component<PrivateRouteProps> {
     if (user) {
       return <Route {...rest} render={(props) => <Komponent user={user} {...props} />} />;
     } else if (!userLoaded) {
-      return <Route {...rest} render={() => <Loader show />} />;
+      return (
+        <Route
+          {...rest}
+          render={() => (
+            <div style={{width: '100%'}}>
+              <Loader show />
+            </div>
+          )}
+        />
+      );
     } else {
       return (
         <Route

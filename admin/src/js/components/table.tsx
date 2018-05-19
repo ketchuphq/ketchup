@@ -1,7 +1,9 @@
 import * as React from 'react';
 import {Link} from 'react-router-dom';
 
-export const Table: React.SFC = (props) => <div className="table">{props.children}</div>;
+export const Table: React.SFC<{loading?: boolean}> = (props) => (
+  <div className={`table ${props.loading ? 'table-loading' : ''}`}>{props.children}</div>
+);
 
 export const Row: React.SFC<{center?: boolean}> = (props) => {
   let k = 'tr';

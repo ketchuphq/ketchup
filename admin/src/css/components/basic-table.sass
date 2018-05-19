@@ -21,6 +21,18 @@
   +basic-shadow
   padding: 10px
   border: 1px solid $slate6
+  &-loading
+    box-shadow: none
+    min-height: 100px
+    border: 1px solid $slate9
+    background: $slate9
+    animation-duration: 1.5s;
+    animation-iteration-count: infinite;
+    animation-name: pulse;
+    animation-timing-function: ease-in-out;
+    margin-bottom: 15px
+    *
+      display: none
   .tr
     border-top: 1px solid $slate9
     display: flex

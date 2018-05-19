@@ -1,8 +1,8 @@
-import {Loader} from 'components/loading';
+import Layout from 'components/layout';
+import {Table} from 'components/table';
 import Theme from 'lib/theme';
 import * as React from 'react';
 import {Link} from 'react-router-dom';
-import Layout from 'components/layout';
 
 interface State {
   themes: Theme[];
@@ -39,8 +39,7 @@ export default class ThemesPage extends React.Component<{}, State> {
         </header>
 
         <h2>Installed themes</h2>
-        <div className="table">
-          <Loader show={this.state.loading} />
+        <Table loading={this.state.loading}>
           {this.state.themes.map((theme) => {
             return (
               <Link key={theme.name} className="tr" to={`/themes/${theme.name}`}>
@@ -48,7 +47,7 @@ export default class ThemesPage extends React.Component<{}, State> {
               </Link>
             );
           })}
-        </div>
+        </Table>
       </Layout>
     );
   }

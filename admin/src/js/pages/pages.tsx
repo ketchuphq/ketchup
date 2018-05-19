@@ -1,5 +1,5 @@
 import Layout from 'components/layout';
-import {Loader} from 'components/loading';
+import {Table} from 'components/table';
 import * as API from 'lib/api';
 import * as Page from 'lib/page';
 import * as React from 'react';
@@ -62,8 +62,7 @@ export default class PagesPage extends React.Component<{}, State> {
           <span className="tab-divider">|</span>
           {tab('published')}
         </h2>
-        <div className="table">
-          <Loader show={this.state.loading} />
+        <Table loading={this.state.loading}>
           {this.state.pages.map((page) => {
             let status = null;
             let klass = '';
@@ -82,7 +81,7 @@ export default class PagesPage extends React.Component<{}, State> {
               </Link>
             );
           })}
-        </div>
+        </Table>
       </Layout>
     );
   }

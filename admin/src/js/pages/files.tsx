@@ -1,10 +1,11 @@
 import Layout from 'components/layout';
-import {Loader} from 'components/loading';
+import {LoadingTable} from 'components/loading';
+import {Table} from 'components/table';
 import * as API from 'lib/api';
 import * as File from 'lib/file';
+import {FileUpload} from 'pages/page/files';
 import * as React from 'react';
 import {Link} from 'react-router-dom';
-import {FileUpload} from 'pages/page/files';
 
 interface State {
   files: API.File[];
@@ -32,13 +33,11 @@ export default class FilesPage extends React.Component<{}, State> {
 
   render() {
     if (this.state.loading) {
-      <Layout className="files">
+      return <Layout className="files">
         <header>
           <h1>Files</h1>
         </header>
-        <div className="table">
-          <Loader show />
-        </div>
+        <LoadingTable />
       </Layout>;
     }
 
@@ -47,7 +46,7 @@ export default class FilesPage extends React.Component<{}, State> {
         <header>
           <h1>Files</h1>
         </header>
-        <div className="table">
+        <Table>
           {!this.state.loading && this.state.files.length == 0 ? (
             <div className="tr">No files uploaded yet. Drag a file in to upload.</div>
           ) : null}
@@ -65,7 +64,7 @@ export default class FilesPage extends React.Component<{}, State> {
               });
             }}
           />
-        </div>
+        </Table>
       </Layout>
     );
   }

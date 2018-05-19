@@ -1,5 +1,5 @@
 import Layout from 'components/layout';
-import {Loader} from 'components/loading';
+import {Loader, LoadingTable} from 'components/loading';
 import * as API from 'lib/api';
 import {get} from 'lib/requests';
 import TLSComponent from 'pages/settings/tls';
@@ -42,7 +42,7 @@ export default class SettingsPage extends React.Component<PrivateRouteComponentP
     const {settings} = this.state;
     let tlsSection;
     if (!settings) {
-      tlsSection = <Loader show />;
+      tlsSection = <LoadingTable />;
     } else if (Object.keys(settings).length == 0 || !settings.hasCertificate) {
       tlsSection = (
         <TLSNewComponent

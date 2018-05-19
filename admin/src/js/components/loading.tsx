@@ -8,3 +8,5 @@ export const Loader: React.SFC<{show: boolean; small?: boolean}> = (props) =>
       <div className="loading2" />
     </div>
   );
+
+export const LoadingTable: React.SFC = () => <div className="table table-loading" />;

@@ -1,9 +1,9 @@
-import * as React from 'react';
-import Data from 'lib/data';
-import {Loader} from 'components/loading';
-import {Editor} from 'components/content';
 import Button from 'components/button';
+import {Editor} from 'components/content';
 import Layout from 'components/layout';
+import {Table} from 'components/table';
+import Data from 'lib/data';
+import * as React from 'react';
 
 let defaultData = ['title'];
 
@@ -56,8 +56,7 @@ export default class DataPage extends React.Component<{}, State> {
         <header>
           <h1>Data</h1>
         </header>
-        <div className="table">
-          <Loader show={this.state.loading} />
+        <Table loading={this.state.loading}>
           {this.state.data.map((data) => (
             <div key={data.key} className="tr tr--center">
               <label>{data.key}</label>
@@ -69,7 +68,7 @@ export default class DataPage extends React.Component<{}, State> {
               Save
             </Button>
           </div>
-        </div>
+        </Table>
       </Layout>
     );
   }
