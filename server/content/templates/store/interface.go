@@ -1,9 +1,14 @@
 package store
 
 import (
+	"fmt"
+
 	"github.com/ketchuphq/ketchup/proto/ketchup/models"
 	"github.com/ketchuphq/ketchup/proto/ketchup/packages"
 )
+
+// ErrParsingConfig is returned when theme.json cannot be parsed
+var ErrParsingConfig = fmt.Errorf("error parsing theme.json")
 
 // ThemeStore is a interface to support multiple theme backends.
 type ThemeStore interface {

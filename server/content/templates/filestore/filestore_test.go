@@ -75,82 +75,95 @@ var testTheme = &models.Theme{
 
 func newForTest(t *testing.T) *FileStore {
 	dir, err := ioutil.TempDir("", "ketchup-filestore-test-")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	fs, err := New(dir, time.Hour, log.Println)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	return fs
 }
 
 func TestGet(t *testing.T) {
 	fs := newForTest(t)
 	err := fs.Add(testTheme)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	expected := store.StripData(testTheme)
 	expected.Templates["test-empty-engine.foo"].Engine = proto.String("foo")
 	theme, err := fs.Get(expected.GetName())
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, theme.Proto())
+}
+
+func TestGet__Invalid(t *testing.T) {
+	fs := newForTest(t)
+	dir := path.Join(fs.baseDir, "bad-theme")
+	assert.NoError(t, os.MkdirAll(dir, os.ModePerm))
+	assert.NoError(t,
+		ioutil.WriteFile(path.Join(dir, "theme.json"), []byte(`{
+			"name": 1
+		}`), os.ModePerm))
+
+	_, err := fs.Get("bad-theme")
+	assert.Error(t, err, store.ErrParsingConfig.Error())
 }
 
 func TestAddAndList(t *testing.T) {
 	fs := newForTest(t)
 
 	themes, err := fs.List()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Empty(t, themes)
 
 	err = fs.Add(testTheme)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	themes, err = fs.List()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, []*models.Theme{store.StripData(testTheme)}, themes)
 }
 
 func TestGetAsset(t *testing.T) {
 	fs := newForTest(t)
 	err := fs.Add(testTheme)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	asset, err := fs.GetAsset("fake")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Nil(t, asset)
 
 	expectedAsset := testTheme.Assets["app.js"]
 	// expectedAsset.SetTheme(testTheme.Name)
 
 	asset, err = fs.GetAsset("app.js")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expectedAsset, asset)
 }
 
 func TestUpdateThemeDirMap(t *testing.T) {
 	fs := newForTest(t)
 	err := fs.Add(testTheme)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Empty(t, fs.themeDirMap)
 
 	altName := "alt-theme-name"
 	oldPath := path.Join(fs.baseDir, testTheme.GetName())
 	newPath := path.Join(fs.baseDir, altName)
 	err = os.Rename(oldPath, newPath)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	// check that rename worked
 	expected := map[string]string{
 		testTheme.GetName(): altName,
 	}
 	err = fs.updateThemeDirMap()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, fs.themeDirMap)
 
 	// check that rename back works
 	err = os.Rename(newPath, oldPath)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	err = fs.updateThemeDirMap()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Empty(t, fs.themeDirMap)
 }

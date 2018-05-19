@@ -38,7 +38,7 @@ func readConfig(themeConfigPath string) (*models.Theme, error) {
 	}
 	err = jsonpb.Unmarshal(bytes.NewBuffer(b), t)
 	if err != nil {
-		return nil, errors.Wrap(err)
+		return nil, errors.New("filestore: error parsing theme.json (malformed?)")
 	}
 	return t, nil
 }

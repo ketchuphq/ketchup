@@ -17,9 +17,12 @@ import (
 // theme returns the thing
 func (m *Module) getTheme(name string) (store.Theme, error) {
 	for i := len(m.Stores) - 1; i > -1; i-- {
-		store := m.Stores[i]
-		theme, err := store.Get(name)
+		stre := m.Stores[i]
+		theme, err := stre.Get(name)
 		if err != nil {
+			if err.Error() == store.ErrParsingConfig.Error() {
+				continue
+			}
 			return theme, errors.Wrap(err)
 		}
 		if theme != nil {

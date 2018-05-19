@@ -36,11 +36,12 @@ var jpb = &jsonpb.Marshaler{
 type FileStore struct {
 	baseDir     string
 	themeDirMap map[string]string // maps theme name to dir
+	logger      func(args ...interface{})
 }
 
 // New returns a new file store which updates periodically
-func New(baseDir string, updateInterval time.Duration, log func(args ...interface{})) (*FileStore, error) {
-	f := &FileStore{baseDir: baseDir}
+func New(baseDir string, updateInterval time.Duration, logger func(args ...interface{})) (*FileStore, error) {
+	f := &FileStore{baseDir: baseDir, logger: logger}
 	err := os.MkdirAll(baseDir, 0700)
 	if err != nil {
 		return nil, err
@@ -53,7 +54,7 @@ func New(baseDir string, updateInterval time.Duration, log func(args ...interfac
 		for range time.Tick(updateInterval) {
 			err := f.updateThemeDirMap()
 			if err != nil {
-				log(err)
+				logger(errors.Wrap(err))
 			}
 		}
 	}()
@@ -76,7 +77,6 @@ func (f *FileStore) updateThemeDirMap() error {
 		themeConfigPath := path.Join(f.baseDir, fi.Name(), configFileName)
 		c, err := readConfig(themeConfigPath)
 		if err != nil {
-			// todo: log error
 			return errors.Wrap(err)
 		}
 		if c.GetName() != "" && fi.Name() != c.GetName() {
@@ -156,7 +156,8 @@ func (f *FileStore) Get(themeName string) (store.Theme, error) {
 	themeConfigPath := path.Join(f.baseDir, themeDir, configFileName)
 	t, err := readConfig(themeConfigPath)
 	if err != nil || t == nil {
-		return nil, nil
+		f.logger("error parsing theme config: ", themeDir, " ", err)
+		return nil, store.ErrParsingConfig
 	}
 
 	// get templates (todo: supported subdirs)
@@ -241,7 +242,7 @@ func (f *FileStore) List() ([]*models.Theme, error) {
 		theme := &models.Theme{}
 		err = jsonpb.Unmarshal(bytes.NewBuffer(b), theme)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err)
 		}
 		if theme.GetName() == "" {
 			dir := themeNameFromPath(p)
