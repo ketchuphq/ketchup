@@ -1,6 +1,5 @@
 import Button from 'components/button';
 import Layout from 'components/layout';
-import {Loader} from 'components/loading';
 import {ConfirmModalComponent, ModalComponent} from 'components/modal';
 import {LinkRow, Row, Table} from 'components/table';
 import * as API from 'lib/api';

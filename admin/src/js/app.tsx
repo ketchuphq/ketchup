@@ -18,6 +18,7 @@ import InstallThemePage from 'pages/install-theme';
 import * as WebFont from 'webfontloader';
 import {BrowserRouter as Router, Route as PublicRoute} from 'react-router-dom';
 import {getUser, User, UserContext, PrivateRoute as Route} from 'components/auth';
+import Toaster from 'components/toaster';
 
 interface State {
   user?: User;
@@ -46,9 +47,9 @@ class App extends React.Component<{}, State> {
       <UserContext.Provider value={this.state.user}>
         <Router basename="/admin">
           <div id="app">
+            <Toaster />
             <Route {...this.state} exact path="/" component={HomePage} />
             <PublicRoute path="/login" component={LoginPage} />
-            {/* <Route path="/routes" component={RoutesPage} /> */}
             <Route {...this.state} path="/pages" component={PagesPage} />
             <Route exact {...this.state} path="/files" component={FilesPage} />
             <Route {...this.state} path="/files/:id" component={FilePage} />

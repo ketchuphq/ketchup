@@ -1,5 +1,5 @@
 import Layout from 'components/layout';
-import {Loader, LoadingTable} from 'components/loading';
+import {LoadingTable} from 'components/loading';
 import * as API from 'lib/api';
 import {get} from 'lib/requests';
 import TLSComponent from 'pages/settings/tls';
