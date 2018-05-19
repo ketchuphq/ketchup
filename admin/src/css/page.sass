@@ -1,9 +1,9 @@
 .page-max
-  min-height: 100%
+  position: absolute
   top: 0
   left: 0
   right: 0
-  position: absolute
+  bottom: 0
   padding: 15px
   background: white
   .page-editor
@@ -64,19 +64,26 @@
       margin-top: 0
 
 .page-max__controls
-  > .button
-    position: relative
-    top: -6px
-    margin-right: 12px
-
-.page-max__controls, .page-editor__icons
   position: fixed
   top: 10px
   right: 10px
+  background: rgba(255,255,255,0.9)
+  border-radius: 5px
+  justify-content: space-between
+  align-items: center
+  line-height: 1
+  padding: 0 15px
   z-index: 10
+  display: flex
+
+  > .button
+    position: relative
+    margin-right: 12px
   span.typcn, a.typcn
-    font-size: 42px
     +transition(color)
+    position: relative
+    top: -2px
+    font-size: 42px
     color: $slate8
     text-decoration: none
     cursor: pointer

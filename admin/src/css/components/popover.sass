@@ -1,6 +1,7 @@
 .popover-outer
   display: inline
   position: relative
+  z-index: 10
   &-hidden
     display: none
   .popover
@@ -9,7 +10,8 @@
     animation: fadeIn 0.3s
     padding: 15px
     position: absolute
-    right: -15px
+    top: 24px
+    right: 0
     border: 1px solid $slate8
     background: white
     width: 300px
