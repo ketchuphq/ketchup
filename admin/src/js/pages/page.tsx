@@ -30,7 +30,6 @@ export default class PagePage extends React.Component<
 
   pageStore: Page.Store;
   routesStore: GenericStore<Data<API.Route[]>>;
-  initialContent: API.Content[];
   pageRef: React.RefObject<HTMLDivElement>;
 
   constructor(props: PrivateRouteComponentProps<{id: string}>) {
@@ -57,14 +56,9 @@ export default class PagePage extends React.Component<
 
     // when a page is updated, we need to make sure we process the new
     // theme and template
-    let initial = true;
     this.pageStore.subscribe('index', (page) => {
       return this.fetchThemeTemplate(page.theme, page.template).then(() => {
-        if (!this.state.page || initial) {
-          this.initialContent = cloneDeep(page.contents);
-        }
         this.setState({page: page});
-        initial = false;
       });
     });
   }
@@ -148,8 +142,7 @@ export default class PagePage extends React.Component<
     }
     this.setState((prev) => {
       let dirty =
-        prev.dirty ||
-        !isEqual(this.initialContent, this.state.page.contents) ||
+        this.pageStore.hasChanges() ||
         !isEqual(this.routesStore.obj.initial, this.routesStore.obj.current);
       let showLeaveModal = dirty || prev.showLeaveModal;
       return {dirty, showLeaveModal, nextRoute: !showLeaveModal};

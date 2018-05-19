@@ -3,6 +3,8 @@ import * as API from 'lib/api';
 import {serialize} from 'lib/params';
 import {get, post} from 'lib/requests';
 import GenericStore from 'lib/store';
+import cloneDeep from 'lodash-es/cloneDeep';
+import isEqual from 'lodash-es/isEqual';
 
 const dateHumanFormat = 'MMM Do, h:mma';
 
@@ -28,18 +30,32 @@ const defaultPage: API.Page = {
 };
 
 export class Store extends GenericStore<API.Page> {
+  initialContent: API.Content[];
+
   constructor(obj?: API.Page) {
     super(API.Page.copy, obj);
+    this.setInitialContent();
   }
 
   get page() {
     return this.obj;
   }
 
+  private setInitialContent() {
+    if (!this.obj) {
+      return;
+    }
+    this.initialContent = cloneDeep(this.obj.contents);
+  }
+
   get(uuid: string): Promise<API.Page> {
     return get(`/api/v1/pages/${uuid}`)
       .then((res) => res.json())
-      .then((page: API.Page) => this.set(page));
+      .then((page: API.Page) => {
+        this.set(page);
+        this.setInitialContent();
+        return page;
+      });
   }
 
   save(): Promise<API.Page> {
@@ -47,8 +63,13 @@ export class Store extends GenericStore<API.Page> {
       .then((res) => res.json())
       .then((page: API.Page) => {
         this.set(page);
+        this.setInitialContent();
         return page;
       });
+  }
+
+  hasChanges() {
+    return !isEqual(this.initialContent, this.obj.contents);
   }
 
   // updateContent updates the page contents by iterating over page contents
