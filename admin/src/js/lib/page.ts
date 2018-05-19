@@ -162,7 +162,7 @@ export function deletePage(page: API.Page): Promise<Response> {
 }
 
 export function isPublished(page: API.Page) {
-  return page.publishedAt != null;
+  return page && page.publishedAt != null;
 }
 
 export function formattedCreatedAt(page: API.Page) {

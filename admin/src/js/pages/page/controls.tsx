@@ -1,14 +1,14 @@
 import Popover from 'components/popover';
 import * as API from 'lib/api';
 import * as Page from 'lib/page';
+import GenericStore, {Data} from 'lib/store';
 import PageButtonsComponent from 'pages/page/buttons';
+import PageEditRoutesComponent from 'pages/page/edit_route';
 import PageSaveButtonComponent from 'pages/page/save_button';
 import PageThemePickerComponent from 'pages/page/theme_picker';
-import PageEditRoutesComponent from 'pages/page/edit_route';
 import * as React from 'react';
-import GenericStore, {Data} from 'lib/store';
 
-interface ControlsProps {
+interface Props {
   store: Page.Store;
   routesStore: GenericStore<Data<API.Route[]>>;
   toggleSettings: () => void;
@@ -16,15 +16,59 @@ interface ControlsProps {
   leave: () => void;
 }
 
-export default class PageControls extends React.Component<ControlsProps, {}> {
+interface State {
+  route?: string;
+  published: boolean;
+}
+
+export default class PageControls extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    let route;
+    let routes = this.props.routesStore.obj.initial;
+    if (routes.length > 0) {
+      route = routes[0].path;
+    }
+    this.state = {
+      route,
+      published: Page.isPublished(this.props.store.page),
+    };
+  }
+
+  componentDidMount() {
+    this.props.store.subscribe('page-controls', (page) => {
+      this.setState({
+        published: Page.isPublished(page),
+      });
+    });
+
+    this.props.routesStore.subscribe('page-controls', (data) => {
+      let routes = data.initial;
+      if (routes.length > 0) {
+        this.setState({
+          route: routes[0].path,
+        });
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    this.props.store.unsubscribe('page-controls');
+    this.props.routesStore.unsubscribe('page-controls');
+  }
+
   render() {
     const stores = {
       store: this.props.store,
       routesStore: this.props.routesStore,
     };
+
     return (
       <div className="page-max__controls">
         <PageSaveButtonComponent {...stores} />
+        {this.state.route && this.state.published ? (
+          <a className="typcn typcn-link" href={this.state.route} target="_blank" />
+        ) : null}
         <span className="typcn typcn-cog" onClick={() => this.props.toggleSettings()} />
         <Popover visible={this.props.showSettings}>
           <div className="controlset">
