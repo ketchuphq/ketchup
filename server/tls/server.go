@@ -27,7 +27,7 @@ func (m *Module) loadTLSConfig() (*tls.Config, error) {
 	m.Logger.Infof("loading certs from %s", glob)
 	matches, err := filepath.Glob(glob)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err)
 	}
 	if len(matches) == 0 {
 		return nil, nil
@@ -40,7 +40,7 @@ func (m *Module) loadTLSConfig() (*tls.Config, error) {
 			if os.IsNotExist(err) {
 				continue
 			}
-			return nil, err
+			return nil, errors.Wrap(err)
 		}
 		m.Logger.Infof("found certs %s %s", keyFile, crtFile)
 		tlsConfig.Certificates = append(tlsConfig.Certificates, cert)

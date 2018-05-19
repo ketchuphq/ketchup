@@ -29,9 +29,9 @@ func (m *Module) CreateContentMap(page *models.Page) (contentMap, error) {
 		contents[c.GetKey()], err = content.RenderContent(c)
 		if err != nil {
 			if errors.IsType(err, content.ErrUnknownContentType{}) {
-				m.Logger.Error(err)
+				m.Logger.Errorf("content: unknown type: %v", err)
 			}
-			return nil, err
+			return nil, errors.Wrap(err)
 		}
 	}
 	return contents, err

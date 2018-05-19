@@ -51,7 +51,7 @@ func (m *Module) GetTLS(rw http.ResponseWriter, req *http.Request, par router.Pa
 	}
 	crt, err := m.tls.LoadCertResource(domain)
 	if err != nil {
-		m.Logger.Error(err)
+		m.Logger.Error(errors.Wrap(err))
 	}
 	res := &api.TLSSettingsResponse{
 		TlsEmail:       &r.Email,

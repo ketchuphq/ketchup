@@ -10,6 +10,7 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/octavore/naga/service"
 	"github.com/octavore/nagax/logger"
+	"github.com/octavore/nagax/util/errors"
 
 	"github.com/ketchuphq/ketchup/db"
 	"github.com/ketchuphq/ketchup/server/config"
@@ -51,7 +52,7 @@ func (m *Module) Init(c *service.Config) {
 			go func() {
 				err := m.WriteBackup()
 				if err != nil {
-					m.Logger.Error(err)
+					m.Logger.Error(errors.Wrap(err))
 				}
 			}()
 		}
