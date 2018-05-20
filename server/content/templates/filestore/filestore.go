@@ -155,9 +155,13 @@ func (f *FileStore) Get(themeName string) (store.Theme, error) {
 
 	themeConfigPath := path.Join(f.baseDir, themeDir, configFileName)
 	t, err := readConfig(themeConfigPath)
-	if err != nil || t == nil {
-		f.logger("error parsing theme config: ", themeDir, " ", err)
+	if err != nil {
+		f.logger("error parsing theme config: ", themeConfigPath, " ", err)
 		return nil, store.ErrParsingConfig
+	}
+	if t == nil {
+		// not found
+		return nil, nil
 	}
 
 	// get templates (todo: supported subdirs)
