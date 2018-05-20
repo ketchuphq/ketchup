@@ -10,6 +10,7 @@ import isEqual from 'lodash-es/isEqual';
 import PageControls from 'pages/page/controls';
 import PageEditorsComponent from 'pages/page/editors';
 import * as React from 'react';
+let store = require('store/dist/store.modern') as StoreJsAPI;
 
 interface State {
   page: API.Page;
@@ -18,6 +19,7 @@ interface State {
   dirty: boolean;
   showSettings: boolean;
   showLeaveModal: boolean;
+  showPreview: boolean;
   pageUUID: string;
   nextRoute: boolean;
 }
@@ -49,6 +51,7 @@ export default class PagePage extends React.Component<
       dirty: false,
       showSettings: false,
       showLeaveModal: false,
+      showPreview: store.get('showPreview', false),
       pageUUID: props.match.params.id,
       nextRoute: false,
     };
@@ -111,6 +114,13 @@ export default class PagePage extends React.Component<
     this.setState({showSettings: !this.state.showSettings});
   };
 
+  togglePreview = () => {
+    this.setState((prev) => {
+      store.set('showPreview', !prev.showPreview);
+      return {showPreview: !prev.showPreview};
+    });
+  };
+
   // fetchThemeTemplate fetches the Theme from the backend
   // Note: this gets called in the page update callback.
   fetchThemeTemplate = (themeName: string, templateName: string): Promise<void> => {
@@ -167,7 +177,7 @@ export default class PagePage extends React.Component<
             e.target.classList.contains('page-max') &&
             this._clickStart &&
             this._clickStart.contains('page-max');
-          if (validClick) {
+          if (validClick && !this.state.showPreview) {
             this.confirmLeave();
           }
         }}
@@ -177,11 +187,12 @@ export default class PagePage extends React.Component<
           store={this.pageStore}
           routesStore={this.routesStore}
           toggleSettings={this.toggleSettings}
+          togglePreview={this.togglePreview}
           showSettings={this.state.showSettings}
           leave={this.confirmLeave}
         />
-        <div className="page-editor">
-          <div className="controls">
+        <div className={`page-editor ${this.state.showPreview ? 'page-editor--previews' : ''}`}>
+          <div className="controls controls--title">
             <input
               type="text"
               className="large"
@@ -195,7 +206,10 @@ export default class PagePage extends React.Component<
               }}
             />
           </div>
-          <PageEditorsComponent contents={this.state.page.contents} />
+          <PageEditorsComponent
+            showPreview={this.state.showPreview}
+            contents={this.state.page.contents}
+          />
         </div>
         <ConfirmModalComponent
           title="You are about to leave this page"

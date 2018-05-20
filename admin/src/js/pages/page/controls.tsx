@@ -12,6 +12,7 @@ interface Props {
   store: Page.Store;
   routesStore: GenericStore<Data<API.Route[]>>;
   toggleSettings: () => void;
+  togglePreview: () => void;
   showSettings: boolean;
   leave: () => void;
 }
@@ -26,7 +27,7 @@ export default class PageControls extends React.Component<Props, State> {
     super(props);
     let route;
     let routes = this.props.routesStore.obj.initial;
-    if (routes.length > 0) {
+    if (routes && routes.length > 0) {
       route = routes[0].path;
     }
     this.state = {
@@ -69,6 +70,7 @@ export default class PageControls extends React.Component<Props, State> {
         {this.state.route && this.state.published ? (
           <a className="typcn typcn-link" href={this.state.route} target="_blank" />
         ) : null}
+        <span className="typcn typcn-zoom" onClick={() => this.props.togglePreview()} />
         <span className="typcn typcn-cog" onClick={() => this.props.toggleSettings()} />
         <Popover visible={this.props.showSettings}>
           <div className="controlset">

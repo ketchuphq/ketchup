@@ -10,6 +10,37 @@
     animation: zoomOut 0.3s ease-in-out 0.1s
     max-width: $pageEditorWidth
     margin: 15px auto
+    &--previews
+      max-width: 100%
+      margin-top: 0
+      .page-editors
+        display: flex
+      .preview-left
+        flex: 1
+        margin-right: 35px
+        overflow: hidden
+      .preview-right
+        flex: 1
+        &__inner
+          position: fixed
+          top: 60px
+          bottom: 15px
+          left: 50%
+          right: 15px
+          .preview-note
+            text-align: right
+            font-size: $fontSize0
+            height: 25px
+          .content-preview
+            +basic-shadow
+            background: white
+            height: calc(100% - 55px)
+            iframe
+              height: 100%
+              width: 100%
+              outline: none
+              border: none
+
     input[type=text]
       background: none
     input[type=text].large
@@ -96,3 +127,8 @@
     bottom: 10px
     .popover
       bottom: 50px
+  .preview-left
+    padding: 0
+    margin-right: 0
+  .preview-right
+    display: none
