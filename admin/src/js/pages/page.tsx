@@ -4,7 +4,6 @@ import * as API from 'lib/api';
 import * as Page from 'lib/page';
 import Route from 'lib/route';
 import GenericStore, {Data} from 'lib/store';
-import Theme from 'lib/theme';
 import cloneDeep from 'lodash-es/cloneDeep';
 import isEqual from 'lodash-es/isEqual';
 import PageControls from 'pages/page/controls';
@@ -13,9 +12,9 @@ import * as React from 'react';
 let store = require('store/dist/store.modern') as StoreJsAPI;
 
 interface State {
-  page: API.Page;
-  theme: string;
-  template: API.ThemeTemplate;
+  pageTitle?: string;
+  contents?: API.Content[];
+
   dirty: boolean;
   showSettings: boolean;
   showLeaveModal: boolean;
@@ -45,9 +44,6 @@ export default class PagePage extends React.Component<
       {}
     );
     this.state = {
-      page: null,
-      theme: null,
-      template: null,
       dirty: false,
       showSettings: false,
       showLeaveModal: false,
@@ -56,14 +52,6 @@ export default class PagePage extends React.Component<
       nextRoute: false,
     };
     this.pageRef = React.createRef();
-
-    // when a page is updated, we need to make sure we process the new
-    // theme and template
-    this.pageStore.subscribe('index', (page) => {
-      return this.fetchThemeTemplate(page.theme, page.template).then(() => {
-        this.setState({page: page});
-      });
-    });
   }
 
   componentDidMount() {
@@ -108,6 +96,17 @@ export default class PagePage extends React.Component<
         current: [{}],
       });
     }
+
+    this.pageStore.subscribe('page-index', (page) => {
+      this.setState({
+        pageTitle: page.title,
+        contents: page.contents,
+      });
+    });
+  }
+
+  componentWillUnmount() {
+    this.pageStore.unsubscribe('page-index');
   }
 
   toggleSettings = () => {
@@ -119,30 +118,6 @@ export default class PagePage extends React.Component<
       store.set('showPreview', !prev.showPreview);
       return {showPreview: !prev.showPreview};
     });
-  };
-
-  // fetchThemeTemplate fetches the Theme from the backend
-  // Note: this gets called in the page update callback.
-  fetchThemeTemplate = (themeName: string, templateName: string): Promise<void> => {
-    if (themeName == this.state.theme && templateName == this.state.template.name) {
-      return Promise.resolve();
-    }
-    return Theme.get(themeName).then(
-      ({theme}) => {
-        let template = Theme.getTemplate(theme, templateName);
-        this.setState({theme: themeName, template});
-      },
-      () => {
-        if (themeName == 'none' && templateName == 'html') {
-          return;
-        }
-        // catch deleted theme
-        return Theme.get('none').then(({theme}) => {
-          let template = Theme.getTemplate(theme, templateName);
-          this.pageStore.setThemeTemplate(theme, template);
-        });
-      }
-    );
   };
 
   confirmLeave = () => {
@@ -160,7 +135,7 @@ export default class PagePage extends React.Component<
   };
 
   render() {
-    if (!this.state.page) {
+    if (!this.pageStore.page) {
       return <div ref={this.pageRef} />;
     }
 
@@ -197,7 +172,7 @@ export default class PagePage extends React.Component<
               type="text"
               className="large"
               placeholder="title..."
-              value={this.state.page.title || ''}
+              value={this.state.pageTitle || ''}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 e.preventDefault();
                 this.pageStore.update((page) => {
@@ -208,7 +183,7 @@ export default class PagePage extends React.Component<
           </div>
           <PageEditorsComponent
             showPreview={this.state.showPreview}
-            contents={this.state.page.contents}
+            contents={this.state.contents}
           />
         </div>
         <ConfirmModalComponent

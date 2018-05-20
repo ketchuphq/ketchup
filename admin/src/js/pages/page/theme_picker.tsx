@@ -2,6 +2,7 @@ import * as React from 'react';
 import {Loader} from 'components/loading';
 import Theme from 'lib/theme';
 import * as Page from 'lib/page';
+import * as API from 'lib/api';
 
 interface Props {
   store: Page.Store;
@@ -12,49 +13,45 @@ interface State {
   ready: boolean;
   templates: string[];
 
-  selectedTheme: string;
-  selectedTemplate: string;
+  selectedTheme?: API.Theme;
+  selectedTemplate?: string;
 }
 
 export default class ThemePickerComponent extends React.Component<Props, State> {
-  themeSelectRef: React.RefObject<HTMLSelectElement>;
-  templateSelectRef: React.RefObject<HTMLSelectElement>;
+  // themes fetched with List are incomplete, so we fetch themes individually,
+  // and cached them here
+  fullThemes: {[themeName: string]: API.Theme};
 
   constructor(props: Props) {
     super(props);
-    const store = props.store;
     this.state = {
       themes: [],
       templates: [],
       ready: false,
-      selectedTheme: store.page.theme,
-      selectedTemplate: store.page.template,
     };
-
-    this.themeSelectRef = React.createRef();
-    this.templateSelectRef = React.createRef();
+    this.fullThemes = {};
   }
 
   componentDidMount() {
     const store = this.props.store;
-    // get all the themes
-    Theme.list()
-      .then((themes) => {
-        this.setState({themes});
-        return this.selectTheme(store.page.theme, store.page.template);
-      })
-      .then(() => {
-        this.templateSelectRef.current.value = this.state.selectedTemplate;
-        this.themeSelectRef.current.value = this.state.selectedTheme;
-      })
-      .then(() => this.setState({ready: true}), () => this.setState({ready: true}));
+
+    // get the selected theme
+    let getPromise = this.selectTheme(store.page.theme, store.page.template);
+
+    // list all the themes to populate the dropdown
+    let listPromise = Theme.list().then((themes) => {
+      this.setState({themes});
+    });
+
+    // mark as ready when both get and list are done
+    Promise.all([getPromise, listPromise]).then(
+      () => this.setState({ready: true}),
+      () => this.setState({ready: true})
+    );
 
     // subscribe to page changes
     store.subscribe('theme-picker', (page) => {
-      this.setState({
-        selectedTheme: page.theme,
-        selectedTemplate: page.template,
-      });
+      this.selectTheme(page.theme, page.template);
     });
   }
 
@@ -62,20 +59,32 @@ export default class ThemePickerComponent extends React.Component<Props, State> 
     this.props.store.unsubscribe('theme-picker');
   }
 
-  selectTheme(name: string, template?: string) {
-    return Theme.get(name).then(({theme}) => {
-      let templates = Object.keys(theme.templates).sort();
-      this.setState({templates});
-      this.props.store.setThemeTemplate(theme, Theme.getTemplate(theme, template || templates[0]));
-    });
-  }
+  selectTheme(themeName: string, templateName?: string) {
+    const page = this.props.store.page;
+    return Promise.resolve(this.fullThemes[themeName])
+      .then((theme) => {
+        if (theme) {
+          return theme;
+        }
+        return Theme.get(themeName).then(({theme}) => {
+          this.fullThemes[theme.name] = theme;
+          return theme;
+        });
+      })
+      .then((theme) => {
+        let templates = Object.keys(theme.templates).sort();
+        let template = Theme.getTemplate(theme, templateName || templates[0]);
+        this.setState({
+          selectedTheme: theme,
+          selectedTemplate: template.name,
+          templates,
+        });
 
-  selectTemplate(template: string) {
-    this.state.themes.map((theme) => {
-      if (theme.name == this.state.selectedTheme) {
-        this.props.store.setThemeTemplate(theme, Theme.getTemplate(theme, template));
-      }
-    });
+        // update page if different
+        if (page.theme != themeName || page.template != templateName) {
+          this.props.store.setThemeTemplate(theme, template);
+        }
+      });
   }
 
   render() {
@@ -87,6 +96,7 @@ export default class ThemePickerComponent extends React.Component<Props, State> 
         <div className="control">
           <div className="label">Theme</div>
           <select
+            defaultValue={this.state.selectedTheme.name}
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
               this.selectTheme(e.target.value);
             }}
@@ -102,8 +112,9 @@ export default class ThemePickerComponent extends React.Component<Props, State> 
         <div className="control">
           <div className="label">Template</div>
           <select
+            defaultValue={this.state.selectedTemplate}
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-              this.selectTemplate(e.target.value);
+              this.selectTheme(this.state.selectedTheme.name, e.target.value);
             }}
           >
             {this.state.templates.map((template: string) => (
