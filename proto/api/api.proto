@@ -137,3 +137,7 @@ message UpdateThemeRequest {
     optional string name = 1; // extracted from URL
     optional string ref = 2;
 }
+
+message PreviewContentRequest {
+    optional ketchup.models.Content content = 1;
+}
