@@ -153,7 +153,7 @@ function formatAuthor(author: API.PackageAuthor) {
   let authorID = author.name || author.email || author.github;
   if (author.github) {
     return (
-      <a key={authorID} href={`https://github.com/${author.github}`}>
+      <a target="_blank" key={authorID} href={`https://github.com/${author.github}`}>
         {authorID}
       </a>
     );
@@ -182,7 +182,9 @@ class PackageSection extends React.PureComponent<PackageProps> {
         <Row key={'theme-homepage'}>
           <div>Homepage</div>
           <div>
-            <a href={pkg.homepage}>{pkg.homepage}</a>
+            <a target="_blank" href={pkg.homepage}>
+              {pkg.homepage}
+            </a>
           </div>
         </Row>
       );
