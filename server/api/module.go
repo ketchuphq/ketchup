@@ -85,7 +85,10 @@ func (m *Module) Init(c *service.Config) {
 				return reflect.ValueOf(v)
 			})
 		auth := m.Auth.Auth.MustWithAuth
-		routes := []struct {
+
+		// THESE ROUTES ARE PUBLIC
+		// todo: fine-grained toggle
+		publicRoutes := []struct {
 			path, method string
 			handle       router2.Handle
 		}{
@@ -95,44 +98,53 @@ func (m *Module) Init(c *service.Config) {
 			{"/api/v1/data/:key", methodGet, m.GetData},
 			{"/api/v1/pages", methodGet, m.ListPages},
 			{"/api/v1/routes", methodGet, m.ListRoutes},
-			{"/api/v1/data", methodGet, auth(m.ListData)},
-
-			{"/api/v1/user", methodGet, auth(m.GetUser)},
-			{"/api/v1/settings/info", methodGet, auth(m.GetInfo)},
-			{"/api/v1/settings/tls", methodGet, auth(m.GetTLS)},
-			{"/api/v1/settings/tls", methodPost, auth(m.EnableTLS)},
-
-			{"/api/v1/themes", methodGet, auth(m.ListThemes)},
-			{"/api/v1/themes/:name", methodGet, auth(m.GetTheme)},
-			{"/api/v1/themes/:name/updates", methodGet, auth(m.CheckThemeForUpdate)},
-			{"/api/v1/themes/:name/update", methodPost, auth(m.UpdateTheme)},
-			{"/api/v1/themes/:name/templates/:template", methodGet, auth(m.GetTemplate)},
-			{"/api/v1/theme-registry", methodGet, auth(m.ThemeRegistry)},
-			{"/api/v1/theme-install", methodPost, auth(m.InstallTheme)},
-
-			{"/api/v1/pages", methodPost, auth(m.UpdatePage)},
-			{"/api/v1/pages/:uuid", methodDelete, auth(m.DeletePage)},
-			{"/api/v1/pages/:uuid/routes", methodPost, auth(m.UpdateRoutesByPage)},
-			{"/api/v1/pages/:uuid/publish", methodPost, auth(m.PublishPage)},
-			{"/api/v1/pages/:uuid/unpublish", methodPost, auth(m.UnpublishPage)},
-
-			{"/api/v1/routes", methodPost, auth(m.UpdateRoute)},
-			{"/api/v1/routes/:uuid", methodDelete, auth(m.DeleteRoute)},
-
-			{"/api/v1/data", methodPost, auth(m.UpdateData)},
-			{"/api/v1/data/:key", methodDelete, auth(m.DeleteData)},
-
-			{"/api/v1/files", methodGet, auth(m.ListFiles)},
-			{"/api/v1/files", methodPost, auth(m.UploadFile)},
-			{"/api/v1/files/:uuid", methodGet, auth(m.GetFile)},
-			{"/api/v1/files/:uuid", methodDelete, auth(m.DeleteFile)},
-
-			{"/api/v1/download-backup", methodGet, auth(m.GetBackup)},
-			{"/api/v1/debug", methodGet, auth(m.Debug)},
-			{"/api/v1/logout", methodGet, auth(m.Logout)},
 		}
-		for _, route := range routes {
+		for _, route := range publicRoutes {
 			m.Router.WrappedHandle(route.method, route.path, route.handle)
+		}
+
+		privateRoutes := []struct {
+			path, method string
+			handle       router2.Handle
+		}{
+			{"/api/v1/data", methodGet, m.ListData},
+
+			{"/api/v1/user", methodGet, m.GetUser},
+			{"/api/v1/settings/info", methodGet, m.GetInfo},
+			{"/api/v1/settings/tls", methodGet, m.GetTLS},
+			{"/api/v1/settings/tls", methodPost, m.EnableTLS},
+
+			{"/api/v1/themes", methodGet, m.ListThemes},
+			{"/api/v1/themes/:name", methodGet, m.GetTheme},
+			{"/api/v1/themes/:name/updates", methodGet, m.CheckThemeForUpdate},
+			{"/api/v1/themes/:name/update", methodPost, m.UpdateTheme},
+			{"/api/v1/themes/:name/templates/:template", methodGet, m.GetTemplate},
+			{"/api/v1/theme-registry", methodGet, m.ThemeRegistry},
+			{"/api/v1/theme-install", methodPost, m.InstallTheme},
+
+			{"/api/v1/pages", methodPost, m.UpdatePage},
+			{"/api/v1/pages/:uuid", methodDelete, m.DeletePage},
+			{"/api/v1/pages/:uuid/routes", methodPost, m.UpdateRoutesByPage},
+			{"/api/v1/pages/:uuid/publish", methodPost, m.PublishPage},
+			{"/api/v1/pages/:uuid/unpublish", methodPost, m.UnpublishPage},
+
+			{"/api/v1/routes", methodPost, m.UpdateRoute},
+			{"/api/v1/routes/:uuid", methodDelete, m.DeleteRoute},
+
+			{"/api/v1/data", methodPost, m.UpdateData},
+			{"/api/v1/data/:key", methodDelete, m.DeleteData},
+
+			{"/api/v1/files", methodGet, m.ListFiles},
+			{"/api/v1/files", methodPost, m.UploadFile},
+			{"/api/v1/files/:uuid", methodGet, m.GetFile},
+			{"/api/v1/files/:uuid", methodDelete, m.DeleteFile},
+
+			{"/api/v1/download-backup", methodGet, m.GetBackup},
+			{"/api/v1/debug", methodGet, m.Debug},
+			{"/api/v1/logout", methodGet, m.Logout},
+		}
+		for _, route := range privateRoutes {
+			m.Router.WrappedHandle(route.method, route.path, auth(route.handle))
 		}
 		return nil
 	}
