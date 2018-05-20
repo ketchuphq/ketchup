@@ -486,6 +486,17 @@ export abstract class CheckThemeForUpdateResponse {
   }
 }
 
+export abstract class PreviewContentRequest {
+  content?: Content;
+  static copy(from: PreviewContentRequest, to?: PreviewContentRequest): PreviewContentRequest {
+    to = to || {};
+    if ('content' in from) {
+      to.content = Content.copy(from.content || {}, to.content || {});
+    }
+    return to;
+  }
+}
+
 export abstract class Error {
   code?: number;
   title?: ErrorCode;

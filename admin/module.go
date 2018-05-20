@@ -29,6 +29,12 @@ func (m *Module) Init(c *service.Config) {
 	c.Setup = func() error {
 		m.Router.Root.Handle(basePath, m)
 		m.Router.Root.HandleFunc("/admin/logout", m.handleLogout)
+		m.Router.Root.HandleFunc("/admin/preview", func(rw http.ResponseWriter, req *http.Request) {
+			err := m.Auth.MustWithAuth(m.handlePreview)(rw, req, nil)
+			if err != nil {
+				m.Router.HandleError(rw, req, err)
+			}
+		})
 		return nil
 	}
 }

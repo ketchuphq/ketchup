@@ -58,6 +58,7 @@ func main() {
 		api.InstallThemeRequest{},
 		api.UpdateThemeRequest{},
 		api.CheckThemeForUpdateResponse{},
+		api.PreviewContentRequest{},
 
 		router_api.Error{},
 		router_api.ErrorResponse{},

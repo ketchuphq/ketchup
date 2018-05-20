@@ -1,12 +1,12 @@
-import * as React from 'react';
 import * as API from 'lib/api';
+import * as React from 'react';
 
 interface Props {
   readonly content: API.Content;
   readonly short?: boolean;
 }
 
-export default class CodeMirrorComponent extends React.Component<Props> {
+export default class CodeMirrorComponent extends React.PureComponent<Props> {
   codemirror: CodeMirror.Editor;
   textInput: React.RefObject<HTMLTextAreaElement>;
   constructor(props: Props) {

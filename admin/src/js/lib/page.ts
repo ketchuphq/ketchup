@@ -123,7 +123,7 @@ export class Store extends GenericStore<API.Page> {
     this.update((page) => {
       page.theme = theme.name;
       page.template = template.name;
-      page.contents = pageContents.concat(placeholderContents);
+      page.contents = cloneDeep(pageContents.concat(placeholderContents));
     });
   }
 
