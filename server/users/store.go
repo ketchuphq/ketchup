@@ -39,8 +39,9 @@ type tokenStore struct {
 	logger.Logger
 }
 
-func (t *tokenStore) Get(token string) *string {
-	user, err := t.GetUserByToken(token)
+// Get a user based on their API token
+func (t *tokenStore) Get(apiToken string) *string {
+	user, err := t.GetUserByToken(apiToken)
 	if err != nil {
 		t.Logger.Warningf("error fetching token: %v", err)
 		return nil
