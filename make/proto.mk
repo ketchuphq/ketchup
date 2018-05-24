@@ -18,5 +18,5 @@ protos-list:
 	@echo $(PROTO_FILES) | tr " " "\n"
 
 prepare-protos:
-	brew install grpc/grpc/google-protobuf
+	brew install protobuf
 	go get -u github.com/octavore/protobuf/protoc-gen-go-2
