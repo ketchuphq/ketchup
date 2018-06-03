@@ -143,6 +143,7 @@ A brief run through of the things without which this project would not exist:
 - Added `/admin/logout` endpoint for logging out.
 - Increased server test coverage significantly.
 - Fixed [#11](https://github.com/ketchuphq/ketchup/issues/11)
+- 0.3.1 - Fixed [blank compose page](https://github.com/ketchuphq/ketchup/issues/13)
 
 ### 0.2.0 - Tranquil Themes
 
