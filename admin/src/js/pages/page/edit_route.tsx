@@ -12,19 +12,19 @@ interface EditorState {
 }
 
 class RouteEditor extends React.Component<EditorProps, EditorState> {
-  readonly originalPath: string;
+  readonly storeKey: string;
   constructor(props: EditorProps) {
     super(props);
     this.state = {
       path: this.getRoute().path || '',
     };
-    this.originalPath = this.state.path;
+    this.storeKey = this.state.path || 'new-path';
   }
 
   getRoute = () => this.props.routesStore.obj.current[this.props.index];
 
   componentDidMount() {
-    this.props.routesStore.subscribe(this.originalPath, (data) => {
+    this.props.routesStore.subscribe(this.storeKey, (data) => {
       this.setState({
         path: data.current[this.props.index].path || '',
       });
@@ -32,7 +32,7 @@ class RouteEditor extends React.Component<EditorProps, EditorState> {
   }
 
   componentWillUnmount() {
-    this.props.routesStore.unsubscribe(this.originalPath);
+    this.props.routesStore.unsubscribe(this.storeKey);
   }
 
   render() {
