@@ -196,6 +196,9 @@ func (f *FileStore) Get(themeName string) (store.Theme, error) {
 
 	baseAssetDir := path.Clean(path.Join(f.baseDir, themeDir, fileStoreAssetsDir))
 	err = filepath.Walk(baseAssetDir, func(p string, info os.FileInfo, err error) error {
+		if os.IsNotExist(err) {
+			return nil
+		}
 		if err != nil {
 			return errors.Wrap(err)
 		}
