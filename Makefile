@@ -19,9 +19,9 @@ build-%:
 	     -asmflags=-trimpath=$$GOPATH \
 	     .
 
-release: goreleaser.yml
+release: goreleaser.yml admin
 	goreleaser
-release-nr: goreleaser.yml
+release-nr: goreleaser.yml admin
 	goreleaser --skip-publish
 goreleaser.yml:
 	@cat ./goreleaser.yml.tmpl \
