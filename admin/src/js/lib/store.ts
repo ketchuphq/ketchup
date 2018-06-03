@@ -35,7 +35,12 @@ export default class GenericStore<T> {
 
   protected notify() {
     Object.keys(this.subscribers).map((key) => {
-      this.subscribers[key](this.obj);
+      // check that the subscriber exists, because we may have removed
+      // the subscriber concurrently
+      let callback = this.subscribers[key];
+      if (callback) {
+        callback(this.obj);
+      }
     });
   }
 }
