@@ -55,6 +55,14 @@ export default class PagePage extends React.Component<
   }
 
   componentDidMount() {
+    // must subscribe to page store events before triggering events
+    this.pageStore.subscribe('page-index', (page) => {
+      this.setState({
+        pageTitle: page.title,
+        contents: page.contents,
+      });
+    });
+
     // handle animations
     this.pageRef.current.addEventListener('mousedown', (e: any) => {
       this._clickStart = e.target.classList;
@@ -96,13 +104,6 @@ export default class PagePage extends React.Component<
         current: [{}],
       });
     }
-
-    this.pageStore.subscribe('page-index', (page) => {
-      this.setState({
-        pageTitle: page.title,
-        contents: page.contents,
-      });
-    });
   }
 
   componentWillUnmount() {
