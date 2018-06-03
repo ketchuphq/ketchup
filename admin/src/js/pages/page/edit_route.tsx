@@ -65,7 +65,7 @@ export default class PageEditRoutesComponent extends React.Component<Props, Stat
   constructor(props: Props) {
     super(props);
     this.state = {routes: []};
-    this.props.routesStore.subscribe('edit_route', (data) => {
+    this.props.routesStore.subscribe('edit-route', (data) => {
       this.setState({routes: data.current});
     });
   }
@@ -77,7 +77,7 @@ export default class PageEditRoutesComponent extends React.Component<Props, Stat
   }
 
   componentWillUnmount() {
-    this.props.routesStore.unsubscribe('edit_route');
+    this.props.routesStore.unsubscribe('edit-route');
   }
 
   render() {

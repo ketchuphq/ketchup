@@ -15,13 +15,13 @@ export default class Toaster extends React.Component {
 
 class ToastList extends React.Component<{}, {toasts: Toast[]}> {
   componentWillMount() {
-    ToastStore.subscribe('ToastList', (toasts) => {
+    ToastStore.subscribe('toast-list', (toasts) => {
       this.setState({toasts});
     });
   }
 
   componentWillUnmount() {
-    ToastStore.unsubscribe('ToastList');
+    ToastStore.unsubscribe('toast-list');
   }
 
   render() {
